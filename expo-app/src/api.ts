@@ -69,7 +69,7 @@ export const api = {
   referral: () => request<Referral>("/api/referral"),
 };
 
-export const money = (n: number, c = "$") => {
+export const money = (n: number, c = "₹") => {
   const neg = n < 0; const a = Math.abs(n);
   return (neg ? "-" : "") + c + a.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };

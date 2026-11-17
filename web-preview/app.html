@@ -407,7 +407,7 @@
       <div class="hdr-wallet">
         <button class="hw-main" id="balPill" type="button">
           <span class="hw-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="18" height="13" rx="2.5"/><path d="M16 13h2"/><path d="M3 9.5h15a2 2 0 012 2"/></svg></span>
-          <span class="hw-text"><span class="hw-label" data-t="balance">Balance</span><span class="hw-amt num" id="balTop">$70.00</span></span>
+          <span class="hw-text"><span class="hw-label" data-t="balance">Balance</span><span class="hw-amt num" id="balTop">₹70.00</span></span>
         </button>
         <button class="hw-add" id="addBtn" type="button" aria-label="Add money"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
       </div>
@@ -441,7 +441,7 @@
 
       <div class="stat-row">
         <div class="stat"><div class="n v num">128K</div><div class="c" data-t="stat1">Verified players</div></div>
-        <div class="stat"><div class="n g num">$4.2M</div><div class="c" data-t="stat2">Prizes paid</div></div>
+        <div class="stat"><div class="n g num">₹4.2M</div><div class="c" data-t="stat2">Prizes paid</div></div>
         <div class="stat"><div class="n b num">36K</div><div class="c" data-t="stat3">Matches today</div></div>
         <div class="stat"><div class="n y num">90s</div><div class="c" data-t="stat4">Avg. payout</div></div>
       </div>
@@ -485,12 +485,12 @@
         <div class="label" data-t="play_mode">Mode</div>
         <div class="play-modes" id="playModes" style="margin-top:8px"></div>
         <div class="label" data-t="play_stake">Entry fee (stake)</div>
-        <div class="amt-box"><span>$</span><input id="playAmt" type="number" inputmode="decimal" min="1" step="1" value="20"></div>
+        <div class="amt-box"><span>₹</span><input id="playAmt" type="number" inputmode="decimal" min="1" step="1" value="20"></div>
         <div class="chips" id="playChips"></div>
         <div class="payout-tiles">
-          <div class="pt"><div class="pt-k" data-t="pp_pot">Prize pot</div><div class="pt-v num" id="ppPot">$40.00</div></div>
-          <div class="pt win"><div class="pt-k" data-t="pp_win">Winner gets 95%</div><div class="pt-v num" id="ppWin">$38.00</div></div>
-          <div class="pt"><div class="pt-k" data-t="pp_comm">Platform fee 5%</div><div class="pt-v num" id="ppComm">$2.00</div></div>
+          <div class="pt"><div class="pt-k" data-t="pp_pot">Prize pot</div><div class="pt-v num" id="ppPot">₹40.00</div></div>
+          <div class="pt win"><div class="pt-k" data-t="pp_win">Winner gets 95%</div><div class="pt-v num" id="ppWin">₹38.00</div></div>
+          <div class="pt"><div class="pt-k" data-t="pp_comm">Platform fee 5%</div><div class="pt-v num" id="ppComm">₹2.00</div></div>
         </div>
         <div class="err" id="playErr"></div>
         <button class="btn btn-accent btn-block btn-lg" id="findBtn" style="margin-top:14px" data-t="play_find">Create match &amp; find opponent</button>
@@ -503,10 +503,10 @@
       <div class="page-head"><h1 data-t="w_title">Wallet</h1><p data-t="w_sub">Demo money — shows exactly how the real wallet behaves.</p></div>
       <div class="wallet-hero">
         <div class="label" data-t="w_total">Total balance</div>
-        <div class="big num" id="wTotal">$70.00</div>
+        <div class="big num" id="wTotal">₹70.00</div>
         <div class="wallet-split">
-          <div class="wsplit"><div class="k" data-t="w_dep">Deposit balance</div><div class="v dep num" id="wDep">$50.00</div></div>
-          <div class="wsplit"><div class="k" data-t="w_win">Winnings (withdrawable)</div><div class="v win num" id="wWin">$20.00</div></div>
+          <div class="wsplit"><div class="k" data-t="w_dep">Deposit balance</div><div class="v dep num" id="wDep">₹50.00</div></div>
+          <div class="wsplit"><div class="k" data-t="w_win">Winnings (withdrawable)</div><div class="v win num" id="wWin">₹20.00</div></div>
         </div>
       </div>
       <div class="wallet-actions">
@@ -524,13 +524,13 @@
       <div class="page-head"><h1 data-t="d_title">Add money</h1><p data-t="d_sub">Top up your deposit balance to join matches.</p></div>
       <div class="card">
         <div class="label" data-t="d_amount">Amount</div>
-        <div class="amt-box"><span>$</span><input id="depAmt" type="number" inputmode="decimal" min="5" step="1" value="50"></div>
+        <div class="amt-box"><span>₹</span><input id="depAmt" type="number" inputmode="decimal" min="5" step="1" value="50"></div>
         <div class="chips" id="depChips"></div>
         <div class="label" style="margin-top:20px" data-t="d_method">Payment method</div>
         <div class="methods" id="depMethods"></div>
         <div class="err" id="depErr"></div>
         <button class="btn btn-green btn-block btn-lg" id="depBtn" style="margin-top:16px" data-t="d_btn">Add money securely</button>
-        <p class="hint" data-t="d_hint">Min $5. Demo only — no real payment is taken. Production routes to a licensed payment partner.</p>
+        <p class="hint" data-t="d_hint">Min ₹5. Demo only — no real payment is taken. Production routes to a licensed payment partner.</p>
       </div>
       <div class="card" style="margin-top:14px"><h3 style="font-size:15px;margin-bottom:10px" data-t="dr_title">Deposit rules</h3><ul class="mini-rules" id="depRules"></ul></div>
     </section>
@@ -540,14 +540,14 @@
       <div class="page-head"><h1 data-t="wd_title">Withdraw</h1><p data-t="wd_sub">Cash out your winnings to your account.</p></div>
       <div class="card">
         <div style="display:flex;align-items:center;justify-content:space-between"><div class="label" data-t="wd_avail">Withdrawable balance</div><span class="kyc-badge">✓ <span data-t="w_kyc">KYC verified</span></span></div>
-        <div class="big num" style="font-family:var(--font-display);font-weight:800;font-size:30px;color:var(--green);margin-top:4px" id="wdAvail">$20.00</div>
+        <div class="big num" style="font-family:var(--font-display);font-weight:800;font-size:30px;color:var(--green);margin-top:4px" id="wdAvail">₹20.00</div>
         <div class="label" style="margin-top:18px" data-t="d_amount">Amount</div>
-        <div class="amt-box"><span>$</span><input id="wdAmt" type="number" inputmode="decimal" min="10" step="1" value="20"></div>
+        <div class="amt-box"><span>₹</span><input id="wdAmt" type="number" inputmode="decimal" min="10" step="1" value="20"></div>
         <button class="chip" id="wdMax" style="margin-top:10px" data-t="wd_max">Withdraw all</button>
         <div class="field"><span class="label" data-t="wd_dest">Pay out to</span><div class="payout-card" id="payoutCard"></div></div>
         <div class="err" id="wdErr"></div>
         <button class="btn btn-accent btn-block btn-lg" id="wdBtn" style="margin-top:16px" data-t="wd_btn">Request withdrawal</button>
-        <p class="hint" data-t="wd_hint">Min $10. Only winnings are withdrawable. Deposits must be played first. Payouts usually settle within minutes.</p>
+        <p class="hint" data-t="wd_hint">Min ₹10. Only winnings are withdrawable. Deposits must be played first. Payouts usually settle within minutes.</p>
       </div>
       <div class="card" style="margin-top:14px"><h3 style="font-size:15px;margin-bottom:10px" data-t="wr_title">Withdrawal rules</h3><ul class="mini-rules" id="wdRules"></ul></div>
     </section>
@@ -557,12 +557,12 @@
       <div class="page-head"><h1 data-t="r_title">Refer &amp; earn</h1><p data-t="r_sub">Earn 1% of everything your friends play — for life.</p></div>
       <div class="ref-hero">
         <div class="label" style="color:rgba(255,255,255,.85)" data-t="r_earned">Your referral earnings</div>
-        <div class="big num" id="rEarn">$3.00</div>
+        <div class="big num" id="rEarn">₹3.00</div>
         <div class="code-box"><span class="code" id="rCode">LUDORA-7K2X</span><button id="rCopy" type="button" data-t="r_copy">Copy link</button></div>
       </div>
       <div class="ref-stats">
         <div class="rstat"><div class="v v num" id="rFriends">3</div><div class="k" data-t="r_friends">Friends</div></div>
-        <div class="rstat"><div class="v b num" id="rVol">$300</div><div class="k" data-t="r_vol">Their volume</div></div>
+        <div class="rstat"><div class="v b num" id="rVol">₹300</div><div class="k" data-t="r_vol">Their volume</div></div>
         <div class="rstat"><div class="v g" id="rRate">3%</div><div class="k" data-t="r_rate">Commission</div></div>
       </div>
       <div class="content-sec" style="margin-top:14px">
@@ -574,7 +574,7 @@
         </ul>
       </div>
       <div class="card" style="margin-top:14px"><h3 style="font-size:16px;margin-bottom:6px" data-t="r_friends_t">Your referred friends</h3><div id="friendList"></div></div>
-      <button class="btn btn-accent btn-block" id="simBtn" style="margin-top:14px" data-t="r_sim">Simulate a friend playing $50</button>
+      <button class="btn btn-accent btn-block" id="simBtn" style="margin-top:14px" data-t="r_sim">Simulate a friend playing ₹50</button>
     </section>
 
     <!-- RULES -->
@@ -601,7 +601,7 @@
         <div class="pf-stat"><div class="v" id="pfPlayed">0</div><div class="k" data-t="pf_played">Played</div></div>
         <div class="pf-stat"><div class="v g" id="pfWon">0</div><div class="k" data-t="pf_wins">Wins</div></div>
         <div class="pf-stat"><div class="v v" id="pfRate">0%</div><div class="k" data-t="pf_rate">Win rate</div></div>
-        <div class="pf-stat"><div class="v y" id="pfEarn">$0</div><div class="k" data-t="pf_earn">Total won</div></div>
+        <div class="pf-stat"><div class="v y" id="pfEarn">₹0</div><div class="k" data-t="pf_earn">Total won</div></div>
       </div>
       <div class="pf-links">
         <button class="pf-link" data-go="matchhist"><span class="ic1">🎮</span><span data-t="pf_matches">Match history</span><span class="chev">›</span></button>
@@ -747,9 +747,9 @@
       s3t:"Play in Ludo King", s3p:"Use the shared room code to play in the Ludo King app.",
       s4t:"Report & get paid", s4p:"The winner reports the result and gets 95% of the pot.",
       cta_h:"Ready to play for real?", cta_p:"Your first match is waiting. New players get a risk-free first game.", cta_btn:"Start playing",
-      mode1_t:"1v1 Duel", mode1_p:"Head-to-head, best of three. Fastest to finish wins.", mode1_s:"$1 – $500",
-      mode2_t:"4-Player Royale", mode2_p:"Four players, one board, winner takes most.", mode2_s:"$2 – $250",
-      mode3_t:"Tournaments", mode3_p:"Scheduled brackets, guaranteed prize pools.", mode3_s:"from $5",
+      mode1_t:"1v1 Duel", mode1_p:"Head-to-head, best of three. Fastest to finish wins.", mode1_s:"₹1 – ₹500",
+      mode2_t:"4-Player Royale", mode2_p:"Four players, one board, winner takes most.", mode2_s:"₹2 – ₹250",
+      mode3_t:"Tournaments", mode3_p:"Scheduled brackets, guaranteed prize pools.", mode3_s:"from ₹5",
       mode4_t:"Private table", mode4_p:"Make a room, share the code, play friends.", mode4_s:"Custom",
       live:"Live", soon:"Soon",
       play_title:"Play", play_sub:"Pick a mode and stake. We'll find you an opponent.", play_create:"＋ Create match", play_live:"Live matches", play_openm:"Open to join", back:"← Back", entry:"entry",
@@ -760,7 +760,7 @@
       w_title:"Wallet", w_sub:"Demo money — shows exactly how the real wallet behaves.",
       w_total:"Total balance", w_dep:"Deposit balance", w_win:"Winnings", w_add:"Add money", w_recent:"Recent activity", w_kyc:"KYC verified",
       d_title:"Add money", d_sub:"Top up your deposit balance to join matches.", d_amount:"Amount", d_method:"Payment method",
-      d_btn:"Add money securely", d_hint:"Minimum $5. This is a demo — no real money is charged.", dr_title:"Deposit rules", wr_title:"Withdrawal rules",
+      d_btn:"Add money securely", d_hint:"Minimum ₹5. This is a demo — no real money is charged.", dr_title:"Deposit rules", wr_title:"Withdrawal rules",
       pay_now:"Pay", pay_confirm:"Confirm withdrawal", pay_done_btn:"Done",
       pay_card_h:"Card details", pay_cardnum:"Card number", pay_exp:"Expiry", pay_cvv:"CVV", pay_name:"Name on card",
       pay_bank_h:"Net banking", pay_bank_note:"You'll be securely redirected to your bank to approve this payment.",
@@ -771,7 +771,7 @@
       pay_done_d:"Payment successful", pay_done_w:"Withdrawal requested", pay_credited:"added to your wallet", pay_sent:"on its way to your account",
       err_card:"Enter a valid card number.", err_exp:"Enter expiry as MM/YY.", err_cvv:"Enter the 3-digit CVV.", err_cname:"Enter the name on the card.", err_upiid:"Enter a valid UPI ID.", err_pin:"Enter your UPI PIN.",
       wd_title:"Withdraw", wd_sub:"Cash out your winnings to your account.", wd_avail:"Withdrawable balance", wd_max:"Withdraw all", wd_dest:"Pay out to",
-      wd_btn:"Request withdrawal", wd_hint:"Minimum $10. You can withdraw your deposit and winnings. Payouts take a few minutes.",
+      wd_btn:"Request withdrawal", wd_hint:"Minimum ₹10. You can withdraw your deposit and winnings. Payouts take a few minutes.",
       upi_title:"Payout UPI accounts", upi_addlbl:"Add a UPI ID", upi_verify:"Verify", upi_verifying:"Verifying…", upi_added:"UPI verified & saved",
       upi_change:"Change", upi_verified:"Verified", upi_default:"Default", upi_add:"Add a UPI ID",
       upi_err:"Enter a valid UPI ID, like name@bank.", upi_dup:"That UPI ID is already saved.", err_noupi:"Add a verified UPI account first.",
@@ -785,7 +785,7 @@
       m_upi:"UPI", m_upi_d:"Instant · GPay, PhonePe, Paytm", m_card:"Card", m_card_d:"Visa, Mastercard, RuPay", m_bank:"Bank transfer", m_bank_d:"Net banking · 1–2 min",
       tx_dep:"Money added", tx_wd:"Withdrawal", tx_ref:"Referral commission (3%)", tx_win:"Match won", tx_stake:"Stake locked",
       via:"via", to:"to", from:"from", played:"played", fr_won:"won", today:"Today", yday:"Yesterday", dago:"d ago",
-      err_min_d:"Minimum deposit is $5.", err_min_w:"Minimum withdrawal is $10.", err_over:"Amount exceeds your withdrawable balance.", err_dest:"Enter a UPI ID or bank account.", err_bal:"Not enough balance. Add funds first.",
+      err_min_d:"Minimum deposit is ₹5.", err_min_w:"Minimum withdrawal is ₹10.", err_over:"Amount exceeds your withdrawable balance.", err_dest:"Enter a UPI ID or bank account.", err_bal:"Not enough balance. Add funds first.",
       t_added:"Added", t_wd:"Withdrawal requested", t_copied:"Referral link copied!", t_ref:"Referral commission credited!",
       matching:"Finding an opponent…", won:"You won!", lost:"You lost", won_sub:"You win the pot. We keep a 5% fee.", lost_sub:"Your opponent won this one.",
       mr_waiting:"Finding an opponent…", mr_cancel:"Cancel & refund", mr_found:"Opponent found!", mr_vs:"vs", mr_pot:"pot",
@@ -827,9 +827,9 @@
       s3t:"लूडो किंग में खेलें", s3p:"शेयर किए रूम कोड से लूडो किंग ऐप में खेलें।",
       s4t:"नतीजा दें और पैसे पाएं", s4p:"विजेता नतीजा दर्ज करता है और पॉट का 95% पाता है।",
       cta_h:"असली के लिए खेलने को तैयार?", cta_p:"आपका पहला मैच इंतज़ार कर रहा है। नए खिलाड़ियों को रिस्क-फ्री पहला गेम मिलता है।", cta_btn:"खेलना शुरू करें",
-      mode1_t:"1v1 डुएल", mode1_p:"आमने-सामने, बेस्ट ऑफ़ थ्री। सबसे पहले पूरा करने वाला जीते।", mode1_s:"$1 – $500",
-      mode2_t:"4-प्लेयर रॉयल", mode2_p:"चार खिलाड़ी, एक बोर्ड, विजेता को सबसे ज़्यादा।", mode2_s:"$2 – $250",
-      mode3_t:"टूर्नामेंट", mode3_p:"निर्धारित ब्रैकेट, गारंटीड इनाम राशि।", mode3_s:"$5 से",
+      mode1_t:"1v1 डुएल", mode1_p:"आमने-सामने, बेस्ट ऑफ़ थ्री। सबसे पहले पूरा करने वाला जीते।", mode1_s:"₹1 – ₹500",
+      mode2_t:"4-प्लेयर रॉयल", mode2_p:"चार खिलाड़ी, एक बोर्ड, विजेता को सबसे ज़्यादा।", mode2_s:"₹2 – ₹250",
+      mode3_t:"टूर्नामेंट", mode3_p:"निर्धारित ब्रैकेट, गारंटीड इनाम राशि।", mode3_s:"₹5 से",
       mode4_t:"प्राइवेट टेबल", mode4_p:"रूम बनाएं, कोड शेयर करें, दोस्तों से खेलें।", mode4_s:"कस्टम",
       live:"लाइव", soon:"जल्द ही",
       play_title:"खेलें", play_sub:"एक मोड और स्टेक चुनें। हम आपको प्रतिद्वंद्वी ढूँढ देंगे।", play_create:"＋ मैच बनाएं", play_live:"लाइव मैच", play_openm:"जॉइन के लिए खुले", back:"← वापस", entry:"एंट्री",
@@ -840,7 +840,7 @@
       w_title:"वॉलेट", w_sub:"डेमो पैसा — दिखाता है कि असली वॉलेट कैसे काम करेगा।",
       w_total:"कुल बैलेंस", w_dep:"जमा बैलेंस", w_win:"जीत", w_add:"पैसे जोड़ें", w_recent:"हाल की गतिविधि", w_kyc:"KYC सत्यापित",
       d_title:"पैसे जोड़ें", d_sub:"मैच जॉइन करने के लिए अपना जमा बैलेंस बढ़ाएं।", d_amount:"राशि", d_method:"भुगतान का तरीका",
-      d_btn:"सुरक्षित रूप से पैसे जोड़ें", d_hint:"न्यूनतम $5। यह डेमो है — कोई असली पैसा नहीं कटता।", dr_title:"जमा नियम", wr_title:"निकासी नियम",
+      d_btn:"सुरक्षित रूप से पैसे जोड़ें", d_hint:"न्यूनतम ₹5। यह डेमो है — कोई असली पैसा नहीं कटता।", dr_title:"जमा नियम", wr_title:"निकासी नियम",
       pay_now:"भुगतान करें", pay_confirm:"निकासी की पुष्टि करें", pay_done_btn:"हो गया",
       pay_card_h:"कार्ड विवरण", pay_cardnum:"कार्ड नंबर", pay_exp:"एक्सपायरी", pay_cvv:"CVV", pay_name:"कार्ड पर नाम",
       pay_bank_h:"नेट बैंकिंग", pay_bank_note:"इस भुगतान को मंज़ूरी देने के लिए आपको सुरक्षित रूप से आपके बैंक पर भेजा जाएगा।",
@@ -851,7 +851,7 @@
       pay_done_d:"भुगतान सफल", pay_done_w:"निकासी का अनुरोध किया गया", pay_credited:"आपके वॉलेट में जोड़ा गया", pay_sent:"आपके खाते में भेजा जा रहा है",
       err_card:"मान्य कार्ड नंबर दर्ज करें।", err_exp:"एक्सपायरी MM/YY में दर्ज करें।", err_cvv:"3-अंकीय CVV दर्ज करें।", err_cname:"कार्ड पर नाम दर्ज करें।", err_upiid:"मान्य UPI ID दर्ज करें।", err_pin:"अपना UPI पिन दर्ज करें।",
       wd_title:"निकासी", wd_sub:"अपनी जीत अपने खाते में निकालें।", wd_avail:"निकासी योग्य बैलेंस", wd_max:"सब निकालें", wd_dest:"भुगतान यहाँ भेजें",
-      wd_btn:"निकासी का अनुरोध करें", wd_hint:"न्यूनतम $10। आप अपनी जमा और जीत निकाल सकते हैं। भुगतान कुछ मिनट लेता है।",
+      wd_btn:"निकासी का अनुरोध करें", wd_hint:"न्यूनतम ₹10। आप अपनी जमा और जीत निकाल सकते हैं। भुगतान कुछ मिनट लेता है।",
       upi_title:"निकासी UPI खाते", upi_addlbl:"UPI ID जोड़ें", upi_verify:"सत्यापित करें", upi_verifying:"सत्यापित हो रहा है…", upi_added:"UPI सत्यापित और सहेजा गया",
       upi_change:"बदलें", upi_verified:"सत्यापित", upi_default:"डिफ़ॉल्ट", upi_add:"UPI ID जोड़ें",
       upi_err:"मान्य UPI ID दर्ज करें, जैसे name@bank।", upi_dup:"यह UPI ID पहले से सहेजी है।", err_noupi:"पहले एक सत्यापित UPI खाता जोड़ें।",
@@ -865,7 +865,7 @@
       m_upi:"UPI", m_upi_d:"तुरंत · GPay, PhonePe, Paytm", m_card:"कार्ड", m_card_d:"Visa, Mastercard, RuPay", m_bank:"बैंक ट्रांसफ़र", m_bank_d:"नेट बैंकिंग · 1–2 मिनट",
       tx_dep:"पैसे जोड़े", tx_wd:"निकासी", tx_ref:"रेफ़रल कमीशन (3%)", tx_win:"मैच जीता", tx_stake:"स्टेक लॉक",
       via:"के ज़रिए", to:"को", from:"से", played:"ने खेला", fr_won:"जीते", today:"आज", yday:"कल", dago:" दिन पहले",
-      err_min_d:"न्यूनतम जमा $5 है।", err_min_w:"न्यूनतम निकासी $10 है।", err_over:"राशि आपके निकासी योग्य बैलेंस से अधिक है।", err_dest:"UPI ID या बैंक खाता दर्ज करें।", err_bal:"बैलेंस पर्याप्त नहीं। पहले फंड जोड़ें।",
+      err_min_d:"न्यूनतम जमा ₹5 है।", err_min_w:"न्यूनतम निकासी ₹10 है।", err_over:"राशि आपके निकासी योग्य बैलेंस से अधिक है।", err_dest:"UPI ID या बैंक खाता दर्ज करें।", err_bal:"बैलेंस पर्याप्त नहीं। पहले फंड जोड़ें।",
       t_added:"जोड़ा गया", t_wd:"निकासी का अनुरोध किया गया", t_copied:"रेफ़रल लिंक कॉपी हो गया!", t_ref:"रेफ़रल कमीशन जोड़ा गया!",
       matching:"प्रतिद्वंद्वी ढूँढ रहे हैं…", won:"आप जीते!", lost:"आप हारे", won_sub:"आप पॉट जीतते हैं। हम 5% फीस लेते हैं।", lost_sub:"इस बार प्रतिद्वंद्वी जीता।",
       mr_waiting:"प्रतिद्वंद्वी ढूँढ रहे हैं…", mr_cancel:"रद्द करें और रिफंड लें", mr_found:"प्रतिद्वंद्वी मिल गया!", mr_vs:"बनाम", mr_pot:"पॉट",
@@ -897,8 +897,8 @@
       {h:"Playing a match", items:["Create a match with an entry fee, or join an open one.","Both players' stakes are held safely in one pot.","Open Ludo King and play the match using the shared room code.","When it ends, report who won. We verify, then pay the winner."]},
       {h:"Winning & payout", items:["The winner receives 95% of the pot.","The platform fee is 5% of the pot.","4-Player Royale: the single winner takes 95% of the full pot."]},
       {h:"Stakes & refunds", items:["If no opponent joins, your stake is refunded in full.","Leaving or disconnecting mid-match counts as a forfeit — your opponent wins.","On a forfeit, the 5% platform fee still applies."]},
-      {h:"Deposit rules", items:["Minimum deposit is $5. You can set a daily or monthly deposit limit.","Deposits are added instantly through a licensed partner — UPI, card or bank.","Your money is held in a segregated account, separate from company funds.","Deposit balance is used to join matches, and can also be withdrawn.","If a payment fails or stays pending, it is reversed within 24 hours."]},
-      {h:"Withdrawal rules", items:["Minimum withdrawal is $10.","You can withdraw both your deposit balance and your winnings.","Complete KYC (age and identity) before your first withdrawal.","Withdrawals go only to a UPI account verified against your KYC name.","Match winnings are paid out only after the result is verified.","Payouts usually settle within minutes; large amounts may be reviewed first."]},
+      {h:"Deposit rules", items:["Minimum deposit is ₹5. You can set a daily or monthly deposit limit.","Deposits are added instantly through a licensed partner — UPI, card or bank.","Your money is held in a segregated account, separate from company funds.","Deposit balance is used to join matches, and can also be withdrawn.","If a payment fails or stays pending, it is reversed within 24 hours."]},
+      {h:"Withdrawal rules", items:["Minimum withdrawal is ₹10.","You can withdraw both your deposit balance and your winnings.","Complete KYC (age and identity) before your first withdrawal.","Withdrawals go only to a UPI account verified against your KYC name.","Match winnings are paid out only after the result is verified.","Payouts usually settle within minutes; large amounts may be reviewed first."]},
       {h:"Referral", items:["Share your referral code with friends.","Earn 3% of your friends' winnings, for life — paid only when they win.","Commission is paid to your withdrawable balance."]},
       {h:"Fair conduct", items:["One account per person.","No collusion or chip-dumping in multiplayer tables.","Breaking the rules can forfeit winnings and suspend the account."]}
     ],
@@ -907,8 +907,8 @@
       {h:"मैच खेलना", items:["एंट्री फीस के साथ मैच बनाएं, या खुला मैच जॉइन करें।","दोनों खिलाड़ियों के स्टेक एक पॉट में सुरक्षित रखे जाते हैं।","लूडो किंग खोलें और शेयर किए रूम कोड से मैच खेलें।","खत्म होने पर बताएं कौन जीता। हम पुष्टि करके विजेता को भुगतान करते हैं।"]},
       {h:"जीत और भुगतान", items:["विजेता को पॉट का 95% मिलता है।","प्लेटफ़ॉर्म फीस पॉट का 5% है।","4-प्लेयर रॉयल: अकेला विजेता पूरे पॉट का 95% लेता है।"]},
       {h:"स्टेक और रिफंड", items:["अगर कोई प्रतिद्वंद्वी नहीं जुड़ता, आपका स्टेक पूरा रिफंड होता है।","मैच बीच में छोड़ना या डिस्कनेक्ट होना फॉरफ़िट माना जाता है — प्रतिद्वंद्वी जीतता है।","फॉरफ़िट पर भी 5% प्लेटफ़ॉर्म फीस लागू होती है।"]},
-      {h:"जमा नियम", items:["न्यूनतम जमा $5 है। आप दैनिक या मासिक जमा सीमा तय कर सकते हैं।","जमा लाइसेंस प्राप्त पार्टनर से तुरंत जुड़ता है — UPI, कार्ड या बैंक।","आपका पैसा कंपनी फंड से अलग, सुरक्षित खाते में रखा जाता है।","जमा बैलेंस मैच जॉइन करने के लिए उपयोग होता है, और निकाला भी जा सकता है।","भुगतान विफल या लंबित रहे तो 24 घंटे में वापस कर दिया जाता है।"]},
-      {h:"निकासी नियम", items:["न्यूनतम निकासी $10 है।","आप अपना जमा बैलेंस और जीत दोनों निकाल सकते हैं।","पहली निकासी से पहले KYC (उम्र और पहचान) पूरा करें।","निकासी केवल आपके KYC नाम से सत्यापित UPI खाते में जाती है।","मैच की जीत नतीजे की पुष्टि के बाद ही दी जाती है।","भुगतान आमतौर पर मिनटों में होता है; बड़ी राशि की पहले समीक्षा हो सकती है।"]},
+      {h:"जमा नियम", items:["न्यूनतम जमा ₹5 है। आप दैनिक या मासिक जमा सीमा तय कर सकते हैं।","जमा लाइसेंस प्राप्त पार्टनर से तुरंत जुड़ता है — UPI, कार्ड या बैंक।","आपका पैसा कंपनी फंड से अलग, सुरक्षित खाते में रखा जाता है।","जमा बैलेंस मैच जॉइन करने के लिए उपयोग होता है, और निकाला भी जा सकता है।","भुगतान विफल या लंबित रहे तो 24 घंटे में वापस कर दिया जाता है।"]},
+      {h:"निकासी नियम", items:["न्यूनतम निकासी ₹10 है।","आप अपना जमा बैलेंस और जीत दोनों निकाल सकते हैं।","पहली निकासी से पहले KYC (उम्र और पहचान) पूरा करें।","निकासी केवल आपके KYC नाम से सत्यापित UPI खाते में जाती है।","मैच की जीत नतीजे की पुष्टि के बाद ही दी जाती है।","भुगतान आमतौर पर मिनटों में होता है; बड़ी राशि की पहले समीक्षा हो सकती है।"]},
       {h:"रेफ़रल", items:["अपना रेफ़रल कोड दोस्तों के साथ शेयर करें।","अपने दोस्तों की जीत का 3% कमाएं, जीवनभर — केवल तब जब वे जीतें।","कमीशन आपके निकासी योग्य बैलेंस में आता है।"]},
       {h:"निष्पक्ष आचरण", items:["एक व्यक्ति, एक खाता।","मल्टीप्लेयर टेबल में कोई कलूज़न या चिप-डंपिंग नहीं।","नियम तोड़ने पर जीत ज़ब्त और खाता निलंबित हो सकता है।"]}
     ]
@@ -979,8 +979,8 @@
     ],
     auth:{ loggedIn:false, name:"Player", phone:"", email:"", joined:2026, rating:1820 }
   };
-  function money(n){ n=Math.round(n*100)/100; return "$"+n.toFixed(2); }
-  function money0(n){ return "$"+Math.round(n); }
+  function money(n){ n=Math.round(n*100)/100; return "₹"+n.toFixed(2); }
+  function money0(n){ return "₹"+Math.round(n); }
   function total(){ return state.deposit + state.winnings; }
   function save(){ try{ localStorage.setItem("ludora_app", JSON.stringify(state)); }catch(e){} }
   function load(){ try{ var s=JSON.parse(localStorage.getItem("ludora_app")||"null"); if(s&&typeof s.deposit==="number"){ state.deposit=s.deposit; state.winnings=s.winnings; state.ref=s.ref; state.tx=s.tx; state.depMethod=s.depMethod||"upi"; state.playMode=s.playMode||1; if(s.upis&&s.upis.length) state.upis=s.upis; if(s.matches) state.matches=s.matches; if(s.auth) state.auth=s.auth; } }catch(e){} }
@@ -1182,7 +1182,7 @@
   function renderChips(inputId, boxId, vals){
     var box=$(boxId); box.innerHTML="";
     vals.forEach(function(v){
-      var b=document.createElement("button"); b.className="chip"; b.textContent="$"+v;
+      var b=document.createElement("button"); b.className="chip"; b.textContent="₹"+v;
       b.addEventListener("click",function(){ $(inputId).value=v; syncChips(inputId,boxId); if(inputId==="playAmt")updatePayout(); if(inputId==="depAmt")$("depErr").textContent=""; });
       box.appendChild(b);
     });

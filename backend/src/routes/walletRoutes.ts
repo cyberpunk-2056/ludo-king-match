@@ -9,7 +9,7 @@ export const walletRoutes = Router();
 async function walletView(userId: string) {
   const r = await query("select deposit, winnings, currency from wallets where user_id = $1", [userId]);
   const w = r.rows[0] ?? { deposit: 0, winnings: 0, currency: "USD" };
-  return { deposit: Number(w.deposit), winnings: Number(w.winnings), currency: w.currency === "USD" ? "$" : w.currency };
+  return { deposit: Number(w.deposit), winnings: Number(w.winnings), currency: "₹" };
 }
 
 walletRoutes.get("/wallet", requireAuth, async (req: AuthedRequest, res) => {
@@ -33,7 +33,7 @@ walletRoutes.post("/wallet/deposit", requireAuth, async (req: AuthedRequest, res
   const parsed = depositSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ message: "Invalid deposit" });
   const amount = Money.round2(parsed.data.amount);
-  if (amount < Money.MIN_DEPOSIT) return res.status(400).json({ message: `Minimum deposit is $${Money.MIN_DEPOSIT}` });
+  if (amount < Money.MIN_DEPOSIT) return res.status(400).json({ message: `Minimum deposit is ₹${Money.MIN_DEPOSIT}` });
 
   const txId = await withTransaction(async (c) => {
     await c.query("update wallets set deposit = deposit + $1 where user_id = $2", [amount, req.userId]);
@@ -54,7 +54,7 @@ walletRoutes.post("/wallet/withdraw", requireAuth, async (req: AuthedRequest, re
   const parsed = withdrawSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ message: "Invalid withdrawal" });
   const amount = Money.round2(parsed.data.amount);
-  if (amount < Money.MIN_WITHDRAW) return res.status(400).json({ message: `Minimum withdrawal is $${Money.MIN_WITHDRAW}` });
+  if (amount < Money.MIN_WITHDRAW) return res.status(400).json({ message: `Minimum withdrawal is ₹${Money.MIN_WITHDRAW}` });
 
   const verified = await query(
     "select 1 from payout_methods where user_id = $1 and vpa = $2 and verified = true",

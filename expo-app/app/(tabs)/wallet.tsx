@@ -21,7 +21,7 @@ export default function Wallet() {
   }, []);
 
   const total = wallet ? wallet.deposit + wallet.winnings : 0;
-  const cur = wallet?.currency ?? "$";
+  const cur = wallet?.currency ?? "₹";
 
   return (
     <ScrollView style={{ backgroundColor: colors.bg }} contentContainerStyle={{ padding: 16 }}>

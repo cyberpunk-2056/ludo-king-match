@@ -38,7 +38,7 @@ data class PlayerStats(
 data class Wallet(
     val deposit: Double = 0.0,
     val winnings: Double = 0.0,
-    val currency: String = "$"
+    val currency: String = "₹"
 ) {
     val total: Double get() = deposit + winnings
 }

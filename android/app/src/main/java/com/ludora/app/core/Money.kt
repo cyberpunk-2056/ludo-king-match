@@ -25,7 +25,7 @@ object Money {
     /** Referral commission earned when a referred friend wins [winnings]. */
     fun referralCommission(winnings: Double): Double = round2(winnings * REFERRAL_RATE)
 
-    fun format(amount: Double, currency: String = "$"): String {
+    fun format(amount: Double, currency: String = "₹"): String {
         val neg = amount < 0
         val a = Math.abs(amount)
         val s = String.format("%,.2f", a)

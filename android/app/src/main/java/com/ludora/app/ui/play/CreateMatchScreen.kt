@@ -58,7 +58,7 @@ fun CreateMatchScreen(nav: NavController, vm: PlayViewModel = viewModel()) {
                 value = stakeText, onValueChange = { stakeText = it.filter { ch -> ch.isDigit() || ch == '.' } },
                 singleLine = true, modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                prefix = { Text("$", color = c.muted) },
+                prefix = { Text("₹", color = c.muted) },
                 colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = c.violet, unfocusedBorderColor = c.line, focusedTextColor = c.fg, unfocusedTextColor = c.fg)
             )
             Spacer(Modifier.height(14.dp))

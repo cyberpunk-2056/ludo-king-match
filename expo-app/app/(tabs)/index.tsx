@@ -18,7 +18,7 @@ export default function Home() {
       </Card>
 
       <View style={{ flexDirection: "row", gap: 12, marginTop: 16 }}>
-        {[["128K", "Players", colors.violet], ["$4.2M", "Paid", colors.green], ["36K", "Today", colors.blue]].map(([v, k, c]) => (
+        {[["128K", "Players", colors.violet], ["₹4.2M", "Paid", colors.green], ["36K", "Today", colors.blue]].map(([v, k, c]) => (
           <View key={k as string} style={{ flex: 1, backgroundColor: colors.surface, borderColor: colors.line, borderWidth: 1, borderRadius: 16, padding: 16, alignItems: "center" }}>
             <Text style={{ color: c as string, fontWeight: "800", fontSize: 22 }}>{v}</Text>
             <Text style={{ color: colors.fgDim, fontSize: 12, marginTop: 2 }}>{k}</Text>

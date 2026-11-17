@@ -39,7 +39,7 @@ export default function Deposit() {
         <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 10 }}>
           {PRESETS.map((v) => (
             <Pressable key={v} onPress={() => setAmount(String(v))} style={{ backgroundColor: colors.surface2, borderColor: colors.line, borderWidth: 1, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 }}>
-              <Text style={{ color: colors.fgDim, fontWeight: "700" }}>${v}</Text>
+              <Text style={{ color: colors.fgDim, fontWeight: "700" }}>₹{v}</Text>
             </Pressable>
           ))}
         </View>

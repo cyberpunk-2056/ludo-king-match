@@ -79,6 +79,39 @@ fun StatTile(label: String, value: String, valueColor: Color? = null, modifier: 
     }
 }
 
+/** App top bar used on the main tabs: brand, live balance chip, language + theme toggles. */
+@Composable
+fun AppTopBar(onToggleLang: () -> Unit, onToggleTheme: () -> Unit) {
+    val c = LocalLudora.current
+    var balance by remember { mutableStateOf<Double?>(null) }
+    LaunchedEffect(Unit) {
+        runCatching { com.ludora.app.di.Graph.repository.wallet() }
+            .onSuccess { balance = it.total }
+    }
+    Surface(color = c.bg, modifier = Modifier.fillMaxWidth()) {
+        Row(
+            Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Ludo", color = c.fg, fontFamily = com.ludora.app.ui.theme.LocalLudora.current.let { null } ?: androidx.compose.ui.text.font.FontFamily.Default, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+            Text("ra", color = c.violet, fontWeight = FontWeight.ExtraBold, fontSize = 20.sp)
+            Spacer(Modifier.weight(1f))
+            Surface(color = c.surface2, shape = RoundedCornerShape(999.dp), border = BorderStroke(1.dp, c.line)) {
+                Row(Modifier.padding(start = 12.dp, end = 4.dp, top = 4.dp, bottom = 4.dp), verticalAlignment = Alignment.CenterVertically) {
+                    Text(com.ludora.app.core.Money.format(balance ?: 0.0), color = c.fg, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                    Spacer(Modifier.width(8.dp))
+                    Box(Modifier.size(26.dp).clip(CircleShape).background(Brush.horizontalGradient(listOf(c.violet, c.indigo))), contentAlignment = Alignment.Center) {
+                        Text("+", color = Color.White, fontSize = 16.sp)
+                    }
+                }
+            }
+            Spacer(Modifier.width(8.dp))
+            TextButton(onClick = onToggleLang) { Text("EN/हिं", color = c.fgDim, fontWeight = FontWeight.Bold, fontSize = 12.sp) }
+            TextButton(onClick = onToggleTheme) { Text(if (c.isDark) "☀" else "☾", color = if (c.isDark) c.yellow else c.indigo, fontSize = 16.sp) }
+        }
+    }
+}
+
 /**
  * Original Ludo board: four colored corner bases, white cross arms and a central
  * pinwheel. Drawn from scratch on Canvas — not anyone's branded artwork.
