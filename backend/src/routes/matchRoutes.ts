@@ -87,7 +87,7 @@ matchRoutes.post("/matches/:id/result", requireAuth, async (req: AuthedRequest, 
     );
 
     const reports = await c.query("select user_id, result from match_reports where match_id = $1", [match.id]);
-    if (reports.rowCount < 2) return "reported"; // wait for the other player
+    if ((reports.rowCount ?? 0) < 2) return "reported"; // wait for the other player
 
     const byUser: Record<string, string> = {};
     for (const r of reports.rows) byUser[r.user_id] = r.result;
