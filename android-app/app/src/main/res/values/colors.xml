@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="bg">#080B13</color>
+    <color name="fg">#F1F4FB</color>
+    <color name="fg_dim">#9AA5C2</color>
+    <color name="violet">#8B6CFF</color>
+    <color name="indigo">#5B8DEF</color>
+    <color name="red">#FF5A6A</color>
+    <color name="green">#32D583</color>
+    <color name="yellow">#FFC94D</color>
+    <color name="blue">#4B9BFF</color>
+</resources>
