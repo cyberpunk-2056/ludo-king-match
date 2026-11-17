@@ -1,17 +1,17 @@
-# Build the TypeScript app, then run a slim production image.
+# Root Dockerfile so Fly.io detects it when launching from the repo root.
+# Builds the backend/ folder (build context is the repo root).
 FROM node:20-slim AS build
 WORKDIR /app
-COPY package*.json ./
+COPY backend/package*.json ./
 RUN npm ci
-COPY . .
+COPY backend/ ./
 RUN npm run build
 
 FROM node:20-slim AS run
 WORKDIR /app
 ENV NODE_ENV=production
-COPY package*.json ./
+COPY backend/package*.json ./
 RUN npm ci --omit=dev
-# compiled JS and the SQL schema the migrate step reads
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/src/schema.sql ./dist/schema.sql
 EXPOSE 8080

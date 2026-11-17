@@ -1,9 +1,9 @@
-# Fly.io config for the Ludora backend. Run from the backend/ folder:
-#   fly launch --no-deploy      (creates the app; skip its DB offer — you use Supabase)
+# Fly.io config at the repo ROOT. Launch/deploy from the repo root:
+#   fly launch --no-deploy      (decline its DB offer — you use Supabase)
 #   fly secrets set DATABASE_URL="..." JWT_SECRET="..." CORS_ORIGINS="https://your-site.vercel.app"
 #   fly deploy
-app = "ludora-api"
-primary_region = "sin"          # Singapore; pick one near your players
+app = "ludo-king-match"
+primary_region = "ams"          # Amsterdam; change to one near your players
 
 [build]
   dockerfile = "Dockerfile"
@@ -16,7 +16,7 @@ primary_region = "sin"          # Singapore; pick one near your players
   force_https = true
   auto_stop_machines = "stop"
   auto_start_machines = true
-  min_machines_running = 1       # keep 1 running so timers/sockets stay alive
+  min_machines_running = 1       # keep 1 running so join timers / sockets stay alive
 
   [[http_service.checks]]
     method = "GET"

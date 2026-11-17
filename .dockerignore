@@ -1,0 +1,9 @@
+.git
+**/node_modules
+**/dist
+android
+web-preview
+**/.env
+**/.env.*
+!backend/.env.example
+*.log

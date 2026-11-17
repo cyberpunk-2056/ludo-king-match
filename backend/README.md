@@ -30,17 +30,20 @@ npm run dev                   # starts on http://localhost:4000
 
 ## Deploy to Fly.io (alternative to Render)
 
+Run from the **repo root** (the `Dockerfile` and `fly.toml` live there so Fly detects them):
+
 ```bash
-cd backend
-fly launch --no-deploy        # creates the app from fly.toml; decline its DB offer (use Supabase)
+# from the repository root, not backend/
+fly launch --no-deploy        # reads root fly.toml; decline its DB offer (use Supabase)
 fly secrets set DATABASE_URL="<supabase pooler string>" \
                 JWT_SECRET="<random>" \
                 CORS_ORIGINS="https://your-site.vercel.app"
 fly deploy
 ```
 
-Uses `Dockerfile` + `fly.toml` (listens on port 8080). `min_machines_running = 1`
-keeps a machine alive so the join timers and sockets keep running. Health check: `/api/health`.
+The root `Dockerfile` builds the `backend/` folder and runs it on port 8080.
+`min_machines_running = 1` keeps a machine alive so the join timers and sockets keep
+running. Health check: `/api/health`.
 
 ## Endpoints
 
