@@ -1,0 +1,1 @@
+{"root":["./src/app.tsx","./src/api.ts","./src/app-state.tsx","./src/components.tsx","./src/i18n.ts","./src/main.tsx","./src/vite-env.d.ts","./src/pages/auth.tsx","./src/pages/deposit.tsx","./src/pages/home.tsx","./src/pages/play.tsx","./src/pages/profile.tsx","./src/pages/wallet.tsx","./src/pages/withdraw.tsx"],"version":"5.9.3"}
