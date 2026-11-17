@@ -1,7 +1,6 @@
--- Ludora schema. Run against the DIRECT Supabase connection (not the pooler):
---   npm run migrate   (uses DATABASE_URL)
--- Safe to re-run: everything uses IF NOT EXISTS.
-
+// Schema as a string so it ships with the compiled app (no file-copy needed) and can
+// be applied on startup. Idempotent: everything uses IF NOT EXISTS.
+export const SCHEMA = `
 create extension if not exists "pgcrypto";
 
 create table if not exists users (
@@ -16,7 +15,6 @@ create table if not exists users (
   created_at    timestamptz not null default now()
 );
 
--- one wallet row per user; money lives here and only the backend writes it
 create table if not exists wallets (
   user_id   uuid primary key references users(id) on delete cascade,
   deposit   numeric(14,2) not null default 0,
@@ -27,8 +25,8 @@ create table if not exists wallets (
 create table if not exists transactions (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null references users(id) on delete cascade,
-  type        text not null,          -- deposit | withdraw | win | stake | referral | refund
-  amount      numeric(14,2) not null, -- positive credit, negative debit
+  type        text not null,
+  amount      numeric(14,2) not null,
   note        text default '',
   created_at  timestamptz not null default now()
 );
@@ -38,7 +36,7 @@ create table if not exists payout_methods (
   id          uuid primary key default gen_random_uuid(),
   user_id     uuid not null references users(id) on delete cascade,
   vpa         text not null,
-  name        text not null,          -- verified account-holder name
+  name        text not null,
   verified    boolean not null default false,
   is_default  boolean not null default false,
   created_at  timestamptz not null default now()
@@ -46,11 +44,11 @@ create table if not exists payout_methods (
 
 create table if not exists matches (
   id            uuid primary key default gen_random_uuid(),
-  mode          int not null default 1,     -- 1 = 1v1 duel, 2 = 4-player royale
+  mode          int not null default 1,
   stake         numeric(14,2) not null,
   player_a      uuid not null references users(id),
   player_b      uuid references users(id),
-  status        text not null default 'open', -- open | waiting | live | settled | cancelled
+  status        text not null default 'open',
   room_code     text,
   join_deadline timestamptz,
   winner_id     uuid references users(id),
@@ -59,13 +57,13 @@ create table if not exists matches (
 );
 create index if not exists idx_match_status on matches(status, created_at desc);
 
--- each player's reported result for a match (used to verify before payout)
 create table if not exists match_reports (
   id         uuid primary key default gen_random_uuid(),
   match_id   uuid not null references matches(id) on delete cascade,
   user_id    uuid not null references users(id),
-  result     text not null,          -- win | lose
+  result     text not null,
   proof_url  text,
   created_at timestamptz not null default now(),
   unique (match_id, user_id)
 );
+`;

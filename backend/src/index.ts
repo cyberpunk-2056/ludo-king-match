@@ -1,8 +1,11 @@
+import "express-async-errors"; // makes async route rejections reach the error handler (Express 4)
 import express from "express";
 import cors from "cors";
 import { createServer } from "node:http";
 import { Server as SocketServer } from "socket.io";
 import { env } from "./env.js";
+import { pool } from "./db.js";
+import { SCHEMA } from "./schema.js";
 import { authRoutes } from "./routes/authRoutes.js";
 import { meRoutes } from "./routes/meRoutes.js";
 import { walletRoutes } from "./routes/walletRoutes.js";
@@ -49,6 +52,23 @@ setInterval(() => {
   expireMatches().catch((e) => console.error("expireMatches failed:", e));
 }, 30_000);
 
-server.listen(env.port, () => {
-  console.log(`Ludora API listening on :${env.port}`);
+// Ensure tables exist on boot (idempotent). Logs but never prevents startup,
+// so /api/health stays reachable even if the DB is briefly unavailable.
+async function ensureSchema() {
+  try {
+    await pool.query(SCHEMA);
+    console.log("Schema ensured.");
+  } catch (e) {
+    console.error("ensureSchema failed (continuing):", e);
+  }
+}
+
+ensureSchema().finally(() => {
+  server.listen(env.port, () => {
+    console.log(`Ludora API listening on :${env.port}`);
+  });
 });
+
+// last-resort guards so an unexpected rejection logs instead of killing the process
+process.on("unhandledRejection", (r) => console.error("unhandledRejection:", r));
+process.on("uncaughtException", (e) => console.error("uncaughtException:", e));

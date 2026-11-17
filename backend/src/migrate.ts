@@ -1,15 +1,10 @@
-import { readFileSync } from "node:fs";
-import { fileURLToPath } from "node:url";
-import { dirname, join } from "node:path";
 import { pool } from "./db.js";
+import { SCHEMA } from "./schema.js";
 
-// Applies schema.sql. Run with: npm run migrate
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
+// Applies the schema. Run with: npm run migrate
 async function main() {
-  const sql = readFileSync(join(__dirname, "schema.sql"), "utf8");
   console.log("Applying schema...");
-  await pool.query(sql);
+  await pool.query(SCHEMA);
   console.log("Schema applied successfully.");
   await pool.end();
 }
