@@ -19,7 +19,7 @@ app.use(cors({ origin: env.corsOrigins.length ? env.corsOrigins : true, credenti
 app.use(express.json());
 
 // health check (used by Render)
-app.get("/api/health", (_req, res) => res.json({ ok: true, time: Date.now() }));
+app.get("/api/health", (_req, res) => res.json({ ok: true, version: "crashfix-1", time: Date.now() }));
 
 // REST API — the same endpoints the web and Android clients call
 app.use("/api/auth", authRoutes);
