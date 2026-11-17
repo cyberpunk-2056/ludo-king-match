@@ -1,0 +1,20 @@
+# Render blueprint. In Render: New -> Blueprint, point at this repo.
+# Set DATABASE_URL and JWT_SECRET as secret env vars in the dashboard (do not hardcode).
+services:
+  - type: web
+    name: ludora-api
+    runtime: node
+    rootDir: backend
+    plan: starter            # free sleeps when idle; use starter+ for a live game
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/health
+    envVars:
+      - key: DATABASE_URL
+        sync: false          # set in dashboard (secret) — use the Supabase pooler string
+      - key: JWT_SECRET
+        sync: false          # set in dashboard (secret)
+      - key: CORS_ORIGINS
+        value: https://your-site.vercel.app
+      - key: NODE_VERSION
+        value: "20"
