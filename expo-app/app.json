@@ -1,0 +1,29 @@
+{
+  "expo": {
+    "name": "Ludora",
+    "slug": "ludora-mobile",
+    "version": "1.0.0",
+    "scheme": "ludora",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "backgroundColor": "#080B13",
+    "newArchEnabled": false,
+    "android": {
+      "package": "com.ludora.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#0E1322"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.ludora.app",
+      "supportsTablet": false
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store"
+    ],
+    "experiments": {
+      "typedRoutes": false
+    }
+  }
+}
