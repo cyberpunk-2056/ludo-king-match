@@ -7,13 +7,18 @@ export function Home() {
   const nav = useNavigate();
   return (
     <>
-      <div className="card" style={{ marginTop: 16, textAlign: "center" }}>
-        <span className="label" style={{ color: "var(--violet)" }}>{t("appName")}</span>
-        <h1 style={{ fontSize: 30, fontWeight: 800, marginTop: 8 }}>{t("hero_h")}</h1>
-        <p className="muted" style={{ marginTop: 10 }}>{t("hero_s")}</p>
+      <div className="hero">
+        <span className="eyebrow">{t("appName")}</span>
+        <h1>{t("hero_h")}</h1>
+        <p>{t("hero_s")}</p>
         <Board />
-        <button className="btn block" onClick={() => nav("/play")}>{t("play_a_match")}</button>
+        <button className="btn lg block" onClick={() => nav("/play")}>{t("play_a_match")}</button>
         <button className="btn ghost block" style={{ marginTop: 10 }} onClick={() => nav("/wallet")}>{t("add_money")}</button>
+      </div>
+      <div className="stat-row">
+        <div className="stat"><div className="n" style={{ color: "var(--violet)" }}>128K</div><div className="c">Players</div></div>
+        <div className="stat"><div className="n" style={{ color: "var(--green)" }}>$4.2M</div><div className="c">Paid</div></div>
+        <div className="stat"><div className="n" style={{ color: "var(--blue)" }}>36K</div><div className="c">Today</div></div>
       </div>
     </>
   );

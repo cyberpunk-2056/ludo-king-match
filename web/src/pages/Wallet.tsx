@@ -42,12 +42,16 @@ export function Wallet() {
         <h3 style={{ fontSize: 16 }}>{t("recent")}</h3>
         {err && <div className="err">{err}</div>}
         {tx.length === 0 && !err && <p className="muted" style={{ marginTop: 8 }}>{t("none")}</p>}
-        {tx.map((x) => (
-          <div className="tx" key={x.id}>
-            <div><div className="t">{x.type.charAt(0).toUpperCase() + x.type.slice(1)}</div>{x.note && <div className="s">{x.note}</div>}</div>
-            <div className={"a " + (x.amount >= 0 ? "pos" : "neg")}>{x.amount >= 0 ? "+" : ""}{money(x.amount, cur)}</div>
-          </div>
-        ))}
+        {tx.map((x) => {
+          const ic = x.type === "deposit" ? "⬇" : x.type === "withdraw" ? "⬆" : x.type === "referral" ? "🎁" : x.type === "win" ? "🏆" : "•";
+          return (
+            <div className="tx" key={x.id}>
+              <div className="ti">{ic}</div>
+              <div><div className="t">{x.type.charAt(0).toUpperCase() + x.type.slice(1)}</div>{x.note && <div className="s">{x.note}</div>}</div>
+              <div className={"a " + (x.amount >= 0 ? "pos" : "neg")}>{x.amount >= 0 ? "+" : ""}{money(x.amount, cur)}</div>
+            </div>
+          );
+        })}
       </div>
     </>
   );

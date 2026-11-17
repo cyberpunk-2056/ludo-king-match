@@ -41,7 +41,7 @@ export function Withdraw() {
 
   return (
     <>
-      <button className="btn ghost" style={{ padding: "6px 12px", marginTop: 14 }} onClick={() => nav("/wallet")}>← {t("nav_wallet")}</button>
+      <button className="back-btn" onClick={() => nav("/wallet")}>← {t("nav_wallet")}</button>
       <h1 className="page-title">{t("withdraw")}</h1>
       <div className="card">
         <div className="label">{t("w_total")}</div>

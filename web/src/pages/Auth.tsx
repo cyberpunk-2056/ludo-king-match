@@ -39,30 +39,27 @@ export function Auth() {
   }
 
   return (
-    <div className="auth">
-      <button className="btn ghost" style={{ padding: "6px 12px" }} onClick={() => setLang(lang === "en" ? "hi" : "en")}>
-        {lang === "en" ? "हिं" : "EN"}
-      </button>
-      <h2>{signup ? t("signup_h") : t("login_h")}</h2>
-      <div className="sub">{signup ? t("signup_s") : t("login_s")}</div>
+    <div className="auth-wrap">
+      <div className="auth">
+        <button className="chip" style={{ marginBottom: 16 }} onClick={() => setLang(lang === "en" ? "hi" : "en")}>{lang === "en" ? "हिं" : "EN"}</button>
+        <div className="mk">♛</div>
+        <h2>{signup ? t("signup_h") : t("login_h")}</h2>
+        <div className="sub">{signup ? t("signup_s") : t("login_s")}</div>
 
-      {signup && (
-        <div className="field"><label>{t("f_name")}</label><input className="input" value={name} onChange={(e) => setName(e.target.value)} /></div>
-      )}
-      <div className="field"><label>{t("f_phone")}</label><input className="input" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
-      {signup && (
-        <div className="field"><label>{t("f_email")}</label><input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
-      )}
-      <div className="field"><label>{t("f_pass")}</label><input className="input" type="password" value={pass} onChange={(e) => setPass(e.target.value)} /></div>
+        {signup && <div className="field"><label>{t("f_name")}</label><input className="input" value={name} onChange={(e) => setName(e.target.value)} /></div>}
+        <div className="field"><label>{t("f_phone")}</label><input className="input" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} /></div>
+        {signup && <div className="field"><label>{t("f_email")}</label><input className="input" type="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>}
+        <div className="field"><label>{t("f_pass")}</label><input className="input" type="password" value={pass} onChange={(e) => setPass(e.target.value)} /></div>
 
-      {err && <div className="err">{err}</div>}
-      <button className="btn block" style={{ marginTop: 14 }} disabled={busy} onClick={submit}>
-        {busy ? "…" : signup ? t("signup_btn") : t("login_btn")}
-      </button>
-      <button className="btn ghost block" style={{ marginTop: 10 }} onClick={() => { setSignup(!signup); setErr(null); }}>
-        {signup ? t("to_login") : t("to_signup")}
-      </button>
-      <p className="muted" style={{ fontSize: 12, marginTop: 16 }}>{t("legal18")}</p>
+        {err && <div className="err">{err}</div>}
+        <button className="btn lg block" style={{ marginTop: 14 }} disabled={busy} onClick={submit}>
+          {busy ? "…" : signup ? t("signup_btn") : t("login_btn")}
+        </button>
+        <div className="switch">
+          <button onClick={() => { setSignup(!signup); setErr(null); }}>{signup ? t("to_login") : t("to_signup")}</button>
+        </div>
+        <p className="muted" style={{ fontSize: 12, marginTop: 16 }}>{t("legal18")}</p>
+      </div>
     </div>
   );
 }

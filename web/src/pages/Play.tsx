@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { api, money, type Match, type MatchResult } from "../api";
 import { useApp } from "../app-state";
 
+const colors = ["#4B9BFF", "#32D583", "#FFC94D", "#FF5A6A", "#8B6CFF"];
+const av = (name: string, i: number) => ({ background: `linear-gradient(145deg,${colors[i % colors.length]},${colors[(i + 1) % colors.length]})` });
+
 export function Play() {
   const { t } = useApp();
   const [live, setLive] = useState<Match[]>([]);
@@ -16,7 +19,7 @@ export function Play() {
     try {
       const [l, o, r] = await Promise.all([api.liveMatches(), api.openMatches(), api.recentResults()]);
       setLive(l); setOpen(o); setRecent(r);
-    } catch { /* lists stay empty until there is data */ }
+    } catch { /* empty until data exists */ }
   }
   useEffect(() => { load(); }, []);
 
@@ -25,11 +28,8 @@ export function Play() {
 
   async function create() {
     setMsg(null); setBusy(true);
-    try {
-      await api.createMatch({ mode, stake: s });
-      setMsg("Match created — stake held. Find your opponent in the lobby.");
-      load();
-    } catch (e: any) { setMsg(e.message); } finally { setBusy(false); }
+    try { await api.createMatch({ mode, stake: s }); setMsg("Match created — stake held. Your opponent can now join."); load(); }
+    catch (e: any) { setMsg(e.message); } finally { setBusy(false); }
   }
   async function join(m: Match) {
     setMsg(null);
@@ -44,8 +44,8 @@ export function Play() {
       <div className="card">
         <div className="label">{t("create_match")}</div>
         <div className="row" style={{ marginTop: 10 }}>
-          <button className={"btn " + (mode === 1 ? "" : "ghost")} onClick={() => setMode(1)}>{t("mode1")}</button>
-          <button className={"btn " + (mode === 2 ? "" : "ghost")} onClick={() => setMode(2)}>{t("mode2")}</button>
+          <button className={"pm" + (mode === 1 ? " on" : "")} onClick={() => setMode(1)}><h4>{t("mode1")}</h4><p>Head-to-head</p></button>
+          <button className={"pm" + (mode === 2 ? " on" : "")} onClick={() => setMode(2)}><h4>{t("mode2")}</h4><p>Four players</p></button>
         </div>
         <div className="label" style={{ marginTop: 14 }}>{t("amount")}</div>
         <input className="input" style={{ marginTop: 6 }} inputMode="decimal" value={stake} onChange={(e) => setStake(e.target.value.replace(/[^0-9.]/g, ""))} />
@@ -55,22 +55,24 @@ export function Play() {
           <div className="tile"><div className="k">{t("fee_5")}</div><div className="v num">{money(Math.round(pot * 5) / 100)}</div></div>
         </div>
         {msg && <div className="err" style={{ color: "var(--fg-dim)" }}>{msg}</div>}
-        <button className="btn block" style={{ marginTop: 14 }} disabled={busy || s < 1} onClick={create}>{t("find_match")}</button>
+        <button className="btn block lg" style={{ marginTop: 14 }} disabled={busy || s < 1} onClick={create}>{t("find_match")}</button>
       </div>
 
       <div className="section-title">{t("live_matches")}</div>
       {live.length === 0 && <p className="muted">{t("none")}</p>}
-      {live.map((m) => (
+      {live.map((m, i) => (
         <div className="lrow" key={m.id}>
-          <div><div className="names">{m.playerA} vs {m.playerB}</div><div className="sub">{money(m.stake)} {t("entry")}</div></div>
+          <span className="av" style={av(m.playerA, i)}>{m.playerA.charAt(0)}</span>
+          <div><div className="names">{m.playerA} vs {m.playerB}</div><div className="sub"><span className="live-badge"><i />Live</span> {money(m.stake)} {t("entry")}</div></div>
           <div className="right">{money(m.stake * 2)}</div>
         </div>
       ))}
 
       <div className="section-title">{t("open_to_join")}</div>
       {open.length === 0 && <p className="muted">{t("none")}</p>}
-      {open.map((m) => (
+      {open.map((m, i) => (
         <div className="lrow" key={m.id}>
+          <span className="av" style={av(m.playerA, i)}>{m.playerA.charAt(0)}</span>
           <div className="grow"><div className="names">{m.playerA}</div><div className="sub">{money(m.stake)} {t("entry")}</div></div>
           <button className="btn ghost" onClick={() => join(m)}>{t("join")}</button>
         </div>
@@ -80,7 +82,8 @@ export function Play() {
       {recent.length === 0 && <p className="muted">{t("none")}</p>}
       {recent.map((r) => (
         <div className="lrow" key={r.id}>
-          <div className="grow"><div className="names">🏆 {r.winner} beat {r.loser}</div><div className="sub">{money(r.stake)} {t("entry")}</div></div>
+          <span className="av" style={{ background: "linear-gradient(145deg,#FFC94D,#FF9E3D)" }}>🏆</span>
+          <div className="grow"><div className="names">{r.winner} beat {r.loser}</div><div className="sub">{money(r.stake)} {t("entry")}</div></div>
           <div className="right pos">+{money(r.payout)}</div>
         </div>
       ))}

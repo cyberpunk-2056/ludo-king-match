@@ -13,14 +13,12 @@ export function Profile() {
     <>
       <h1 className="page-title">{t("profile")}</h1>
       <div className="card" style={{ display: "flex", alignItems: "center", gap: 14 }}>
-        <div style={{ width: 56, height: 56, borderRadius: 16, background: "var(--grad)", color: "#fff", display: "grid", placeItems: "center", fontFamily: "var(--font-d)", fontWeight: 800, fontSize: 24 }}>
-          {user.name.charAt(0).toUpperCase()}
-        </div>
+        <div className="pf-av">{user.name.charAt(0).toUpperCase()}</div>
         <div className="grow">
           <div style={{ fontFamily: "var(--font-d)", fontWeight: 800, fontSize: 18 }}>{user.name}</div>
           <div className="muted" style={{ fontSize: 12 }}>{tail} · since {user.joined}</div>
         </div>
-        <div style={{ color: "var(--violet)", fontWeight: 700 }}>★ {user.rating}</div>
+        <span className="pf-rating">★ <b>{user.rating}</b></span>
       </div>
 
       <div className="tiles" style={{ gridTemplateColumns: "repeat(4,1fr)" }}>
