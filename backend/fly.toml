@@ -1,0 +1,29 @@
+# Fly.io config for the Ludora backend. Run from the backend/ folder:
+#   fly launch --no-deploy      (creates the app; skip its DB offer — you use Supabase)
+#   fly secrets set DATABASE_URL="..." JWT_SECRET="..." CORS_ORIGINS="https://your-site.vercel.app"
+#   fly deploy
+app = "ludora-api"
+primary_region = "sin"          # Singapore; pick one near your players
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "8080"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "stop"
+  auto_start_machines = true
+  min_machines_running = 1       # keep 1 running so timers/sockets stay alive
+
+  [[http_service.checks]]
+    method = "GET"
+    path = "/api/health"
+    interval = "15s"
+    timeout = "3s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"
