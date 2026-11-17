@@ -1,0 +1,480 @@
+<title>Ludora Wallet</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;600;700;800;900&family=Baloo+2:wght@500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap">
+<style>
+  /* Bright casual-game wallet app: sunny bg, white cards, candy buttons, bottom tab bar.
+     Four pages — Wallet, Deposit, Withdraw, Refer (1% commission). Single committed light theme.
+     Latin Fredoka+Nunito; HI swaps Baloo 2 + Noto Devanagari. */
+  :root {
+    --bg: #EAF2FF; --card: #FFFFFF; --cream: #FFF8EC;
+    --ink: #1A2550; --ink-dim: #566196; --muted: #8A95BC; --line: #E6EAF6;
+    --red: #FF5560; --green: #27C06A; --yellow: #FFC32B; --blue: #2E9BE6; --grape: #7A61FF;
+    --red-d: #D8343F; --green-d: #1C9A52; --blue-d: #1D7CC0; --grape-d: #5E45E0;
+    --gold: #FFB223;
+    --shadow: 0 18px 40px -16px rgba(42,58,120,.35); --shadow-sm: 0 8px 20px -10px rgba(42,58,120,.3);
+    --radius: 20px; --maxw: 680px;
+    --font-display: "Fredoka","Baloo 2",sans-serif; --font-body: "Nunito",system-ui,sans-serif;
+    --navh: 66px;
+    color-scheme: light;
+  }
+  :root[data-lang="hi"] { --font-display:"Baloo 2","Noto Sans Devanagari",sans-serif; --font-body:"Noto Sans Devanagari","Nunito",sans-serif; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: radial-gradient(800px 460px at 90% -6%, #F0E6FF, transparent 60%), var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; font-weight: 600; line-height: 1.5; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  h1,h2,h3 { font-family: var(--font-display); font-weight: 700; margin: 0; line-height: 1.08; }
+  p { margin: 0; } a { color: inherit; text-decoration: none; } img { max-width: 100%; }
+  .wrap { width: 100%; max-width: var(--maxw); margin-inline: auto; padding-inline: max(16px, env(safe-area-inset-left,0px)) max(16px, env(safe-area-inset-right,0px)); }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: var(--font-display); font-weight: 600; font-size: 16px; color: #fff; padding: 14px 22px; border-radius: 15px; border: 0; cursor: pointer; transition: transform .08s ease, box-shadow .12s ease; white-space: nowrap; width: 100%; }
+  .btn:active { transform: translateY(3px); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn-green { background: var(--green); box-shadow: 0 5px 0 var(--green-d); } .btn-green:active:not(:disabled){ box-shadow:0 2px 0 var(--green-d); }
+  .btn-blue { background: var(--blue); box-shadow: 0 5px 0 var(--blue-d); } .btn-blue:active:not(:disabled){ box-shadow:0 2px 0 var(--blue-d); }
+  .btn-grape { background: var(--grape); box-shadow: 0 5px 0 var(--grape-d); } .btn-grape:active:not(:disabled){ box-shadow:0 2px 0 var(--grape-d); }
+  .btn-white { background: #fff; color: var(--ink); box-shadow: 0 5px 0 #D8DEF0; } .btn-white:active:not(:disabled){ box-shadow:0 2px 0 #D8DEF0; }
+  .btn-sm { width: auto; padding: 10px 16px; font-size: 14px; border-radius: 12px; }
+
+  header { position: sticky; top: env(safe-area-inset-top,0px); z-index: 20; background: rgba(255,255,255,.85); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+  body::before { content:""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top,0px); z-index: 30; background: #fff; }
+  .bar { display: flex; align-items: center; gap: 12px; height: 62px; }
+  .brand { display: inline-flex; align-items: center; gap: 9px; font-family: var(--font-display); font-weight: 700; font-size: 20px; }
+  .brand .crown { width: 32px; height: 32px; border-radius: 9px; background: linear-gradient(160deg,var(--yellow),var(--gold)); display: grid; place-items: center; box-shadow: 0 3px 0 #E39A12; font-size: 17px; }
+  .brand b { color: var(--grape-d); }
+  .bar .right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .bal-chip { display: inline-flex; align-items: center; gap: 7px; background: #fff; border: 2px solid var(--line); border-radius: 999px; padding: 6px 13px; font-family: var(--font-display); font-weight: 600; font-size: 15px; color: var(--green-d); cursor: pointer; font-variant-numeric: tabular-nums; }
+  .lang-toggle { display: inline-flex; border: 2px solid var(--line); border-radius: 999px; overflow: hidden; background: #fff; }
+  .lang-toggle button { background: transparent; border: 0; color: var(--ink-dim); font-family: var(--font-display); font-weight: 600; font-size: 12.5px; padding: 6px 11px; cursor: pointer; }
+  .lang-toggle button[data-set="hi"]{ font-family:"Noto Sans Devanagari",var(--font-display); }
+  .lang-toggle button.active { background: var(--grape); color: #fff; }
+
+  main { padding-block: 18px; padding-bottom: calc(var(--navh) + env(safe-area-inset-bottom,0px) + 24px); }
+  .view[hidden] { display: none !important; }
+  .page-title { font-size: 24px; margin-bottom: 4px; }
+  .page-sub { color: var(--ink-dim); font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+
+  .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow-sm); padding: 20px; }
+  .card + .card { margin-top: 14px; }
+  .label { font-family: var(--font-display); font-weight: 500; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+
+  /* Balance hero */
+  .bal-hero { background: linear-gradient(125deg, var(--grape), #9a7bff); color: #fff; border-radius: 24px; padding: 24px; box-shadow: var(--shadow); }
+  .bal-hero .label { color: rgba(255,255,255,.85); }
+  .bal-hero .big { font-family: var(--font-display); font-weight: 700; font-size: 44px; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .bal-split { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
+  .bal-split .s { background: rgba(255,255,255,.16); border-radius: 14px; padding: 12px 14px; }
+  .bal-split .s .k { font-size: 11.5px; font-weight: 800; opacity: .9; }
+  .bal-split .s .v { font-family: var(--font-display); font-weight: 600; font-size: 20px; font-variant-numeric: tabular-nums; margin-top: 2px; }
+  .quick { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px; }
+
+  .kyc { display: inline-flex; align-items: center; gap: 7px; background: #DEF6E9; color: var(--green-d); border-radius: 999px; padding: 6px 12px; font-size: 12.5px; font-weight: 800; }
+
+  /* amount input */
+  .amt-input { display: flex; align-items: center; gap: 6px; background: #F4F7FF; border: 2px solid var(--line); border-radius: 14px; padding: 6px 6px 6px 16px; margin-top: 8px; }
+  .amt-input span { font-family: var(--font-display); font-weight: 600; font-size: 22px; color: var(--muted); }
+  .amt-input input { flex: 1; min-width: 0; background: transparent; border: 0; outline: none; font-family: var(--font-display); font-weight: 600; font-size: 26px; color: var(--ink); padding: 8px 0; font-variant-numeric: tabular-nums; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .chip { background: #F0F3FC; border: 2px solid var(--line); color: var(--ink-dim); border-radius: 999px; padding: 8px 15px; font-family: var(--font-display); font-weight: 600; font-size: 14px; cursor: pointer; font-variant-numeric: tabular-nums; }
+  .chip.on, .chip:hover { background: var(--grape); color: #fff; border-color: var(--grape); }
+
+  .methods { display: grid; gap: 10px; margin-top: 8px; }
+  .method { display: flex; align-items: center; gap: 13px; background: #fff; border: 2px solid var(--line); border-radius: 14px; padding: 13px 15px; cursor: pointer; transition: border-color .12s ease; }
+  .method.on { border-color: var(--grape); background: #F7F5FF; }
+  .method .mi { width: 42px; height: 42px; border-radius: 11px; display: grid; place-items: center; font-size: 21px; flex: none; }
+  .method .mt { font-family: var(--font-display); font-weight: 600; font-size: 15px; }
+  .method .md { font-size: 12.5px; color: var(--muted); font-weight: 700; }
+  .method .rad { margin-left: auto; width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--line); flex: none; display: grid; place-items: center; }
+  .method.on .rad { border-color: var(--grape); } .method.on .rad::after { content:""; width: 11px; height: 11px; border-radius: 50%; background: var(--grape); }
+
+  .field { margin-top: 14px; }
+  .field > .label { display: block; margin-bottom: 7px; }
+  .text-input { width: 100%; background: #F4F7FF; border: 2px solid var(--line); border-radius: 13px; padding: 13px 15px; font-family: var(--font-body); font-weight: 700; font-size: 15px; color: var(--ink); outline: none; }
+  .text-input:focus { border-color: var(--grape); }
+  .hint { font-size: 12.5px; color: var(--muted); font-weight: 700; margin-top: 8px; }
+  .err { color: var(--red-d); font-size: 13px; font-weight: 800; margin-top: 10px; min-height: 1px; }
+
+  .summ { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px dashed var(--line); font-size: 14px; font-weight: 700; }
+  .summ:last-of-type { border-bottom: 0; }
+  .summ b { font-variant-numeric: tabular-nums; color: var(--ink); }
+
+  /* transactions */
+  .tx { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .tx:last-child { border-bottom: 0; }
+  .tx .ti { width: 40px; height: 40px; border-radius: 12px; display: grid; place-items: center; font-size: 18px; flex: none; }
+  .tx .ti.inp { background: #DEF6E9; } .tx .ti.out { background: #FFE5E7; } .tx .ti.ref { background: #EFEBFF; }
+  .tx .tinfo { min-width: 0; flex: 1; } .tx .tinfo .tt { font-weight: 800; font-size: 14.5px; } .tx .tinfo .ts { font-size: 12px; color: var(--muted); font-weight: 700; }
+  .tx .tamt { font-family: var(--font-display); font-weight: 600; font-variant-numeric: tabular-nums; font-size: 15px; }
+  .tx .tamt.pos { color: var(--green-d); } .tx .tamt.neg { color: var(--red-d); }
+
+  /* referral */
+  .ref-hero { background: linear-gradient(125deg, var(--blue), var(--grape)); color: #fff; border-radius: 24px; padding: 24px; box-shadow: var(--shadow); text-align: center; }
+  .ref-hero .big { font-family: var(--font-display); font-weight: 700; font-size: 34px; }
+  .code-box { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,.18); border: 2px dashed rgba(255,255,255,.5); border-radius: 14px; padding: 12px 16px; margin-top: 14px; }
+  .code-box .code { font-family: var(--font-display); font-weight: 700; font-size: 22px; letter-spacing: .06em; flex: 1; text-align: left; }
+  .code-box button { background: #fff; color: var(--grape-d); border: 0; border-radius: 10px; padding: 9px 14px; font-family: var(--font-display); font-weight: 600; font-size: 13px; cursor: pointer; }
+  .ref-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-top: 14px; }
+  .ref-stat { background: var(--card); border-radius: 16px; box-shadow: var(--shadow-sm); padding: 14px; text-align: center; }
+  .ref-stat .v { font-family: var(--font-display); font-weight: 700; font-size: 22px; font-variant-numeric: tabular-nums; }
+  .ref-stat .k { font-size: 11.5px; color: var(--muted); font-weight: 800; margin-top: 2px; }
+  .ref-stat.e .v { color: var(--green-d); } .ref-stat.v2 .v { color: var(--blue-d); } .ref-stat.f .v { color: var(--grape-d); }
+  .how-ref { background: var(--cream); border-radius: var(--radius); padding: 18px; margin-top: 14px; }
+  .how-ref ol { margin: 10px 0 0; padding-left: 20px; } .how-ref li { font-size: 13.5px; font-weight: 700; color: var(--ink-dim); margin-bottom: 7px; }
+  .how-ref .pct { font-family: var(--font-display); font-weight: 700; color: var(--grape-d); }
+
+  /* bottom nav */
+  nav.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 25; background: rgba(255,255,255,.95); backdrop-filter: blur(12px); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom,0px); }
+  .tabs-inner { max-width: var(--maxw); margin-inline: auto; display: grid; grid-template-columns: repeat(4,1fr); height: var(--navh); }
+  .tab { background: none; border: 0; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; color: var(--muted); font-family: var(--font-display); font-weight: 500; font-size: 11.5px; }
+  .tab .tic { font-size: 21px; line-height: 1; }
+  .tab.on { color: var(--grape-d); }
+  .tab.on .tic { transform: translateY(-1px); }
+
+  /* toast */
+  .toast { position: fixed; left: 50%; bottom: calc(var(--navh) + env(safe-area-inset-bottom,0px) + 16px); transform: translateX(-50%) translateY(20px); background: var(--ink); color: #fff; font-family: var(--font-display); font-weight: 500; font-size: 14px; padding: 12px 20px; border-radius: 14px; box-shadow: var(--shadow); z-index: 40; opacity: 0; pointer-events: none; transition: opacity .25s ease, transform .25s ease; max-width: 90%; text-align: center; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  @media (prefers-reduced-motion: reduce) { .btn:active { transform: none; } }
+</style>
+
+<header>
+  <div class="wrap bar">
+    <span class="brand"><span class="crown">♛</span>Ludo<b>ra</b></span>
+    <div class="right">
+      <button class="bal-chip" id="barBal" type="button">$70.00</button>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" data-set="en" class="active">EN</button>
+        <button type="button" data-set="hi">हिं</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <!-- WALLET -->
+    <section class="view" id="view-wallet">
+      <h1 class="page-title" data-t="w_title">My wallet</h1>
+      <p class="page-sub" data-t="w_sub">Demo money — shows exactly how the real wallet behaves.</p>
+      <div class="bal-hero">
+        <div class="label" data-t="w_total">Total balance</div>
+        <div class="big" id="wTotal">$70.00</div>
+        <div class="bal-split">
+          <div class="s"><div class="k" data-t="w_deposit">Deposit balance</div><div class="v" id="wDep">$50.00</div></div>
+          <div class="s"><div class="k" data-t="w_winnings">Winnings (withdrawable)</div><div class="v" id="wWin">$20.00</div></div>
+        </div>
+      </div>
+      <div class="quick">
+        <button class="btn btn-green" data-go="deposit" data-t="w_add">＋ Add money</button>
+        <button class="btn btn-white" data-go="withdraw" data-t="w_wd">↑ Withdraw</button>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <h3 style="font-size:17px" data-t="w_recent">Recent activity</h3>
+          <span class="kyc">✓ <span data-t="w_kyc">KYC verified</span></span>
+        </div>
+        <div id="txList"></div>
+      </div>
+    </section>
+
+    <!-- DEPOSIT -->
+    <section class="view" id="view-deposit" hidden>
+      <h1 class="page-title" data-t="d_title">Add money</h1>
+      <p class="page-sub" data-t="d_sub">Top up your deposit balance to join matches.</p>
+      <div class="card">
+        <div class="label" data-t="d_amount">Amount</div>
+        <div class="amt-input"><span>$</span><input id="depAmt" type="number" inputmode="decimal" min="5" step="1" value="50"></div>
+        <div class="chips" id="depChips"></div>
+        <div class="label" style="margin-top:20px" data-t="d_method">Payment method</div>
+        <div class="methods" id="depMethods"></div>
+        <div class="err" id="depErr"></div>
+        <button class="btn btn-green" id="depBtn" style="margin-top:16px" data-t="d_btn">Add money securely</button>
+        <p class="hint" data-t="d_hint">Min $5. Demo only — no real payment is taken. In production this routes to a licensed payment partner.</p>
+      </div>
+    </section>
+
+    <!-- WITHDRAW -->
+    <section class="view" id="view-withdraw" hidden>
+      <h1 class="page-title" data-t="wd_title">Withdraw</h1>
+      <p class="page-sub" data-t="wd_sub">Cash out your winnings to your account.</p>
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div class="label" data-t="wd_avail">Withdrawable balance</div>
+          <span class="kyc">✓ <span data-t="w_kyc">KYC verified</span></span>
+        </div>
+        <div style="font-family:var(--font-display);font-weight:700;font-size:28px;color:var(--green-d);margin-top:4px;font-variant-numeric:tabular-nums" id="wdAvail">$20.00</div>
+        <div class="label" style="margin-top:18px" data-t="d_amount">Amount</div>
+        <div class="amt-input"><span>$</span><input id="wdAmt" type="number" inputmode="decimal" min="10" step="1" value="20"></div>
+        <button class="btn btn-white btn-sm" id="wdMax" style="margin-top:10px;width:auto" data-t="wd_max">Withdraw all</button>
+        <div class="field">
+          <span class="label" data-t="wd_dest">Pay out to</span>
+          <input class="text-input" id="wdDest" type="text" placeholder="UPI ID / bank account" value="player@upi">
+        </div>
+        <div class="err" id="wdErr"></div>
+        <button class="btn btn-blue" id="wdBtn" style="margin-top:16px" data-t="wd_btn">Request withdrawal</button>
+        <p class="hint" data-t="wd_hint">Min $10. Only winnings are withdrawable. Deposits must be played first. Payouts usually settle within minutes.</p>
+      </div>
+    </section>
+
+    <!-- REFER -->
+    <section class="view" id="view-refer" hidden>
+      <h1 class="page-title" data-t="r_title">Refer &amp; earn</h1>
+      <p class="page-sub" data-t="r_sub">Earn 1% of everything your friends play — for life.</p>
+      <div class="ref-hero">
+        <div class="label" style="color:rgba(255,255,255,.85)" data-t="r_earned">Your referral earnings</div>
+        <div class="big" id="rEarn">$3.00</div>
+        <div class="code-box">
+          <span class="code" id="rCode">LUDORA-7K2X</span>
+          <button id="rCopy" type="button" data-t="r_copy">Copy link</button>
+        </div>
+      </div>
+      <div class="ref-stats">
+        <div class="ref-stat f"><div class="v" id="rFriends">3</div><div class="k" data-t="r_friends">Friends joined</div></div>
+        <div class="ref-stat v2"><div class="v" id="rVol">$300</div><div class="k" data-t="r_vol">Their play volume</div></div>
+        <div class="ref-stat e"><div class="v" id="rRate">1%</div><div class="k" data-t="r_rate">Commission</div></div>
+      </div>
+      <div class="how-ref">
+        <h3 style="font-size:16px" data-t="r_how">How it works</h3>
+        <ol>
+          <li data-t="r_h1">Share your code. A friend signs up with it.</li>
+          <li data-th="r_h2">Every time they pay an entry fee, you earn <span class="pct">1%</span> of that stake.</li>
+          <li data-t="r_h3">Your commission lands straight in your withdrawable balance.</li>
+        </ol>
+      </div>
+      <div class="card" style="margin-top:14px">
+        <h3 style="font-size:16px;margin-bottom:4px" data-t="r_friends_t">Your referred friends</h3>
+        <div id="friendList"></div>
+      </div>
+      <button class="btn btn-grape" id="simBtn" style="margin-top:14px" data-t="r_sim">Simulate a friend playing $50</button>
+      <p class="hint" style="text-align:center" data-t="r_simhint">Demo button to show the 1% commission crediting in real time.</p>
+    </section>
+
+  </div>
+</main>
+
+<nav class="tabs">
+  <div class="tabs-inner">
+    <button class="tab on" data-go="wallet"><span class="tic">👛</span><span data-t="tab_wallet">Wallet</span></button>
+    <button class="tab" data-go="deposit"><span class="tic">＋</span><span data-t="tab_deposit">Deposit</span></button>
+    <button class="tab" data-go="withdraw"><span class="tic">↑</span><span data-t="tab_withdraw">Withdraw</span></button>
+    <button class="tab" data-go="refer"><span class="tic">🎁</span><span data-t="tab_refer">Refer</span></button>
+  </div>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  var T = {
+    en: {
+      w_title:"My wallet", w_sub:"Demo money — shows exactly how the real wallet behaves.",
+      w_total:"Total balance", w_deposit:"Deposit balance", w_winnings:"Winnings (withdrawable)",
+      w_add:"＋ Add money", w_wd:"↑ Withdraw", w_recent:"Recent activity", w_kyc:"KYC verified",
+      d_title:"Add money", d_sub:"Top up your deposit balance to join matches.", d_amount:"Amount", d_method:"Payment method",
+      d_btn:"Add money securely", d_hint:"Min $5. Demo only — no real payment is taken. In production this routes to a licensed payment partner.",
+      wd_title:"Withdraw", wd_sub:"Cash out your winnings to your account.", wd_avail:"Withdrawable balance",
+      wd_max:"Withdraw all", wd_dest:"Pay out to", wd_btn:"Request withdrawal",
+      wd_hint:"Min $10. Only winnings are withdrawable. Deposits must be played first. Payouts usually settle within minutes.",
+      r_title:"Refer & earn", r_sub:"Earn 1% of everything your friends play — for life.",
+      r_earned:"Your referral earnings", r_copy:"Copy link", r_friends:"Friends joined", r_vol:"Their play volume", r_rate:"Commission",
+      r_how:"How it works", r_h1:"Share your code. A friend signs up with it.",
+      r_h2:"Every time they pay an entry fee, you earn <span class='pct'>1%</span> of that stake.",
+      r_h3:"Your commission lands straight in your withdrawable balance.",
+      r_friends_t:"Your referred friends", r_sim:"Simulate a friend playing $50",
+      r_simhint:"Demo button to show the 1% commission crediting in real time.",
+      tab_wallet:"Wallet", tab_deposit:"Deposit", tab_withdraw:"Withdraw", tab_refer:"Refer",
+      m_upi:"UPI", m_upi_d:"Instant · GPay, PhonePe, Paytm", m_card:"Card", m_card_d:"Visa, Mastercard, RuPay", m_bank:"Bank transfer", m_bank_d:"Net banking · 1–2 min",
+      tx_dep:"Money added", tx_wd:"Withdrawal", tx_ref:"Referral commission (1%)", tx_win:"Match won", tx_stake:"Stake locked",
+      via:"via", to:"to", from:"from",
+      err_min_d:"Minimum deposit is $5.", err_min_w:"Minimum withdrawal is $10.", err_over:"Amount exceeds your withdrawable balance.", err_dest:"Enter a UPI ID or bank account.",
+      t_added:"Added", t_wd:"Withdrawal requested", t_copied:"Referral link copied!", t_ref:"Referral commission credited!",
+      pending:"Processing"
+    },
+    hi: {
+      w_title:"मेरा वॉलेट", w_sub:"डेमो पैसा — दिखाता है कि असली वॉलेट कैसे काम करेगा।",
+      w_total:"कुल बैलेंस", w_deposit:"जमा बैलेंस", w_winnings:"जीत (निकासी योग्य)",
+      w_add:"＋ पैसे जोड़ें", w_wd:"↑ निकासी", w_recent:"हाल की गतिविधि", w_kyc:"KYC सत्यापित",
+      d_title:"पैसे जोड़ें", d_sub:"मैच जॉइन करने के लिए अपना जमा बैलेंस बढ़ाएं।", d_amount:"राशि", d_method:"भुगतान का तरीका",
+      d_btn:"सुरक्षित रूप से पैसे जोड़ें", d_hint:"न्यूनतम $5। केवल डेमो — कोई असली भुगतान नहीं लिया जाता। प्रोडक्शन में यह लाइसेंस प्राप्त पेमेंट पार्टनर से होता है।",
+      wd_title:"निकासी", wd_sub:"अपनी जीत अपने खाते में निकालें।", wd_avail:"निकासी योग्य बैलेंस",
+      wd_max:"सब निकालें", wd_dest:"भुगतान यहाँ भेजें", wd_btn:"निकासी का अनुरोध करें",
+      wd_hint:"न्यूनतम $10। केवल जीत निकाली जा सकती है। जमा को पहले खेलना ज़रूरी है। भुगतान आमतौर पर मिनटों में होता है।",
+      r_title:"रेफ़र करें और कमाएं", r_sub:"अपने दोस्तों के हर खेल का 1% कमाएं — जीवनभर।",
+      r_earned:"आपकी रेफ़रल कमाई", r_copy:"लिंक कॉपी करें", r_friends:"जुड़े दोस्त", r_vol:"उनका खेल वॉल्यूम", r_rate:"कमीशन",
+      r_how:"यह कैसे काम करता है", r_h1:"अपना कोड शेयर करें। दोस्त उससे साइन अप करता है।",
+      r_h2:"जब भी वे एंट्री फीस देते हैं, आप उस स्टेक का <span class='pct'>1%</span> कमाते हैं।",
+      r_h3:"आपका कमीशन सीधे आपके निकासी योग्य बैलेंस में आता है।",
+      r_friends_t:"आपके रेफ़र किए दोस्त", r_sim:"दोस्त के $50 खेलने का सिम्युलेशन",
+      r_simhint:"1% कमीशन रियल-टाइम में जुड़ते दिखाने के लिए डेमो बटन।",
+      tab_wallet:"वॉलेट", tab_deposit:"जमा", tab_withdraw:"निकासी", tab_refer:"रेफ़र",
+      m_upi:"UPI", m_upi_d:"तुरंत · GPay, PhonePe, Paytm", m_card:"कार्ड", m_card_d:"Visa, Mastercard, RuPay", m_bank:"बैंक ट्रांसफ़र", m_bank_d:"नेट बैंकिंग · 1–2 मिनट",
+      tx_dep:"पैसे जोड़े", tx_wd:"निकासी", tx_ref:"रेफ़रल कमीशन (1%)", tx_win:"मैच जीता", tx_stake:"स्टेक लॉक",
+      via:"के ज़रिए", to:"को", from:"से",
+      err_min_d:"न्यूनतम जमा $5 है।", err_min_w:"न्यूनतम निकासी $10 है।", err_over:"राशि आपके निकासी योग्य बैलेंस से अधिक है।", err_dest:"UPI ID या बैंक खाता दर्ज करें।",
+      t_added:"जोड़ा गया", t_wd:"निकासी का अनुरोध किया गया", t_copied:"रेफ़रल लिंक कॉपी हो गया!", t_ref:"रेफ़रल कमीशन जोड़ा गया!",
+      pending:"प्रोसेसिंग"
+    }
+  };
+  var lang = "en";
+  function t(k){ return (T[lang] && T[lang][k] != null) ? T[lang][k] : (T.en[k] != null ? T.en[k] : k); }
+
+  var REF_RATE = 0.01;
+  var METHODS = [
+    { id:"upi",  ic:"📲", bg:"#DEF6E9", t:"m_upi",  d:"m_upi_d" },
+    { id:"card", ic:"💳", bg:"#E2F1FC", t:"m_card", d:"m_card_d" },
+    { id:"bank", ic:"🏦", bg:"#FFF2D4", t:"m_bank", d:"m_bank_d" }
+  ];
+  var FRIEND_NAMES = ["Rohit","Priya","Aman","Neha","Vikram","Sana","Dev","Isha"];
+
+  var state = {
+    deposit: 50, winnings: 20,
+    ref: { code:"LUDORA-7K2X", volume:300, earnings:3, friends:[ {n:"Rohit",v:120}, {n:"Priya",v:110}, {n:"Aman",v:70} ] },
+    depMethod: "upi",
+    tx: [
+      { ty:"ref", k:"tx_ref", amt:1.10, meta:"Priya", ts:Date.now()-86400000 },
+      { ty:"inp", k:"tx_dep", amt:50, meta:"upi", ts:Date.now()-172800000 },
+      { ty:"out", k:"tx_wd", amt:-15, meta:"player@upi", ts:Date.now()-259200000 }
+    ]
+  };
+  function money(n){ n = Math.round(n*100)/100; return "$" + n.toFixed(2); }
+  function money0(n){ return "$" + Math.round(n); }
+  function save(){ try { localStorage.setItem("ludora_wallet", JSON.stringify(state)); } catch(e){} }
+  function load(){ try { var s = JSON.parse(localStorage.getItem("ludora_wallet")||"null"); if (s && typeof s.deposit==="number"){ state.deposit=s.deposit; state.winnings=s.winnings; state.ref=s.ref; state.tx=s.tx; state.depMethod=s.depMethod||"upi"; } } catch(e){} }
+
+  var $ = function(id){ return document.getElementById(id); };
+  function total(){ return state.deposit + state.winnings; }
+
+  function fmtWhen(ts){ var d = Math.floor((Date.now()-ts)/86400000); if (d<=0) return lang==="hi"?"आज":"Today"; if (d===1) return lang==="hi"?"कल":"Yesterday"; return d + (lang==="hi"?" दिन पहले":"d ago"); }
+  function txMeta(x){ if (x.ty==="inp") return t("via")+" "+(T[lang]["m_"+x.meta]?t("m_"+x.meta):x.meta); if (x.ty==="out") return t("to")+" "+x.meta; if (x.ty==="ref") return t("from")+" "+x.meta; return x.meta||""; }
+
+  function render(){
+    $("barBal").textContent = money(total());
+    $("wTotal").textContent = money(total());
+    $("wDep").textContent = money(state.deposit);
+    $("wWin").textContent = money(state.winnings);
+    $("wdAvail").textContent = money(state.winnings);
+    // tx list
+    var tl = $("txList"); tl.innerHTML = "";
+    state.tx.slice(0,8).forEach(function(x){
+      var cls = x.amt >= 0 ? "pos" : "neg";
+      var iccls = x.ty;
+      var ic = x.ty==="inp" ? "⬇" : (x.ty==="out" ? "⬆" : "🎁");
+      var row = document.createElement("div"); row.className = "tx";
+      row.innerHTML = '<div class="ti '+iccls+'">'+ic+'</div>'+
+        '<div class="tinfo"><div class="tt">'+t(x.k)+'</div><div class="ts">'+txMeta(x)+' · '+fmtWhen(x.ts)+'</div></div>'+
+        '<div class="tamt '+cls+'">'+(x.amt>=0?"+":"")+money(x.amt)+'</div>';
+      tl.appendChild(row);
+    });
+    // refer
+    $("rEarn").textContent = money(state.ref.earnings);
+    $("rCode").textContent = state.ref.code;
+    $("rFriends").textContent = state.ref.friends.length;
+    $("rVol").textContent = money0(state.ref.volume);
+    var fl = $("friendList"); fl.innerHTML = "";
+    state.ref.friends.forEach(function(f){
+      var row = document.createElement("div"); row.className = "tx";
+      row.innerHTML = '<div class="ti ref">'+f.n.charAt(0)+'</div>'+
+        '<div class="tinfo"><div class="tt">'+f.n+'</div><div class="ts">'+(lang==="hi"?"खेला ":"played ")+money0(f.v)+'</div></div>'+
+        '<div class="tamt pos">+'+money(f.v*REF_RATE)+'</div>';
+      fl.appendChild(row);
+    });
+  }
+
+  function renderMethods(){
+    var box = $("depMethods"); box.innerHTML = "";
+    METHODS.forEach(function(m){
+      var el = document.createElement("div"); el.className = "method" + (state.depMethod===m.id?" on":"");
+      el.innerHTML = '<div class="mi" style="background:'+m.bg+'">'+m.ic+'</div><div><div class="mt">'+t(m.t)+'</div><div class="md">'+t(m.d)+'</div></div><div class="rad"></div>';
+      el.addEventListener("click", function(){ state.depMethod = m.id; save(); renderMethods(); });
+      box.appendChild(el);
+    });
+  }
+  function renderChips(){
+    var box = $("depChips"); box.innerHTML = "";
+    [10,25,50,100,250].forEach(function(v){
+      var b = document.createElement("button"); b.className="chip"; b.textContent="$"+v;
+      b.addEventListener("click", function(){ $("depAmt").value=v; syncChips(); $("depErr").textContent=""; });
+      box.appendChild(b);
+    });
+    syncChips();
+  }
+  function syncChips(){ var v = parseFloat($("depAmt").value); document.querySelectorAll("#depChips .chip").forEach(function(c){ c.classList.toggle("on", parseFloat(c.textContent.slice(1))===v); }); }
+
+  var toastTimer;
+  function toast(msg){ var el = $("toast"); el.textContent = msg; el.classList.add("show"); clearTimeout(toastTimer); toastTimer = setTimeout(function(){ el.classList.remove("show"); }, 2200); }
+
+  function go(view){
+    ["wallet","deposit","withdraw","refer"].forEach(function(v){ $("view-"+v).hidden = (v!==view); });
+    document.querySelectorAll(".tab").forEach(function(tb){ tb.classList.toggle("on", tb.getAttribute("data-go")===view); });
+    window.scrollTo(0,0);
+  }
+
+  // Deposit
+  function doDeposit(){
+    var amt = parseFloat($("depAmt").value); $("depErr").textContent="";
+    if (!amt || amt < 5){ $("depErr").textContent = t("err_min_d"); return; }
+    amt = Math.round(amt*100)/100;
+    state.deposit += amt;
+    state.tx.unshift({ ty:"inp", k:"tx_dep", amt:amt, meta:state.depMethod, ts:Date.now() });
+    save(); render(); toast(t("t_added")+" "+money(amt)); go("wallet");
+  }
+  // Withdraw
+  function doWithdraw(){
+    var amt = parseFloat($("wdAmt").value); $("wdErr").textContent="";
+    var dest = $("wdDest").value.trim();
+    if (!amt || amt < 10){ $("wdErr").textContent = t("err_min_w"); return; }
+    if (amt > state.winnings + 0.0001){ $("wdErr").textContent = t("err_over"); return; }
+    if (!dest){ $("wdErr").textContent = t("err_dest"); return; }
+    amt = Math.round(amt*100)/100;
+    state.winnings -= amt;
+    state.tx.unshift({ ty:"out", k:"tx_wd", amt:-amt, meta:dest, ts:Date.now() });
+    save(); render(); toast(t("t_wd")+" · "+money(amt)); go("wallet");
+  }
+  // Referral simulate
+  function doSimRef(){
+    var stake = 50;
+    var comm = Math.round(stake*REF_RATE*100)/100;
+    var name = FRIEND_NAMES[Math.floor(Math.random()*FRIEND_NAMES.length)];
+    state.ref.volume += stake;
+    state.ref.earnings += comm;
+    state.winnings += comm;
+    var ex = null; state.ref.friends.forEach(function(f){ if (f.n===name) ex=f; });
+    if (ex) ex.v += stake; else state.ref.friends.unshift({ n:name, v:stake });
+    state.tx.unshift({ ty:"ref", k:"tx_ref", amt:comm, meta:name, ts:Date.now() });
+    save(); render(); toast(t("t_ref")+" +"+money(comm));
+  }
+  function doCopy(){
+    var link = "https://ludora.game/r/" + state.ref.code;
+    if (navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(link).then(function(){ toast(t("t_copied")); }).catch(function(){ fallbackCopy(link); });
+    } else fallbackCopy(link);
+  }
+  function fallbackCopy(txt){ try { var ta=document.createElement("textarea"); ta.value=txt; document.body.appendChild(ta); ta.select(); document.execCommand("copy"); document.body.removeChild(ta); toast(t("t_copied")); } catch(e){ toast(txt); } }
+
+  // Language
+  function applyLang(l){
+    if (!T[l]) l="en"; lang=l;
+    document.documentElement.setAttribute("lang", l);
+    document.documentElement.setAttribute("data-lang", l);
+    document.querySelectorAll("[data-t]").forEach(function(el){ var v=T[l][el.getAttribute("data-t")]; if (v!=null) el.textContent=v; });
+    document.querySelectorAll("[data-th]").forEach(function(el){ var v=T[l][el.getAttribute("data-th")]; if (v!=null) el.innerHTML=v; });
+    document.querySelectorAll(".lang-toggle button").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-set")===l); });
+    renderMethods(); render();
+    try { localStorage.setItem("ludora_lang", l); } catch(e){}
+  }
+
+  // Wire
+  document.querySelectorAll("[data-go]").forEach(function(b){ b.addEventListener("click", function(){ go(b.getAttribute("data-go")); }); });
+  $("depBtn").addEventListener("click", doDeposit);
+  $("depAmt").addEventListener("input", function(){ syncChips(); $("depErr").textContent=""; });
+  $("wdBtn").addEventListener("click", doWithdraw);
+  $("wdMax").addEventListener("click", function(){ $("wdAmt").value = Math.round(state.winnings*100)/100; $("wdErr").textContent=""; });
+  $("simBtn").addEventListener("click", doSimRef);
+  $("rCopy").addEventListener("click", doCopy);
+  $("barBal").addEventListener("click", function(){ go("wallet"); });
+  document.querySelectorAll(".lang-toggle button").forEach(function(b){ b.addEventListener("click", function(){ applyLang(b.getAttribute("data-set")); }); });
+
+  load(); renderChips(); renderMethods(); render(); go("wallet");
+  var sl="en"; try { sl = localStorage.getItem("ludora_lang")||"en"; } catch(e){}
+  applyLang(sl);
+})();
+</script>

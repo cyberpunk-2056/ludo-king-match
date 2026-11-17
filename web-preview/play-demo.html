@@ -1,0 +1,584 @@
+<title>Ludora Play Demo</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&family=Baloo+2:wght@500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap">
+<style>
+  /* App demo for the create/join/stake/settle loop. Dark arcade world, single committed theme.
+     Palette from Ludo's four tokens over midnight + gold; Latin faces, Devanagari swapped for HI. */
+  :root {
+    --bg: #080B14; --bg-2: #0C1120; --surface: #121A2E; --surface-2: #18223A;
+    --line: rgba(255,255,255,0.08); --line-strong: rgba(255,255,255,0.14);
+    --fg: #EAEEFA; --fg-dim: #AAB4CD; --muted: #7C87A3;
+    --gold: #E9BA54; --gold-soft: #F2D08A;
+    --red: #F0434E; --green: #2BD47D; --yellow: #FFC845; --blue: #3D8BFF;
+    --shadow: 0 24px 60px -24px rgba(0,0,0,0.8);
+    --radius: 16px;
+    --font-display: "Bricolage Grotesque","Trebuchet MS",sans-serif;
+    --font-body: "Manrope",system-ui,sans-serif;
+    color-scheme: dark;
+  }
+  :root[data-lang="hi"] { --font-display:"Baloo 2","Noto Sans Devanagari",sans-serif; --font-body:"Noto Sans Devanagari",system-ui,sans-serif; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: radial-gradient(900px 500px at 85% -10%, rgba(61,139,255,0.12), transparent 60%), var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+  h1,h2,h3 { font-family: var(--font-display); font-weight: 800; margin: 0; line-height: 1.08; letter-spacing: -0.01em; }
+  p { margin: 0; }
+  a { color: inherit; }
+  .wrap { width: 100%; max-width: 760px; margin-inline: auto; padding-inline: max(16px, env(safe-area-inset-left,0px)) max(16px, env(safe-area-inset-right,0px)); }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; font-family: var(--font-body); font-weight: 700; font-size: 15px; padding: 12px 18px; border-radius: 12px; border: 1px solid transparent; cursor: pointer; transition: transform .12s ease, box-shadow .2s ease, background .2s ease; white-space: nowrap; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-primary { background: linear-gradient(180deg,var(--gold-soft),var(--gold)); color: #231803; box-shadow: 0 10px 26px -12px rgba(233,186,84,.6); }
+  .btn-primary:not(:disabled):hover { transform: translateY(-2px); }
+  .btn-ghost { background: rgba(255,255,255,.04); color: var(--fg); border-color: var(--line-strong); }
+  .btn-ghost:not(:disabled):hover { background: rgba(255,255,255,.08); }
+  .btn-sm { padding: 9px 14px; font-size: 13.5px; border-radius: 10px; }
+
+  /* App bar */
+  header { position: sticky; top: env(safe-area-inset-top,0px); z-index: 20; background: color-mix(in srgb, var(--bg) 82%, transparent); backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+  body::before { content:""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top,0px); z-index: 30; background: var(--bg); }
+  .bar { display: flex; align-items: center; gap: 12px; height: 62px; }
+  .brand { display: inline-flex; align-items: center; gap: 9px; font-family: var(--font-display); font-weight: 800; font-size: 18px; }
+  .brand .mark { width: 28px; height: 28px; border-radius: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; padding: 4px; background: var(--surface-2); border: 1px solid var(--line-strong); }
+  .brand .mark span { border-radius: 2px; }
+  .brand .mark span:nth-child(1){background:var(--red)} .brand .mark span:nth-child(2){background:var(--green)}
+  .brand .mark span:nth-child(3){background:var(--blue)} .brand .mark span:nth-child(4){background:var(--yellow)}
+  .brand b { color: var(--gold-soft); }
+  .bar .right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .wallet-chip { display: inline-flex; align-items: center; gap: 8px; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 999px; padding: 7px 13px; font-weight: 800; font-size: 14px; font-variant-numeric: tabular-nums; cursor: pointer; }
+  .wallet-chip .lbl { color: var(--muted); font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+  .wallet-chip .amt { color: var(--gold-soft); }
+  .lang-toggle { display: inline-flex; border: 1px solid var(--line-strong); border-radius: 999px; overflow: hidden; }
+  .lang-toggle button { background: transparent; border: 0; color: var(--fg-dim); font-family: var(--font-body); font-weight: 700; font-size: 12.5px; padding: 7px 11px; cursor: pointer; }
+  .lang-toggle button[data-set="hi"]{ font-family:"Noto Sans Devanagari",var(--font-body); }
+  .lang-toggle button.active { background: linear-gradient(180deg,var(--gold-soft),var(--gold)); color: #231803; }
+
+  main { padding-block: 22px 60px; }
+  .view[hidden] { display: none !important; }
+
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px; }
+  .panel + .panel { margin-top: 16px; }
+  .eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--gold-soft); }
+  .section-title { font-size: 20px; margin-top: 6px; }
+  .muted { color: var(--fg-dim); font-size: 14px; }
+
+  /* Wallet summary */
+  .wallet-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  .wtile { background: var(--bg-2); border: 1px solid var(--line); border-radius: 13px; padding: 14px; }
+  .wtile .k { font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 700; }
+  .wtile .v { font-family: var(--font-display); font-weight: 800; font-size: 22px; margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .wtile.bal .v { color: var(--gold-soft); } .wtile.esc .v { color: var(--blue); } .wtile.comm .v { color: var(--green); }
+
+  /* Create form */
+  .field-label { font-size: 13px; font-weight: 700; color: var(--fg-dim); margin-bottom: 8px; }
+  .stake-input { display: flex; align-items: center; gap: 8px; background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: 12px; padding: 4px 4px 4px 14px; }
+  .stake-input span { color: var(--muted); font-weight: 800; }
+  .stake-input input { flex: 1; min-width: 0; background: transparent; border: 0; color: var(--fg); font-family: var(--font-body); font-weight: 800; font-size: 18px; padding: 10px 0; outline: none; font-variant-numeric: tabular-nums; }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .chip { background: var(--surface-2); border: 1px solid var(--line-strong); color: var(--fg-dim); border-radius: 999px; padding: 7px 13px; font-weight: 700; font-size: 13px; cursor: pointer; font-variant-numeric: tabular-nums; }
+  .chip:hover, .chip.on { color: #231803; background: linear-gradient(180deg,var(--gold-soft),var(--gold)); border-color: transparent; }
+  .payout-preview { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--line-strong); font-size: 13.5px; }
+  .payout-preview b { font-variant-numeric: tabular-nums; }
+  .pp-win b { color: var(--green); } .pp-comm b { color: var(--gold-soft); }
+  .err { color: #ff8b92; font-size: 13px; font-weight: 600; margin-top: 10px; min-height: 1px; }
+
+  /* Rooms */
+  .room { display: flex; align-items: center; gap: 12px; padding: 13px 0; border-bottom: 1px solid var(--line); }
+  .room:last-child { border-bottom: 0; }
+  .room .av { flex: none; width: 40px; height: 40px; border-radius: 11px; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; color: #0b0b0b; }
+  .room .info { min-width: 0; flex: 1; }
+  .room .info .nm { font-weight: 700; font-size: 14.5px; }
+  .room .info .sub { font-size: 12.5px; color: var(--muted); }
+  .room .stake { font-weight: 800; color: var(--gold-soft); font-variant-numeric: tabular-nums; font-size: 14px; }
+
+  /* Match */
+  .match-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
+  .pot-chip { background: var(--bg-2); border: 1px solid var(--line-strong); border-radius: 12px; padding: 8px 14px; text-align: center; }
+  .pot-chip .k { font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; }
+  .pot-chip .v { font-family: var(--font-display); font-weight: 800; font-size: 20px; color: var(--gold-soft); font-variant-numeric: tabular-nums; }
+  .vs-row { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; margin-bottom: 16px; }
+  .side { display: flex; align-items: center; gap: 10px; }
+  .side.opp { flex-direction: row-reverse; text-align: right; }
+  .side .dot { width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; color: #0b0b0b; font-family: var(--font-display); }
+  .side .nm { font-weight: 700; font-size: 14px; } .side .rt { font-size: 12px; color: var(--muted); }
+  .side.active .nm { color: var(--gold-soft); }
+  .vs-mid { font-family: var(--font-display); font-weight: 800; color: var(--muted); }
+
+  .track { display: grid; grid-template-columns: repeat(auto-fill, minmax(30px, 1fr)); gap: 5px; background: var(--bg-2); border: 1px solid var(--line); border-radius: 14px; padding: 12px; }
+  .cell { aspect-ratio: 1; border-radius: 7px; background: var(--surface-2); border: 1px solid var(--line); display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 2px; position: relative; }
+  .cell .ci { position: absolute; top: 2px; left: 4px; font-size: 8px; color: var(--muted); font-variant-numeric: tabular-nums; }
+  .cell.home { background: rgba(233,186,84,.14); border-color: rgba(233,186,84,.5); }
+  .cell.start { background: rgba(124,135,163,.14); }
+  .tok { width: 15px; height: 15px; border-radius: 50%; font-size: 8px; font-weight: 800; color: #07101f; display: grid; place-items: center; border: 1.5px solid rgba(0,0,0,.25); }
+  .tok.b { background: var(--blue); } .tok.g { background: var(--green); } .tok.r { background: var(--red); } .tok.y { background: var(--yellow); }
+  .tok.movable { cursor: pointer; box-shadow: 0 0 0 2px var(--gold), 0 0 10px rgba(233,186,84,.8); animation: bob .9s ease-in-out infinite; }
+  @keyframes bob { 50% { transform: translateY(-3px); } }
+
+  .controls { display: flex; align-items: center; gap: 14px; margin-top: 16px; flex-wrap: wrap; }
+  .die { width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(180deg,#fff,#dfe4ef); color: #10182b; display: grid; place-items: center; font-family: var(--font-display); font-weight: 800; font-size: 28px; box-shadow: var(--shadow); font-variant-numeric: tabular-nums; }
+  .die.roll { animation: shake .5s ease; } @keyframes shake { 25%{transform:rotate(-12deg)} 75%{transform:rotate(12deg)} }
+  .turn-msg { font-weight: 700; font-size: 14.5px; min-height: 20px; }
+  .turn-msg.you { color: var(--gold-soft); }
+
+  /* Result */
+  .result-card { text-align: center; }
+  .result-emoji { font-size: 48px; }
+  .result-card h2 { font-size: 30px; margin-top: 6px; }
+  .result-card h2.win { color: var(--green); } .result-card h2.lose { color: #ff8b92; }
+  .breakdown { max-width: 340px; margin: 18px auto 0; display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .brow { display: flex; justify-content: space-between; gap: 12px; padding: 11px 15px; background: var(--surface); font-size: 14px; }
+  .brow b { font-variant-numeric: tabular-nums; }
+  .brow.tot { background: var(--bg-2); font-weight: 800; }
+  .brow .pos { color: var(--green); } .brow .neg { color: #ff8b92; }
+
+  /* Modal */
+  .modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: end center; background: rgba(4,6,12,.6); backdrop-filter: blur(3px); padding: 0; }
+  .modal[hidden] { display: none !important; }
+  .sheet { width: 100%; max-width: 760px; max-height: 82vh; overflow-y: auto; background: var(--surface); border: 1px solid var(--line-strong); border-radius: 20px 20px 0 0; padding: 22px; padding-bottom: calc(22px + env(safe-area-inset-bottom,0px)); }
+  .sheet-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .x { background: var(--surface-2); border: 1px solid var(--line-strong); color: var(--fg); width: 34px; height: 34px; border-radius: 10px; font-size: 18px; cursor: pointer; }
+  .ledger-row { display: flex; justify-content: space-between; gap: 12px; padding: 11px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
+  .ledger-row:last-child { border-bottom: 0; }
+  .ledger-row .amt { font-weight: 800; font-variant-numeric: tabular-nums; }
+  .ledger-row .amt.pos { color: var(--green); } .ledger-row .amt.neg { color: #ff8b92; } .ledger-row .amt.zero { color: var(--muted); }
+  .addfunds { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+
+  .note { font-size: 12px; color: var(--muted); margin-top: 14px; line-height: 1.6; }
+  @media (prefers-reduced-motion: reduce) { .tok.movable, .die.roll { animation: none; } }
+</style>
+
+<header>
+  <div class="wrap bar">
+    <span class="brand"><span class="mark"><span></span><span></span><span></span><span></span></span>Ludo<b>ra</b></span>
+    <div class="right">
+      <button class="wallet-chip" id="walletBtn"><span class="lbl" data-t="bal">Balance</span><span class="amt" id="barBal">$100.00</span></button>
+      <div class="lang-toggle" role="group" aria-label="Language">
+        <button type="button" data-set="en" class="active">EN</button>
+        <button type="button" data-set="hi">हिं</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+
+    <!-- LOBBY -->
+    <section class="view" id="view-lobby">
+      <div class="panel">
+        <div class="eyebrow" data-t="wallet_eyebrow">Your wallet</div>
+        <div class="section-title" data-t="wallet_title">Demo balance</div>
+        <div class="wallet-grid" style="margin-top:14px">
+          <div class="wtile bal"><div class="k" data-t="bal">Balance</div><div class="v" id="tBal">$100.00</div></div>
+          <div class="wtile esc"><div class="k" data-t="escrow">In escrow</div><div class="v" id="tEsc">$0.00</div></div>
+          <div class="wtile comm"><div class="k" data-t="commission">Platform 5%</div><div class="v" id="tComm">$0.00</div></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="eyebrow" data-t="create_eyebrow">Create a room</div>
+        <div class="section-title" data-t="create_title">Set your entry fee</div>
+        <p class="muted" style="margin-top:6px" data-t="create_sub">Your stake is locked in escrow until the match settles. You need enough balance to create.</p>
+        <div style="margin-top:16px">
+          <div class="field-label" data-t="entry_fee">Entry fee (stake)</div>
+          <div class="stake-input"><span>$</span><input id="stakeInput" type="number" inputmode="decimal" min="1" step="1" value="20"></div>
+          <div class="presets" id="presets"></div>
+          <div class="payout-preview">
+            <span class="pp-pot" data-t="pp_pot">Prize pot</span> <b id="ppPot">$40.00</b>
+            <span class="pp-win"><span data-t="pp_win">Winner gets 95%</span> <b id="ppWin">$38.00</b></span>
+            <span class="pp-comm"><span data-t="pp_comm">Platform 5%</span> <b id="ppComm">$2.00</b></span>
+          </div>
+          <div class="err" id="createErr"></div>
+          <button class="btn btn-primary" id="createBtn" style="width:100%;margin-top:14px" data-t="create_btn">Create room &amp; find opponent</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="eyebrow" data-t="open_eyebrow">Open rooms</div>
+        <div class="section-title" data-t="open_title">Join a match</div>
+        <div id="roomsList" style="margin-top:8px"></div>
+      </div>
+
+      <p class="note" data-t="demo_note">Demo money only. No real funds, no backend — this shows the create, join and 95% / 5% settlement loop exactly as the real wallet will work.</p>
+    </section>
+
+    <!-- MATCH -->
+    <section class="view" id="view-match" hidden>
+      <div class="panel">
+        <div class="match-head">
+          <div><div class="eyebrow" data-t="match_eyebrow">Live match</div><div class="section-title" data-t="match_title">1v1 Duel</div></div>
+          <div class="pot-chip"><div class="k" data-t="pp_pot">Prize pot</div><div class="v" id="mPot">$40.00</div></div>
+        </div>
+        <div class="vs-row">
+          <div class="side you" id="sideYou"><span class="dot b">Y</span><div><div class="nm" data-t="you">You</div><div class="rt">Rating 1820</div></div></div>
+          <div class="vs-mid">VS</div>
+          <div class="side opp" id="sideOpp"><span class="dot r">O</span><div><div class="nm" id="oppName">Nova_Dice</div><div class="rt">Rating 1844</div></div></div>
+        </div>
+        <div class="track" id="track"></div>
+        <div class="controls">
+          <div class="die" id="die">–</div>
+          <button class="btn btn-primary" id="rollBtn" data-t="roll">Roll dice</button>
+          <div class="turn-msg" id="turnMsg"></div>
+        </div>
+        <p class="note" data-t="match_rule">Move your blue and green tokens to the gold home cell. Land on an opponent token to send it back. Both tokens home wins the pot. A simplified stand-in for the full skill-based Ludo engine.</p>
+      </div>
+    </section>
+
+    <!-- RESULT -->
+    <section class="view" id="view-result" hidden>
+      <div class="panel result-card">
+        <div class="result-emoji" id="rEmoji">🏆</div>
+        <h2 id="rTitle" class="win">You won!</h2>
+        <p class="muted" id="rSub"></p>
+        <div class="breakdown" id="rBreak"></div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:20px">
+          <button class="btn btn-ghost" id="againBtn" data-t="again">Play again</button>
+          <button class="btn btn-primary" id="lobbyBtn" data-t="back_lobby">Back to lobby</button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- WALLET MODAL -->
+<div class="modal" id="walletModal" hidden>
+  <div class="sheet">
+    <div class="sheet-head">
+      <h3 data-t="wallet_history">Wallet &amp; history</h3>
+      <button class="x" id="closeWallet" aria-label="Close">×</button>
+    </div>
+    <div class="wallet-grid">
+      <div class="wtile bal"><div class="k" data-t="bal">Balance</div><div class="v" id="mBal">$100.00</div></div>
+      <div class="wtile esc"><div class="k" data-t="escrow">In escrow</div><div class="v" id="mEsc">$0.00</div></div>
+      <div class="wtile comm"><div class="k" data-t="commission">Platform 5%</div><div class="v" id="mComm">$0.00</div></div>
+    </div>
+    <div class="addfunds">
+      <button class="btn btn-ghost btn-sm" data-add="50">+ $50</button>
+      <button class="btn btn-ghost btn-sm" data-add="100">+ $100</button>
+      <button class="btn btn-ghost btn-sm" id="resetDemo" data-t="reset">Reset demo</button>
+    </div>
+    <h3 style="font-size:15px;margin:20px 0 4px" data-t="ledger">Transaction ledger</h3>
+    <div id="ledgerList"></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var T = {
+    en: {
+      bal:"Balance", escrow:"In escrow", commission:"Platform 5%",
+      wallet_eyebrow:"Your wallet", wallet_title:"Demo balance",
+      create_eyebrow:"Create a room", create_title:"Set your entry fee",
+      create_sub:"Your stake is locked in escrow until the match settles. You need enough balance to create.",
+      entry_fee:"Entry fee (stake)", pp_pot:"Prize pot", pp_win:"Winner gets 95%", pp_comm:"Platform 5%",
+      create_btn:"Create room & find opponent",
+      open_eyebrow:"Open rooms", open_title:"Join a match",
+      demo_note:"Demo money only. No real funds, no backend — this shows the create, join and 95% / 5% settlement loop exactly as the real wallet will work.",
+      match_eyebrow:"Live match", match_title:"1v1 Duel", you:"You", roll:"Roll dice",
+      match_rule:"Move your blue and green tokens to the gold home cell. Land on an opponent token to send it back. Both tokens home wins the pot. A simplified stand-in for the full skill-based Ludo engine.",
+      again:"Play again", back_lobby:"Back to lobby",
+      wallet_history:"Wallet & history", reset:"Reset demo", ledger:"Transaction ledger",
+      join:"Join", host_by:"Hosted by", entry:"entry",
+      err_stake:"Enter a valid stake of at least $1.", err_balance:"Not enough balance. Add funds or lower the stake.",
+      lock_create:"Stake locked — room created", lock_join:"Stake locked — joined room",
+      win_label:"Match won — 95% of pot", lose_label:"Match lost — stake forfeited",
+      add_funds:"Added demo funds", reset_label:"Demo reset",
+      your_turn:"Your turn — roll the dice", pick_token:"Pick a highlighted token to move",
+      opp_turn:"Opponent's turn…", you_rolled:"You rolled", opp_rolled:"Opponent rolled",
+      no_move:"No legal move — turn passes", extra:"Rolled a 6 — roll again!",
+      won_title:"You won!", lost_title:"You lost",
+      won_sub:"The pot is yours, minus the 5% platform commission.",
+      lost_sub:"Your opponent took the pot this time.",
+      b_pot:"Prize pot", b_stake:"Your stake", b_payout:"Payout (95%)", b_comm:"Platform commission (5%)", b_net:"Net to balance"
+    },
+    hi: {
+      bal:"बैलेंस", escrow:"एस्क्रो में", commission:"प्लेटफ़ॉर्म 5%",
+      wallet_eyebrow:"आपका वॉलेट", wallet_title:"डेमो बैलेंस",
+      create_eyebrow:"रूम बनाएं", create_title:"अपनी एंट्री फीस तय करें",
+      create_sub:"मैच सेटल होने तक आपका स्टेक एस्क्रो में लॉक रहता है। रूम बनाने के लिए पर्याप्त बैलेंस चाहिए।",
+      entry_fee:"एंट्री फीस (स्टेक)", pp_pot:"इनाम राशि", pp_win:"विजेता को 95%", pp_comm:"प्लेटफ़ॉर्म 5%",
+      create_btn:"रूम बनाएं और प्रतिद्वंद्वी खोजें",
+      open_eyebrow:"खुले रूम", open_title:"मैच जॉइन करें",
+      demo_note:"केवल डेमो पैसा। कोई असली फंड नहीं, कोई बैकएंड नहीं — यह रूम बनाने, जॉइन करने और 95% / 5% सेटलमेंट का पूरा लूप दिखाता है, बिल्कुल जैसे असली वॉलेट काम करेगा।",
+      match_eyebrow:"लाइव मैच", match_title:"1v1 डुएल", you:"आप", roll:"पासा फेंकें",
+      match_rule:"अपने नीले और हरे टोकन को सुनहरे होम सेल तक ले जाएं। प्रतिद्वंद्वी के टोकन पर उतरें तो वह वापस भेज दिया जाता है। दोनों टोकन होम पहुँचने पर पॉट जीतें। यह पूर्ण स्किल-आधारित लूडो इंजन का सरल रूप है।",
+      again:"फिर से खेलें", back_lobby:"लॉबी पर वापस",
+      wallet_history:"वॉलेट और इतिहास", reset:"डेमो रीसेट", ledger:"लेनदेन लेजर",
+      join:"जॉइन", host_by:"होस्ट", entry:"एंट्री",
+      err_stake:"कम से कम $1 का मान्य स्टेक दर्ज करें।", err_balance:"बैलेंस पर्याप्त नहीं। फंड जोड़ें या स्टेक घटाएं।",
+      lock_create:"स्टेक लॉक — रूम बनाया", lock_join:"स्टेक लॉक — रूम जॉइन किया",
+      win_label:"मैच जीता — पॉट का 95%", lose_label:"मैच हारा — स्टेक गया",
+      add_funds:"डेमो फंड जोड़ा", reset_label:"डेमो रीसेट",
+      your_turn:"आपकी बारी — पासा फेंकें", pick_token:"चलने के लिए हाइलाइट टोकन चुनें",
+      opp_turn:"प्रतिद्वंद्वी की बारी…", you_rolled:"आपने फेंका", opp_rolled:"प्रतिद्वंद्वी ने फेंका",
+      no_move:"कोई चाल नहीं — बारी पास", extra:"6 आया — फिर फेंकें!",
+      won_title:"आप जीते!", lost_title:"आप हारे",
+      won_sub:"पॉट आपका है, 5% प्लेटफ़ॉर्म कमीशन घटाकर।",
+      lost_sub:"इस बार प्रतिद्वंद्वी ने पॉट जीता।",
+      b_pot:"इनाम राशि", b_stake:"आपका स्टेक", b_payout:"भुगतान (95%)", b_comm:"प्लेटफ़ॉर्म कमीशन (5%)", b_net:"बैलेंस में शुद्ध"
+    }
+  };
+  var lang = "en";
+  function t(k){ return (T[lang] && T[lang][k] != null) ? T[lang][k] : (T.en[k] != null ? T.en[k] : k); }
+
+  // ---------- State ----------
+  var HOME = 27;
+  var state = { balance:100, escrow:0, commission:0, ledger:[] };
+  function money(n){ return "$" + (Math.round(n*100)/100).toFixed(2); }
+  function load(){ try { var s = JSON.parse(localStorage.getItem("ludora_demo")||"null"); if (s && typeof s.balance==="number"){ state.balance=s.balance; state.escrow=s.escrow||0; state.commission=s.commission||0; state.ledger=s.ledger||[]; } } catch(e){} }
+  function save(){ try { localStorage.setItem("ludora_demo", JSON.stringify({balance:state.balance,escrow:state.escrow,commission:state.commission,ledger:state.ledger})); } catch(e){} }
+  function addLedger(labelKey, amt){ state.ledger.unshift({ k:labelKey, amt:amt, ts:Date.now() }); }
+
+  // ---------- Rooms seed ----------
+  var ROOMS = [
+    { name:"KashFlow", stake:10, cls:"y", c1:"#ffc845", c2:"#f0434e" },
+    { name:"Nova_Dice", stake:20, cls:"b", c1:"#4f9bff", c2:"#2bd47d" },
+    { name:"RollRoyce", stake:5, cls:"g", c1:"#2bd47d", c2:"#3d8bff" },
+    { name:"SixOnSix", stake:50, cls:"r", c1:"#f0434e", c2:"#ffc845" }
+  ];
+
+  // ---------- DOM ----------
+  var $ = function(id){ return document.getElementById(id); };
+  function show(view){ ["view-lobby","view-match","view-result"].forEach(function(v){ $(v).hidden = (v !== view); }); window.scrollTo(0,0); }
+
+  function renderWallet(){
+    $("barBal").textContent = money(state.balance);
+    $("tBal").textContent = money(state.balance);
+    $("tEsc").textContent = money(state.escrow);
+    $("tComm").textContent = money(state.commission);
+    $("mBal").textContent = money(state.balance);
+    $("mEsc").textContent = money(state.escrow);
+    $("mComm").textContent = money(state.commission);
+  }
+  function renderLedger(){
+    var el = $("ledgerList"); el.innerHTML = "";
+    if (!state.ledger.length){ el.innerHTML = '<p class="muted">—</p>'; return; }
+    state.ledger.forEach(function(x){
+      var cls = x.amt > 0 ? "pos" : (x.amt < 0 ? "neg" : "zero");
+      var sign = x.amt > 0 ? "+" : "";
+      var row = document.createElement("div"); row.className = "ledger-row";
+      row.innerHTML = '<span>'+ t(x.k) +'</span><span class="amt '+cls+'">'+ (x.amt===0 ? "—" : sign+money(x.amt)) +'</span>';
+      el.appendChild(row);
+    });
+  }
+
+  // ---------- Payout preview ----------
+  function updatePreview(){
+    var stake = parseFloat($("stakeInput").value) || 0;
+    var pot = stake * 2, comm = Math.round(pot*5)/100, win = Math.round(pot*95)/100;
+    $("ppPot").textContent = money(pot);
+    $("ppWin").textContent = money(win);
+    $("ppComm").textContent = money(comm);
+    document.querySelectorAll("#presets .chip").forEach(function(c){ c.classList.toggle("on", parseFloat(c.dataset.v)===stake); });
+  }
+
+  // ---------- Lobby render ----------
+  function renderPresets(){
+    var box = $("presets"); box.innerHTML = "";
+    [5,10,20,50,100].forEach(function(v){
+      var b = document.createElement("button"); b.className="chip"; b.dataset.v=v; b.textContent="$"+v;
+      b.addEventListener("click", function(){ $("stakeInput").value=v; updatePreview(); $("createErr").textContent=""; });
+      box.appendChild(b);
+    });
+  }
+  function renderRooms(){
+    var box = $("roomsList"); box.innerHTML = "";
+    ROOMS.forEach(function(r){
+      var row = document.createElement("div"); row.className="room";
+      row.innerHTML =
+        '<span class="av" style="background:linear-gradient(145deg,'+r.c1+','+r.c2+')">'+r.name.charAt(0)+'</span>'+
+        '<div class="info"><div class="nm">'+r.name+'</div><div class="sub">'+t("host_by")+' · 1v1 Duel</div></div>'+
+        '<div class="stake">'+money(r.stake)+' <span style="color:var(--muted);font-weight:600">'+t("entry")+'</span></div>';
+      var btn = document.createElement("button"); btn.className="btn btn-ghost btn-sm"; btn.textContent=t("join"); btn.style.marginLeft="10px";
+      btn.addEventListener("click", function(){ joinRoom(r); });
+      row.appendChild(btn);
+      box.appendChild(row);
+    });
+  }
+
+  // ---------- Create / Join ----------
+  function createRoom(){
+    var stake = parseFloat($("stakeInput").value);
+    $("createErr").textContent = "";
+    if (!stake || stake < 1){ $("createErr").textContent = t("err_stake"); return; }
+    stake = Math.round(stake*100)/100;
+    if (stake > state.balance){ $("createErr").textContent = t("err_balance"); return; }
+    state.balance -= stake; state.escrow += stake;
+    addLedger("lock_create", -stake); save(); renderWallet(); renderLedger();
+    startMatch(stake, ROOMS[1]);
+  }
+  function joinRoom(r){
+    if (r.stake > state.balance){ openWallet(); return; }
+    state.balance -= r.stake; state.escrow += r.stake;
+    addLedger("lock_join", -r.stake); save(); renderWallet(); renderLedger();
+    startMatch(r.stake, r);
+  }
+
+  // ---------- Match ----------
+  var M = null;
+  function startMatch(stake, opp){
+    M = { stake:stake, pot:stake*2, cur:"you", dice:null, await:false, over:false,
+          tok:{ you:[0,0], opp:[0,0] }, oppName:opp.name };
+    $("oppName").textContent = opp.name;
+    $("mPot").textContent = money(M.pot);
+    $("die").textContent = "–";
+    show("view-match");
+    renderTrack(); setTurn("you");
+  }
+  function cellsOccupants(){
+    var map = {};
+    ["you","opp"].forEach(function(side){ M.tok[side].forEach(function(p,i){ (map[p]=map[p]||[]).push({side:side,i:i}); }); });
+    return map;
+  }
+  function renderTrack(movable){
+    movable = movable || [];
+    var track = $("track"); track.innerHTML = "";
+    var occ = cellsOccupants();
+    for (var c=0; c<=HOME; c++){
+      var cell = document.createElement("div");
+      cell.className = "cell" + (c===HOME ? " home" : "") + (c===0 ? " start" : "");
+      cell.innerHTML = '<span class="ci">'+ (c===0?"⟲":(c===HOME?"★":c)) +'</span>';
+      (occ[c]||[]).forEach(function(o){
+        var tk = document.createElement("span");
+        var color = o.side==="you" ? (o.i===0?"b":"g") : (o.i===0?"r":"y");
+        tk.className = "tok "+color;
+        tk.textContent = (o.side==="you"?"Y":"O")+(o.i+1);
+        var mv = movable.indexOf(o.i) > -1 && o.side==="you";
+        if (mv){ tk.classList.add("movable"); (function(idx){ tk.addEventListener("click", function(){ doMove("you", idx, M.dice); }); })(o.i); }
+        cell.appendChild(tk);
+      });
+      track.appendChild(cell);
+    }
+  }
+  function legalMoves(side, dice){
+    var mv = [];
+    M.tok[side].forEach(function(p,i){ if (p < HOME && p + dice <= HOME) mv.push(i); });
+    return mv;
+  }
+  function setTurn(who){
+    M.cur = who;
+    $("sideYou").classList.toggle("active", who==="you");
+    $("sideOpp").classList.toggle("active", who==="opp");
+    var msg = $("turnMsg");
+    if (who==="you"){ msg.textContent = t("your_turn"); msg.classList.add("you"); $("rollBtn").disabled = false; }
+    else { msg.textContent = t("opp_turn"); msg.classList.remove("you"); $("rollBtn").disabled = true; setTimeout(oppTurn, 650); }
+  }
+  function rollDice(){ return 1 + Math.floor(Math.random()*6); }
+
+  function youRoll(){
+    if (M.cur!=="you" || M.over) return;
+    $("rollBtn").disabled = true;
+    var d = rollDice(); M.dice = d; animDie(d);
+    var mv = legalMoves("you", d);
+    $("turnMsg").textContent = t("you_rolled") + " " + d;
+    if (!mv.length){ setTimeout(function(){ $("turnMsg").textContent = t("no_move"); endTurn("you", d); }, 700); return; }
+    setTimeout(function(){ $("turnMsg").textContent = t("pick_token"); renderTrack(mv); }, 450);
+  }
+  function oppTurn(){
+    if (M.over) return;
+    var d = rollDice(); M.dice = d; animDie(d);
+    $("turnMsg").textContent = t("opp_rolled") + " " + d;
+    var mv = legalMoves("opp", d);
+    if (!mv.length){ setTimeout(function(){ endTurn("opp", d); }, 650); return; }
+    // AI: capture > reach home > advance furthest
+    var occ = cellsOccupants(), best = mv[0], bestScore = -1;
+    mv.forEach(function(i){
+      var to = M.tok.opp[i] + d, score = M.tok.opp[i];
+      if (to === HOME) score += 100;
+      if ((occ[to]||[]).some(function(o){ return o.side==="you" && to!==0 && to!==HOME; })) score += 1000;
+      if (score > bestScore){ bestScore = score; best = i; }
+    });
+    setTimeout(function(){ doMove("opp", best, d); }, 600);
+  }
+  function doMove(side, i, d){
+    if (M.over) return;
+    var to = M.tok[side][i] + d;
+    if (to > HOME) return;
+    M.tok[side][i] = to;
+    // capture
+    if (to !== 0 && to !== HOME){
+      var other = side==="you" ? "opp" : "you";
+      M.tok[other].forEach(function(p,j){ if (p === to){ M.tok[other][j] = 0; } });
+    }
+    renderTrack();
+    // win?
+    if (M.tok[side][0]===HOME && M.tok[side][1]===HOME){ return finishMatch(side==="you"); }
+    endTurn(side, d);
+  }
+  function endTurn(side, d){
+    if (M.over) return;
+    if (d === 6){ // extra turn
+      if (side==="you"){ $("turnMsg").textContent = t("extra"); setTurn("you"); }
+      else { setTurn("opp"); }
+    } else {
+      setTurn(side==="you" ? "opp" : "you");
+    }
+  }
+  function animDie(d){ var die=$("die"); die.textContent=d; die.classList.remove("roll"); void die.offsetWidth; die.classList.add("roll"); }
+
+  // ---------- Settlement ----------
+  function finishMatch(youWon){
+    M.over = true;
+    var pot = M.pot, comm = Math.round(pot*5)/100, payout = Math.round(pot*95)/100;
+    state.escrow -= M.stake; if (state.escrow < 0.005) state.escrow = 0;
+    state.commission += comm;
+    if (youWon){ state.balance += payout; addLedger("win_label", payout); }
+    else { addLedger("lose_label", 0); }
+    save(); renderWallet(); renderLedger();
+
+    $("rEmoji").textContent = youWon ? "🏆" : "💔";
+    var title = $("rTitle"); title.textContent = youWon ? t("won_title") : t("lost_title");
+    title.className = youWon ? "win" : "lose";
+    $("rSub").textContent = youWon ? t("won_sub") : t("lost_sub");
+    var rows = [
+      ["b_pot", money(pot), ""],
+      ["b_stake", "-"+money(M.stake), "neg"],
+      youWon ? ["b_payout", "+"+money(payout), "pos"] : ["b_comm", money(comm), ""],
+      ["b_net", (youWon ? "+" : "-")+money(youWon ? payout - M.stake : M.stake), youWon ? "pos" : "neg"]
+    ];
+    var bd = $("rBreak"); bd.innerHTML = "";
+    rows.forEach(function(r, idx){
+      var row = document.createElement("div"); row.className = "brow" + (idx===rows.length-1 ? " tot" : "");
+      row.innerHTML = '<span>'+t(r[0])+'</span><b class="'+r[2]+'">'+r[1]+'</b>';
+      bd.appendChild(row);
+    });
+    show("view-result");
+  }
+
+  // ---------- Wallet modal ----------
+  function openWallet(){ renderWallet(); renderLedger(); $("walletModal").hidden = false; }
+  function closeWallet(){ $("walletModal").hidden = true; }
+
+  // ---------- Language ----------
+  function applyLang(l){
+    if (!T[l]) l = "en"; lang = l;
+    document.documentElement.setAttribute("lang", l);
+    document.documentElement.setAttribute("data-lang", l);
+    document.querySelectorAll("[data-t]").forEach(function(el){ var v = T[l][el.getAttribute("data-t")]; if (v!=null) el.textContent = v; });
+    document.querySelectorAll(".lang-toggle button").forEach(function(b){ b.classList.toggle("active", b.getAttribute("data-set")===l); });
+    renderRooms(); renderLedger();
+    if (M && !$("view-match").hidden){ if (M.cur==="you" && !M.over) $("turnMsg").textContent = t("your_turn"); }
+    try { localStorage.setItem("ludora_lang", l); } catch(e){}
+  }
+
+  // ---------- Wire up ----------
+  renderPresets();
+  $("stakeInput").addEventListener("input", function(){ updatePreview(); $("createErr").textContent=""; });
+  $("createBtn").addEventListener("click", createRoom);
+  $("rollBtn").addEventListener("click", youRoll);
+  $("againBtn").addEventListener("click", function(){ show("view-lobby"); });
+  $("lobbyBtn").addEventListener("click", function(){ show("view-lobby"); });
+  $("walletBtn").addEventListener("click", openWallet);
+  $("closeWallet").addEventListener("click", closeWallet);
+  $("walletModal").addEventListener("click", function(e){ if (e.target===$("walletModal")) closeWallet(); });
+  document.querySelectorAll("[data-add]").forEach(function(b){ b.addEventListener("click", function(){ state.balance += parseFloat(b.dataset.add); addLedger("add_funds", parseFloat(b.dataset.add)); save(); renderWallet(); renderLedger(); }); });
+  $("resetDemo").addEventListener("click", function(){ state = { balance:100, escrow:0, commission:0, ledger:[] }; save(); renderWallet(); renderLedger(); });
+  document.querySelectorAll(".lang-toggle button").forEach(function(b){ b.addEventListener("click", function(){ applyLang(b.getAttribute("data-set")); }); });
+
+  load();
+  var savedLang = "en"; try { savedLang = localStorage.getItem("ludora_lang") || "en"; } catch(e){}
+  renderWallet(); renderLedger(); updatePreview(); show("view-lobby");
+  applyLang(savedLang);
+})();
+</script>

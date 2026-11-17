@@ -1,0 +1,569 @@
+<title>Ludora</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@500;600;700;800;900&family=Baloo+2:wght@500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap">
+<style>
+  /* Layout: bright playful casual-game landing — sunny sky bg, chunky candy buttons,
+     an original colourful Ludo board as the hero. Single committed light theme.
+     Latin: Fredoka (display) + Nunito (body); HI swaps in Baloo 2 + Noto Devanagari. */
+  :root {
+    --sky-1: #DDEBFF; --sky-2: #F0E6FF; --cream: #FFF8EC;
+    --bg: #EAF2FF; --card: #FFFFFF;
+    --ink: #1A2550; --ink-dim: #566196; --muted: #8A95BC;
+    --line: #E6EAF6;
+    --red: #FF5560; --green: #27C06A; --yellow: #FFC32B; --blue: #2E9BE6; --grape: #7A61FF;
+    --red-d: #D8343F; --green-d: #1C9A52; --blue-d: #1D7CC0; --grape-d: #5E45E0;
+    --gold: #FFB223;
+    --shadow: 0 18px 40px -16px rgba(42, 58, 120, 0.35);
+    --shadow-sm: 0 8px 20px -10px rgba(42, 58, 120, 0.3);
+    --radius: 22px;
+    --maxw: 1180px;
+    --font-display: "Fredoka", "Baloo 2", sans-serif;
+    --font-body: "Nunito", system-ui, sans-serif;
+    color-scheme: light;
+  }
+  :root[data-lang="hi"] { --font-display: "Baloo 2", "Noto Sans Devanagari", sans-serif; --font-body: "Noto Sans Devanagari", "Nunito", sans-serif; }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body {
+    background:
+      radial-gradient(900px 500px at 88% -6%, var(--sky-2), transparent 60%),
+      radial-gradient(800px 460px at 6% 0%, #E2F4FF, transparent 58%),
+      var(--bg);
+    color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.55;
+    font-weight: 600; -webkit-font-smoothing: antialiased; overflow-x: hidden;
+  }
+  h1, h2, h3 { font-family: var(--font-display); font-weight: 700; margin: 0; line-height: 1.04; }
+  h1, h2 { text-wrap: balance; }
+  p { margin: 0; }
+  a { color: inherit; text-decoration: none; }
+  img { max-width: 100%; }
+
+  .wrap { width: 100%; max-width: var(--maxw); margin-inline: auto;
+    padding-inline: max(20px, env(safe-area-inset-left,0px)) max(20px, env(safe-area-inset-right,0px)); }
+
+  .eyebrow { display: inline-block; font-family: var(--font-display); font-weight: 600; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; color: var(--grape-d); background: #EFEBFF; padding: 5px 13px; border-radius: 999px; }
+
+  /* Candy buttons with a 3D bottom edge */
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+    font-family: var(--font-display); font-weight: 600; font-size: 16px; color: #fff;
+    padding: 14px 26px; border-radius: 16px; border: 0; cursor: pointer;
+    transition: transform .08s ease, box-shadow .12s ease; white-space: nowrap; }
+  .btn:active { transform: translateY(3px); }
+  .btn-play { background: var(--green); box-shadow: 0 5px 0 var(--green-d), var(--shadow-sm); }
+  .btn-play:active { box-shadow: 0 2px 0 var(--green-d); }
+  .btn-blue { background: var(--blue); box-shadow: 0 5px 0 var(--blue-d); }
+  .btn-blue:active { box-shadow: 0 2px 0 var(--blue-d); }
+  .btn-grape { background: var(--grape); box-shadow: 0 5px 0 var(--grape-d); }
+  .btn-grape:active { box-shadow: 0 2px 0 var(--grape-d); }
+  .btn-white { background: #fff; color: var(--ink); box-shadow: 0 5px 0 #D8DEF0; }
+  .btn-white:active { box-shadow: 0 2px 0 #D8DEF0; }
+  .btn-lg { font-size: 19px; padding: 17px 34px; border-radius: 18px; }
+
+  /* Header */
+  header { position: sticky; top: env(safe-area-inset-top,0px); z-index: 20;
+    background: rgba(255,255,255,.82); backdrop-filter: blur(12px); border-bottom: 1px solid var(--line); }
+  body::before { content:""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top,0px); z-index: 30; background: #fff; }
+  .nav { display: flex; align-items: center; gap: 18px; height: 70px; }
+  .brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-display); font-weight: 700; font-size: 23px; color: var(--ink); }
+  .brand .crown { width: 38px; height: 38px; border-radius: 11px; background: linear-gradient(160deg, var(--yellow), var(--gold)); display: grid; place-items: center; box-shadow: 0 4px 0 #E39A12; font-size: 20px; }
+  .brand b { color: var(--grape-d); }
+  .nav-links { display: flex; gap: 22px; margin-left: 8px; }
+  .nav-links a { font-family: var(--font-display); font-weight: 500; font-size: 15px; color: var(--ink-dim); }
+  .nav-links a:hover { color: var(--grape-d); }
+  .nav-right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+  .lang-toggle { display: inline-flex; border: 2px solid var(--line); border-radius: 999px; overflow: hidden; background: #fff; }
+  .lang-toggle button { background: transparent; border: 0; color: var(--ink-dim); font-family: var(--font-display); font-weight: 600; font-size: 13px; padding: 7px 12px; cursor: pointer; }
+  .lang-toggle button[data-set="hi"] { font-family: "Noto Sans Devanagari", var(--font-display); }
+  .lang-toggle button.active { background: var(--grape); color: #fff; }
+
+  /* Hero */
+  .hero { padding-block: clamp(30px, 5vw, 64px) clamp(40px, 6vw, 72px); }
+  .hero-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(28px, 4vw, 56px); align-items: center; }
+  .hero h1 { font-size: clamp(38px, 6vw, 66px); margin-top: 16px; color: var(--ink); }
+  .hero h1 em { font-style: normal; color: var(--grape-d); }
+  .hero .lede { color: var(--ink-dim); font-size: clamp(16px, 1.7vw, 20px); font-weight: 700; max-width: 46ch; margin-top: 18px; }
+  .hero-actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 28px; }
+  .stores { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+  .store { display: inline-flex; align-items: center; gap: 9px; background: var(--ink); color: #fff; border-radius: 13px; padding: 9px 16px; font-family: var(--font-display); font-weight: 500; font-size: 13px; box-shadow: 0 4px 0 #0e1738; }
+  .store small { display: block; font-size: 10px; opacity: .8; font-weight: 500; }
+  .store .ss { font-size: 15px; margin-top: -2px; }
+  .trust-row { display: flex; flex-wrap: wrap; gap: 8px 10px; margin-top: 24px; }
+  .pill { display: inline-flex; align-items: center; gap: 7px; background: #fff; border: 2px solid var(--line); border-radius: 999px; padding: 7px 13px; font-size: 13px; font-weight: 800; color: var(--ink-dim); }
+  .pill i { width: 9px; height: 9px; border-radius: 50%; }
+
+  /* Board */
+  .board-stage { position: relative; display: grid; place-items: center; }
+  .board-card { background: #fff; border-radius: 30px; padding: 22px; box-shadow: var(--shadow); width: 100%; max-width: 420px; transform: rotate(-2deg); }
+  .board-card svg { display: block; width: 100%; height: auto; }
+  .float-die { position: absolute; width: 60px; height: 60px; background: #fff; border-radius: 16px; box-shadow: var(--shadow); display: grid; grid-template-columns: repeat(3,1fr); grid-template-rows: repeat(3,1fr); padding: 11px; gap: 3px; transform: rotate(10deg); }
+  .float-die.one { top: -14px; right: 6%; }
+  .float-die.two { bottom: -10px; left: 2%; transform: rotate(-14deg); }
+  .float-die b { background: var(--ink); border-radius: 50%; }
+  .float-die b.off { background: transparent; }
+  @keyframes bobf { 50% { transform: translateY(-10px) rotate(10deg); } }
+  @keyframes bobf2 { 50% { transform: translateY(8px) rotate(-14deg); } }
+  .float-die.one { animation: bobf 3.2s ease-in-out infinite; }
+  .float-die.two { animation: bobf2 3.6s ease-in-out infinite; }
+
+  /* Stat band */
+  .stats { background: linear-gradient(100deg, var(--grape), #9a7bff); }
+  .stats-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; padding-block: 30px; }
+  .stat { text-align: center; color: #fff; }
+  .stat .num { font-family: var(--font-display); font-weight: 700; font-size: clamp(26px,3.6vw,40px); font-variant-numeric: tabular-nums; }
+  .stat .cap { font-size: 13.5px; font-weight: 800; opacity: .92; margin-top: 2px; }
+
+  /* Sections */
+  section.block { padding-block: clamp(48px, 6vw, 86px); }
+  .sec-head { text-align: center; max-width: 60ch; margin: 0 auto 40px; }
+  .sec-head h2 { font-size: clamp(28px, 4vw, 44px); margin-top: 12px; color: var(--ink); }
+  .sec-head p { color: var(--ink-dim); font-size: 17px; font-weight: 700; margin-top: 12px; }
+
+  .modes { display: grid; grid-template-columns: repeat(4,1fr); gap: 18px; }
+  .mode { background: var(--card); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow-sm); position: relative; transition: transform .14s ease; border-bottom: 5px solid var(--line); }
+  .mode:hover { transform: translateY(-5px); }
+  .mode.c-blue { border-bottom-color: var(--blue); } .mode.c-green { border-bottom-color: var(--green); }
+  .mode.c-gold { border-bottom-color: var(--gold); } .mode.c-red { border-bottom-color: var(--red); }
+  .mode .tag { position: absolute; top: 15px; right: 15px; font-family: var(--font-display); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: .03em; padding: 4px 9px; border-radius: 999px; }
+  .tag.live { color: #fff; background: var(--green); } .tag.soon { color: var(--ink-dim); background: #EEF1FA; }
+  .mode .ic { width: 56px; height: 56px; border-radius: 16px; display: grid; place-items: center; font-size: 28px; margin-bottom: 14px; }
+  .ic.blue { background: #E2F1FC; } .ic.green { background: #DEF6E9; } .ic.gold { background: #FFF2D4; } .ic.red { background: #FFE5E7; }
+  .mode h3 { font-size: 20px; color: var(--ink); }
+  .mode p { color: var(--ink-dim); font-size: 14.5px; font-weight: 700; margin-top: 7px; }
+  .mode .stake { margin-top: 15px; font-family: var(--font-display); font-weight: 600; font-size: 14px; color: var(--ink); }
+  .mode .stake b { color: var(--grape-d); }
+
+  .features { display: grid; grid-template-columns: repeat(2,1fr); gap: 18px; }
+  .feature { display: flex; gap: 15px; background: var(--card); border-radius: var(--radius); padding: 22px; box-shadow: var(--shadow-sm); }
+  .feature .fic { flex: none; width: 52px; height: 52px; border-radius: 15px; display: grid; place-items: center; font-size: 25px; }
+  .feature h3 { font-size: 18px; color: var(--ink); } .feature p { color: var(--ink-dim); font-size: 14.5px; font-weight: 700; margin-top: 6px; }
+
+  .steps { display: grid; grid-template-columns: repeat(3,1fr); gap: 18px; }
+  .step { background: var(--card); border-radius: var(--radius); padding: 26px 22px; box-shadow: var(--shadow-sm); text-align: center; }
+  .step .n { width: 54px; height: 54px; margin: 0 auto 14px; border-radius: 50%; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 22px; color: #fff; }
+  .step:nth-child(1) .n { background: var(--red); } .step:nth-child(2) .n { background: var(--blue); } .step:nth-child(3) .n { background: var(--green); }
+  .step h3 { font-size: 19px; color: var(--ink); } .step p { color: var(--ink-dim); font-size: 14.5px; font-weight: 700; margin-top: 8px; }
+
+  .lb-wrap { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; align-items: start; }
+  .lb { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow-sm); overflow: hidden; }
+  .lb-h { display: grid; grid-template-columns: 42px 1fr auto auto; gap: 12px; padding: 15px 20px; font-family: var(--font-display); font-weight: 500; font-size: 12px; text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--line); }
+  .lb-h .rt, .lb-h .wn { text-align: right; }
+  .lb-row { display: grid; grid-template-columns: 42px 1fr auto auto; gap: 12px; padding: 14px 20px; align-items: center; border-bottom: 1px solid var(--line); }
+  .lb-row:last-child { border-bottom: 0; }
+  .lb-row .rk { font-family: var(--font-display); font-weight: 700; color: var(--muted); }
+  .lb-row:nth-child(2) .rk { color: var(--gold); } .lb-row:nth-child(3) .rk { color: #9fb0c9; } .lb-row:nth-child(4) .rk { color: #cd9b6a; }
+  .lb-row .pl { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 14.5px; min-width: 0; color: var(--ink); }
+  .lb-row .pl .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lb-row .mini { flex: none; width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center; font-family: var(--font-display); font-weight: 700; font-size: 13px; color: #fff; }
+  .lb-row .rt, .lb-row .wn { font-variant-numeric: tabular-nums; font-weight: 800; font-size: 14px; text-align: right; }
+  .lb-row .wn { color: var(--green-d); } .lb-row .rt { color: var(--ink-dim); }
+  .lb-side .mode { height: 100%; }
+
+  .compliance { background: var(--cream); border-radius: var(--radius); padding: clamp(24px,4vw,40px); display: grid; grid-template-columns: 1.1fr 1fr; gap: 30px; align-items: center; box-shadow: var(--shadow-sm); }
+  .compliance ul { list-style: none; margin: 16px 0 0; padding: 0; display: grid; gap: 11px; }
+  .compliance li { display: flex; gap: 11px; font-size: 14.5px; font-weight: 700; color: var(--ink-dim); }
+  .compliance li svg { flex: none; margin-top: 2px; }
+  .badges { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+  .badge { background: #fff; border-radius: 15px; padding: 16px; text-align: center; box-shadow: var(--shadow-sm); }
+  .badge .bt { font-family: var(--font-display); font-weight: 700; font-size: 16px; color: var(--ink); }
+  .badge .bs { font-size: 12px; color: var(--muted); font-weight: 700; margin-top: 2px; }
+
+  .cta-band { text-align: center; background: linear-gradient(120deg, var(--blue), var(--grape)); border-radius: 28px; padding: clamp(36px,6vw,64px); box-shadow: var(--shadow); color: #fff; }
+  .cta-band h2 { font-size: clamp(28px,4.4vw,48px); }
+  .cta-band p { font-size: 17px; font-weight: 700; margin-top: 12px; opacity: .95; max-width: 44ch; margin-inline: auto; }
+  .cta-actions { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; margin-top: 26px; }
+
+  footer { background: #fff; border-top: 1px solid var(--line); margin-top: 20px; }
+  .foot { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr; gap: 30px; padding-block: 46px 28px; }
+  .foot h4 { font-family: var(--font-display); font-weight: 600; font-size: 13px; text-transform: uppercase; color: var(--muted); margin: 0 0 12px; }
+  .foot a { display: block; color: var(--ink-dim); font-size: 14px; font-weight: 700; padding: 5px 0; }
+  .foot a:hover { color: var(--grape-d); }
+  .foot .about p { color: var(--muted); font-size: 13.5px; font-weight: 700; margin-top: 12px; max-width: 34ch; }
+  .legal { border-top: 1px solid var(--line); padding-block: 20px 36px; display: flex; flex-wrap: wrap; gap: 12px 22px; align-items: center; justify-content: space-between; }
+  .legal .g18 { display: inline-flex; align-items: center; gap: 10px; font-size: 13px; font-weight: 700; color: var(--muted); max-width: 60ch; }
+  .legal .g18 b { flex: none; display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--red); color: #fff; font-family: var(--font-display); font-weight: 700; font-size: 12px; }
+  .legal small { color: var(--muted); font-size: 12.5px; font-weight: 700; line-height: 1.6; max-width: 72ch; }
+
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity .55s ease, transform .55s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+
+  @media (max-width: 920px) {
+    .hero-grid { grid-template-columns: 1fr; } .hero .board-stage { order: -1; }
+    .modes { grid-template-columns: repeat(2,1fr); } .lb-wrap { grid-template-columns: 1fr; }
+    .compliance { grid-template-columns: 1fr; } .foot { grid-template-columns: 1fr 1fr; }
+    .nav-links { display: none; }
+  }
+  @media (max-width: 560px) {
+    .stats-grid { grid-template-columns: 1fr 1fr; gap: 16px; } .modes { grid-template-columns: 1fr; }
+    .features { grid-template-columns: 1fr; } .steps { grid-template-columns: 1fr; } .foot { grid-template-columns: 1fr; gap: 22px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } .float-die { animation: none !important; } }
+</style>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="#top"><span class="crown">♛</span>Ludo<b>ra</b></a>
+    <nav class="nav-links">
+      <a href="#modes" data-t="nav_games">Games</a>
+      <a href="#fair" data-t="nav_fair">Fair play</a>
+      <a href="#how" data-t="nav_how">How it works</a>
+      <a href="#leaderboard" data-t="nav_lb">Leaderboard</a>
+    </nav>
+    <div class="nav-right">
+      <div class="lang-toggle" role="group" aria-label="Language / भाषा">
+        <button type="button" data-set="en" class="active">EN</button>
+        <button type="button" data-set="hi">हिं</button>
+      </div>
+      <a class="btn btn-play" href="#" data-t="nav_play">Play now</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div class="reveal in">
+        <span class="eyebrow" data-t="hero_eyebrow">Skill-based real-money Ludo</span>
+        <h1 data-th="hero_h1">Roll. Race. <em>Win real cash.</em></h1>
+        <p class="lede" data-t="hero_lede">The Ludo you grew up with, now for real stakes. Rated matches, certified-fair dice, and winnings in your wallet in minutes.</p>
+        <div class="hero-actions">
+          <a class="btn btn-play btn-lg" href="#" data-t="hero_cta1">▶ Play a match</a>
+          <a class="btn btn-white btn-lg" href="#how" data-t="hero_cta2">How it works</a>
+        </div>
+        <div class="stores">
+          <a class="store" href="#"><span class="ss">▶</span><span><small data-t="store_get">GET IT ON</small>Google Play</span></a>
+          <a class="store" href="#"><span class="ss"></span><span><small data-t="store_dl">Download on the</small>App Store</span></a>
+        </div>
+        <div class="trust-row">
+          <span class="pill"><i style="background:var(--green)"></i><span data-t="trust1">Licensed &amp; regulated</span></span>
+          <span class="pill"><i style="background:var(--blue)"></i><span data-t="trust2">Provably-fair RNG</span></span>
+          <span class="pill"><i style="background:var(--gold)"></i><span data-t="trust3">Instant withdrawals</span></span>
+          <span class="pill"><i style="background:var(--red)"></i><span data-t="trust4">18+ only</span></span>
+        </div>
+      </div>
+
+      <div class="board-stage reveal in">
+        <div class="float-die one"><b></b><b class="off"></b><b></b><b class="off"></b><b class="off"></b><b class="off"></b><b></b><b class="off"></b><b></b></div>
+        <div class="board-card">
+          <svg viewBox="0 0 320 320" role="img" aria-label="Colourful Ludo board">
+            <rect x="2" y="2" width="316" height="316" rx="26" fill="#F7F9FF" stroke="#E6EAF6" stroke-width="3"/>
+            <!-- corner bases -->
+            <rect x="16" y="16" width="120" height="120" rx="18" fill="#FF5560"/>
+            <rect x="184" y="16" width="120" height="120" rx="18" fill="#27C06A"/>
+            <rect x="16" y="184" width="120" height="120" rx="18" fill="#2E9BE6"/>
+            <rect x="184" y="184" width="120" height="120" rx="18" fill="#FFC32B"/>
+            <!-- inner pockets -->
+            <rect x="38" y="38" width="76" height="76" rx="14" fill="#fff"/>
+            <rect x="206" y="38" width="76" height="76" rx="14" fill="#fff"/>
+            <rect x="38" y="206" width="76" height="76" rx="14" fill="#fff"/>
+            <rect x="206" y="206" width="76" height="76" rx="14" fill="#fff"/>
+            <g>
+              <circle cx="60" cy="60" r="9" fill="#FF5560"/><circle cx="92" cy="60" r="9" fill="#FF5560"/><circle cx="60" cy="92" r="9" fill="#FF5560"/><circle cx="92" cy="92" r="9" fill="#FF5560"/>
+              <circle cx="228" cy="60" r="9" fill="#27C06A"/><circle cx="260" cy="60" r="9" fill="#27C06A"/><circle cx="228" cy="92" r="9" fill="#27C06A"/><circle cx="260" cy="92" r="9" fill="#27C06A"/>
+              <circle cx="60" cy="228" r="9" fill="#2E9BE6"/><circle cx="92" cy="228" r="9" fill="#2E9BE6"/><circle cx="60" cy="260" r="9" fill="#2E9BE6"/><circle cx="92" cy="260" r="9" fill="#2E9BE6"/>
+              <circle cx="228" cy="228" r="9" fill="#FFC32B"/><circle cx="260" cy="228" r="9" fill="#FFC32B"/><circle cx="228" cy="260" r="9" fill="#FFC32B"/><circle cx="260" cy="260" r="9" fill="#FFC32B"/>
+            </g>
+            <!-- home lanes -->
+            <rect x="146" y="20" width="28" height="112" rx="8" fill="#27C06A" opacity=".85"/>
+            <rect x="20" y="146" width="112" height="28" rx="8" fill="#FF5560" opacity=".85"/>
+            <rect x="188" y="146" width="112" height="28" rx="8" fill="#FFC32B" opacity=".85"/>
+            <rect x="146" y="188" width="28" height="112" rx="8" fill="#2E9BE6" opacity=".85"/>
+            <!-- centre pinwheel -->
+            <polygon points="136,136 184,136 160,160" fill="#27C06A"/>
+            <polygon points="184,136 184,184 160,160" fill="#FFC32B"/>
+            <polygon points="184,184 136,184 160,160" fill="#2E9BE6"/>
+            <polygon points="136,184 136,136 160,160" fill="#FF5560"/>
+          </svg>
+        </div>
+        <div class="float-die two"><b class="off"></b><b class="off"></b><b></b><b class="off"></b><b></b><b class="off"></b><b></b><b class="off"></b><b class="off"></b></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stats">
+    <div class="wrap stats-grid">
+      <div class="stat reveal"><div class="num">128K</div><div class="cap" data-t="stat1">Verified players</div></div>
+      <div class="stat reveal"><div class="num">$4.2M</div><div class="cap" data-t="stat2">Prizes paid out</div></div>
+      <div class="stat reveal"><div class="num">36K</div><div class="cap" data-t="stat3">Matches today</div></div>
+      <div class="stat reveal"><div class="num">90s</div><div class="cap" data-t="stat4">Avg. payout time</div></div>
+    </div>
+  </section>
+
+  <section class="block" id="modes">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow" data-t="modes_eyebrow">Game modes</span>
+        <h2 data-t="modes_h2">Pick your table, set your stake.</h2>
+        <p data-t="modes_p">Every mode is matched by skill rating, so you play opponents at your level — not whoever happens to be online.</p>
+      </div>
+      <div class="modes">
+        <div class="mode c-blue reveal">
+          <span class="tag live" data-t="tag_live">Live</span>
+          <div class="ic blue">⚔️</div>
+          <h3 data-t="mode1_t">1v1 Duel</h3>
+          <p data-t="mode1_p">Head-to-head, best of three. Pure skill, fastest to finish wins the pot.</p>
+          <div class="stake"><span data-t="lbl_stakes">Stakes</span> <b>$1 – $500</b></div>
+        </div>
+        <div class="mode c-green reveal">
+          <span class="tag live" data-t="tag_live">Live</span>
+          <div class="ic green">👑</div>
+          <h3 data-t="mode2_t">4-Player Royale</h3>
+          <p data-t="mode2_p">Four players, one board, winner-takes-most. The classic Ludo table with real stakes.</p>
+          <div class="stake"><span data-t="lbl_stakes">Stakes</span> <b>$2 – $250</b></div>
+        </div>
+        <div class="mode c-gold reveal">
+          <span class="tag live" data-t="tag_live">Live</span>
+          <div class="ic gold">🏆</div>
+          <h3 data-t="mode3_t">Tournaments</h3>
+          <p data-t="mode3_p">Scheduled brackets with guaranteed prize pools. Climb rounds, split the purse.</p>
+          <div class="stake"><span data-t="lbl_entry">Entry</span> <b data-t="mode3_s">from $5</b></div>
+        </div>
+        <div class="mode c-red reveal">
+          <span class="tag soon" data-t="tag_soon">Soon</span>
+          <div class="ic red">🔒</div>
+          <h3 data-t="mode4_t">Private table</h3>
+          <p data-t="mode4_p">Create a room, share the code, play friends for a stake you both agree on.</p>
+          <div class="stake" data-t="mode4_s">Custom stakes</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="fair" style="background:#fff;">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow" data-t="fair_eyebrow">Why it's skill, not luck</span>
+        <h2 data-t="fair_h2">Built so the better player wins.</h2>
+        <p data-t="fair_p">Luck evens out over a match. What's left is positioning, risk and timing — and an engine that no one can rig.</p>
+      </div>
+      <div class="features">
+        <div class="feature reveal"><div class="fic" style="background:#EFEBFF">🧠</div><div><h3 data-t="f1_t">Rating-based matchmaking</h3><p data-t="f1_p">An ELO-style rating pairs you with opponents of similar skill, so results reflect play, not mismatches.</p></div></div>
+        <div class="feature reveal"><div class="fic" style="background:#E2F1FC">🎲</div><div><h3 data-t="f2_t">Certified provably-fair dice</h3><p data-t="f2_p">Each roll is drawn from a pre-committed seed you can verify after the match. No server-side favours, ever.</p></div></div>
+        <div class="feature reveal"><div class="fic" style="background:#DEF6E9">🛡️</div><div><h3 data-t="f3_t">Server-authoritative engine</h3><p data-t="f3_p">Game logic runs on our servers, not your device. Modified clients and auto-play bots can't change the board.</p></div></div>
+        <div class="feature reveal"><div class="fic" style="background:#FFE5E7">🕵️</div><div><h3 data-t="f4_t">Anti-collusion monitoring</h3><p data-t="f4_p">Pattern detection flags chip-dumping and teaming in 4-player tables, with manual review on payouts.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="how">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow" data-t="how_eyebrow">How it works</span>
+        <h2 data-t="how_h2">From sign-up to payout in three steps.</h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal"><div class="n">1</div><h3 data-t="s1_t">Verify &amp; fund</h3><p data-t="s1_p">Create an account, confirm your age and identity, and add funds through a licensed payment partner.</p></div>
+        <div class="step reveal"><div class="n">2</div><h3 data-t="s2_t">Join a match</h3><p data-t="s2_p">Pick a mode and a stake. We match you by rating and lock both stakes into an escrowed pot.</p></div>
+        <div class="step reveal"><div class="n">3</div><h3 data-t="s3_t">Win &amp; withdraw</h3><p data-t="s3_p">Outplay your opponent and the pot lands in your wallet. Withdraw to your account, usually within minutes.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="leaderboard" style="background:#fff;">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <span class="eyebrow" data-t="lb_eyebrow">This week's leaders</span>
+        <h2 data-t="lb_h2">Top of the ladder.</h2>
+      </div>
+      <div class="lb-wrap">
+        <div class="lb reveal">
+          <div class="lb-h"><div>#</div><div data-t="lb_player">Player</div><div class="rt" data-t="lb_rating">Rating</div><div class="wn" data-t="lb_won">Won</div></div>
+          <div class="lb-row"><div class="rk">1</div><div class="pl"><span class="mini" style="background:linear-gradient(145deg,#FFC32B,#FF5560)">K</span><span class="nm">KashFlow</span></div><div class="rt">2104</div><div class="wn">$12,480</div></div>
+          <div class="lb-row"><div class="rk">2</div><div class="pl"><span class="mini" style="background:linear-gradient(145deg,#2E9BE6,#27C06A)">N</span><span class="nm">Nova_Dice</span></div><div class="rt">2061</div><div class="wn">$9,920</div></div>
+          <div class="lb-row"><div class="rk">3</div><div class="pl"><span class="mini" style="background:linear-gradient(145deg,#27C06A,#2E9BE6)">R</span><span class="nm">RollRoyce</span></div><div class="rt">2018</div><div class="wn">$8,145</div></div>
+          <div class="lb-row"><div class="rk">4</div><div class="pl"><span class="mini" style="background:linear-gradient(145deg,#FF5560,#FFC32B)">S</span><span class="nm">SixOnSix</span></div><div class="rt">1987</div><div class="wn">$6,730</div></div>
+          <div class="lb-row"><div class="rk">5</div><div class="pl"><span class="mini" style="background:linear-gradient(145deg,#7A61FF,#2E9BE6)">M</span><span class="nm">MiraPlays</span></div><div class="rt">1955</div><div class="wn">$5,410</div></div>
+        </div>
+        <div class="lb-side">
+          <div class="mode c-gold reveal" style="height:100%">
+            <span class="tag live" data-t="lb_starts">Starts 8:00 PM</span>
+            <div class="ic gold">🏆</div>
+            <h3 data-t="lb_tt">Friday Night Royale</h3>
+            <p data-t="lb_tp">256-seat bracket, single elimination. Guaranteed prize pool with the lion's share to the final table.</p>
+            <div class="stake"><span data-t="lbl_entry">Entry</span> <b>$10</b> · <span data-t="lbl_pool">Pool</span> <b data-t="lb_pool">$2,000 guaranteed</b></div>
+            <div style="margin-top:16px"><a class="btn btn-grape" href="#" style="width:100%" data-t="lb_reg">Register seat</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" id="safe">
+    <div class="wrap">
+      <div class="compliance reveal">
+        <div>
+          <span class="eyebrow" data-t="cp_eyebrow">Play safe, play legal</span>
+          <h2 style="font-size:clamp(24px,3.4vw,34px); margin-top:12px; color:var(--ink)" data-t="cp_h2">Regulated where we operate, blocked where we're not.</h2>
+          <ul>
+            <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 7" stroke="#27C06A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-t="cp_li1">Identity and age verified before any deposit or withdrawal.</span></li>
+            <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 7" stroke="#27C06A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-t="cp_li2">Geo-blocked in jurisdictions where real-money play isn't allowed.</span></li>
+            <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 7" stroke="#27C06A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-t="cp_li3">Deposit limits, cool-off periods and one-tap self-exclusion.</span></li>
+            <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4L19 7" stroke="#27C06A" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-t="cp_li4">Funds held with a licensed payments partner, segregated from operations.</span></li>
+          </ul>
+        </div>
+        <div class="badges">
+          <div class="badge"><div class="bt">18+</div><div class="bs" data-t="bdg1">Strictly age-gated</div></div>
+          <div class="badge"><div class="bt">KYC / AML</div><div class="bs" data-t="bdg2">Verified accounts</div></div>
+          <div class="badge"><div class="bt" data-t="bdg3t">Provably fair</div><div class="bs" data-t="bdg3">Auditable RNG</div></div>
+          <div class="badge"><div class="bt" data-t="bdg4t">Segregated funds</div><div class="bs" data-t="bdg4">Player money protected</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="padding-top:0">
+    <div class="wrap">
+      <div class="cta-band reveal">
+        <span class="eyebrow" style="background:rgba(255,255,255,.25); color:#fff" data-t="cta_eyebrow">Your first match is waiting</span>
+        <h2 style="margin-top:12px" data-t="cta_h2">Ready to play for real?</h2>
+        <p data-t="cta_p">Sign up, verify once, and you're on the board. New players get a risk-free first match.</p>
+        <div class="cta-actions">
+          <a class="btn btn-play btn-lg" href="#" data-t="cta_b1">Create free account</a>
+          <a class="btn btn-white btn-lg" href="#" data-t="cta_b2">Get the Android app</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot">
+      <div class="about">
+        <a class="brand" href="#top"><span class="crown">♛</span>Ludo<b>ra</b></a>
+        <p data-t="foot_about">Skill-based real-money Ludo. Rated matches, certified dice, fast payouts.</p>
+      </div>
+      <div><h4 data-t="foot_play">Play</h4>
+        <a href="#modes" data-t="mode1_t">1v1 Duel</a><a href="#modes" data-t="mode2_t">4-Player Royale</a><a href="#leaderboard" data-t="mode3_t">Tournaments</a><a href="#leaderboard" data-t="nav_lb">Leaderboard</a>
+      </div>
+      <div><h4 data-t="foot_trust">Trust</h4>
+        <a href="#fair" data-t="foot_fair">Fair play &amp; RNG</a><a href="#safe" data-t="foot_rg">Responsible gaming</a><a href="#safe" data-t="foot_lic">Licensing</a><a href="#" data-t="foot_terms">Terms &amp; privacy</a>
+      </div>
+      <div><h4 data-t="foot_support">Support</h4>
+        <a href="#" data-t="foot_help">Help centre</a><a href="#" data-t="foot_dep">Deposits &amp; payouts</a><a href="#" data-t="foot_verify">Verify account</a><a href="#" data-t="foot_contact">Contact</a>
+      </div>
+    </div>
+    <div class="legal">
+      <div class="g18"><b>18</b><span data-t="legal_18">You must be 18 or older. Play responsibly — know your limits.</span></div>
+      <small data-t="legal_small">Ludora is a demo concept interface. Real-money play requires a valid gaming licence in each market served and is restricted to permitted jurisdictions. Gambling can be addictive; set limits and seek help if you need it.</small>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var T = {
+      en: {
+        nav_games:"Games", nav_fair:"Fair play", nav_how:"How it works", nav_lb:"Leaderboard", nav_play:"Play now",
+        hero_eyebrow:"Skill-based real-money Ludo",
+        hero_h1:"Roll. Race. <em>Win real cash.</em>",
+        hero_lede:"The Ludo you grew up with, now for real stakes. Rated matches, certified-fair dice, and winnings in your wallet in minutes.",
+        hero_cta1:"▶ Play a match", hero_cta2:"How it works",
+        store_get:"GET IT ON", store_dl:"Download on the",
+        trust1:"Licensed & regulated", trust2:"Provably-fair RNG", trust3:"Instant withdrawals", trust4:"18+ only",
+        stat1:"Verified players", stat2:"Prizes paid out", stat3:"Matches today", stat4:"Avg. payout time",
+        modes_eyebrow:"Game modes", modes_h2:"Pick your table, set your stake.",
+        modes_p:"Every mode is matched by skill rating, so you play opponents at your level — not whoever happens to be online.",
+        tag_live:"Live", tag_soon:"Soon", lbl_stakes:"Stakes", lbl_entry:"Entry", lbl_pool:"Pool",
+        mode1_t:"1v1 Duel", mode1_p:"Head-to-head, best of three. Pure skill, fastest to finish wins the pot.",
+        mode2_t:"4-Player Royale", mode2_p:"Four players, one board, winner-takes-most. The classic Ludo table with real stakes.",
+        mode3_t:"Tournaments", mode3_p:"Scheduled brackets with guaranteed prize pools. Climb rounds, split the purse.", mode3_s:"from $5",
+        mode4_t:"Private table", mode4_p:"Create a room, share the code, play friends for a stake you both agree on.", mode4_s:"Custom stakes",
+        fair_eyebrow:"Why it's skill, not luck", fair_h2:"Built so the better player wins.",
+        fair_p:"Luck evens out over a match. What's left is positioning, risk and timing — and an engine that no one can rig.",
+        f1_t:"Rating-based matchmaking", f1_p:"An ELO-style rating pairs you with opponents of similar skill, so results reflect play, not mismatches.",
+        f2_t:"Certified provably-fair dice", f2_p:"Each roll is drawn from a pre-committed seed you can verify after the match. No server-side favours, ever.",
+        f3_t:"Server-authoritative engine", f3_p:"Game logic runs on our servers, not your device. Modified clients and auto-play bots can't change the board.",
+        f4_t:"Anti-collusion monitoring", f4_p:"Pattern detection flags chip-dumping and teaming in 4-player tables, with manual review on payouts.",
+        how_eyebrow:"How it works", how_h2:"From sign-up to payout in three steps.",
+        s1_t:"Verify & fund", s1_p:"Create an account, confirm your age and identity, and add funds through a licensed payment partner.",
+        s2_t:"Join a match", s2_p:"Pick a mode and a stake. We match you by rating and lock both stakes into an escrowed pot.",
+        s3_t:"Win & withdraw", s3_p:"Outplay your opponent and the pot lands in your wallet. Withdraw to your account, usually within minutes.",
+        lb_eyebrow:"This week's leaders", lb_h2:"Top of the ladder.", lb_player:"Player", lb_rating:"Rating", lb_won:"Won",
+        lb_starts:"Starts 8:00 PM", lb_tt:"Friday Night Royale",
+        lb_tp:"256-seat bracket, single elimination. Guaranteed prize pool with the lion's share to the final table.",
+        lb_pool:"$2,000 guaranteed", lb_reg:"Register seat",
+        cp_eyebrow:"Play safe, play legal", cp_h2:"Regulated where we operate, blocked where we're not.",
+        cp_li1:"Identity and age verified before any deposit or withdrawal.",
+        cp_li2:"Geo-blocked in jurisdictions where real-money play isn't allowed.",
+        cp_li3:"Deposit limits, cool-off periods and one-tap self-exclusion.",
+        cp_li4:"Funds held with a licensed payments partner, segregated from operations.",
+        bdg1:"Strictly age-gated", bdg2:"Verified accounts", bdg3t:"Provably fair", bdg3:"Auditable RNG", bdg4t:"Segregated funds", bdg4:"Player money protected",
+        cta_eyebrow:"Your first match is waiting", cta_h2:"Ready to play for real?",
+        cta_p:"Sign up, verify once, and you're on the board. New players get a risk-free first match.",
+        cta_b1:"Create free account", cta_b2:"Get the Android app",
+        foot_about:"Skill-based real-money Ludo. Rated matches, certified dice, fast payouts.",
+        foot_play:"Play", foot_trust:"Trust", foot_support:"Support",
+        foot_fair:"Fair play & RNG", foot_rg:"Responsible gaming", foot_lic:"Licensing", foot_terms:"Terms & privacy",
+        foot_help:"Help centre", foot_dep:"Deposits & payouts", foot_verify:"Verify account", foot_contact:"Contact",
+        legal_18:"You must be 18 or older. Play responsibly — know your limits.",
+        legal_small:"Ludora is a demo concept interface. Real-money play requires a valid gaming licence in each market served and is restricted to permitted jurisdictions. Gambling can be addictive; set limits and seek help if you need it."
+      },
+      hi: {
+        nav_games:"खेल", nav_fair:"निष्पक्ष खेल", nav_how:"यह कैसे काम करता है", nav_lb:"लीडरबोर्ड", nav_play:"अभी खेलें",
+        hero_eyebrow:"स्किल-आधारित रियल-मनी लूडो",
+        hero_h1:"रोल करें। रेस करें। <em>असली पैसे जीतें।</em>",
+        hero_lede:"वही लूडो जिसके साथ आप बड़े हुए, अब असली दांव पर। रेटेड मैच, प्रमाणित-निष्पक्ष पासे, और मिनटों में आपके वॉलेट में जीत।",
+        hero_cta1:"▶ मैच खेलें", hero_cta2:"यह कैसे काम करता है",
+        store_get:"इस पर पाएं", store_dl:"डाउनलोड करें",
+        trust1:"लाइसेंस प्राप्त और विनियमित", trust2:"प्रमाणित निष्पक्ष RNG", trust3:"तुरंत निकासी", trust4:"केवल 18+",
+        stat1:"सत्यापित खिलाड़ी", stat2:"दिए गए इनाम", stat3:"आज के मैच", stat4:"औसत भुगतान समय",
+        modes_eyebrow:"गेम मोड", modes_h2:"अपनी टेबल चुनें, अपना स्टेक तय करें।",
+        modes_p:"हर मोड स्किल रेटिंग के आधार पर मैच होता है, इसलिए आप अपने स्तर के प्रतिद्वंद्वियों से खेलते हैं — किसी भी ऑनलाइन खिलाड़ी से नहीं।",
+        tag_live:"लाइव", tag_soon:"जल्द ही", lbl_stakes:"स्टेक", lbl_entry:"एंट्री", lbl_pool:"पूल",
+        mode1_t:"1v1 डुएल", mode1_p:"आमने-सामने, बेस्ट ऑफ़ थ्री। पूरी तरह स्किल — सबसे पहले पूरा करने वाला पॉट जीतता है।",
+        mode2_t:"4-प्लेयर रॉयल", mode2_p:"चार खिलाड़ी, एक बोर्ड, विजेता को सबसे ज़्यादा। असली स्टेक के साथ क्लासिक लूडो टेबल।",
+        mode3_t:"टूर्नामेंट", mode3_p:"गारंटीड इनाम राशि के साथ निर्धारित ब्रैकेट। राउंड चढ़ें, इनाम बाँटें।", mode3_s:"$5 से",
+        mode4_t:"प्राइवेट टेबल", mode4_p:"रूम बनाएं, कोड शेयर करें, और दोनों की सहमति वाले स्टेक पर दोस्तों से खेलें।", mode4_s:"कस्टम स्टेक",
+        fair_eyebrow:"यह किस्मत नहीं, स्किल क्यों है", fair_h2:"इस तरह बनाया गया कि बेहतर खिलाड़ी जीते।",
+        fair_p:"एक मैच में किस्मत बराबर हो जाती है। बचता है पोज़िशनिंग, जोखिम और टाइमिंग — और एक ऐसा इंजन जिसे कोई रिग नहीं कर सकता।",
+        f1_t:"रेटिंग-आधारित मैचमेकिंग", f1_p:"ELO-शैली की रेटिंग आपको समान स्किल वाले प्रतिद्वंद्वियों से जोड़ती है, ताकि नतीजे खेल दर्शाएं, बेमेल नहीं।",
+        f2_t:"प्रमाणित निष्पक्ष पासे", f2_p:"हर रोल एक पूर्व-प्रतिबद्ध सीड से निकलता है जिसे आप मैच के बाद सत्यापित कर सकते हैं। सर्वर की ओर से कोई पक्षपात नहीं, कभी नहीं।",
+        f3_t:"सर्वर-नियंत्रित इंजन", f3_p:"गेम लॉजिक हमारे सर्वर पर चलता है, आपके डिवाइस पर नहीं। मॉडिफाइड क्लाइंट और ऑटो-प्ले बॉट बोर्ड नहीं बदल सकते।",
+        f4_t:"एंटी-कलूज़न निगरानी", f4_p:"पैटर्न डिटेक्शन 4-प्लेयर टेबल में चिप-डंपिंग और टीमिंग को पकड़ता है, और भुगतान पर मैनुअल समीक्षा होती है।",
+        how_eyebrow:"यह कैसे काम करता है", how_h2:"साइन-अप से भुगतान तक, तीन चरणों में।",
+        s1_t:"सत्यापित करें और फंड डालें", s1_p:"खाता बनाएं, अपनी उम्र और पहचान की पुष्टि करें, और लाइसेंस प्राप्त पेमेंट पार्टनर के ज़रिए फंड जोड़ें।",
+        s2_t:"मैच जॉइन करें", s2_p:"एक मोड और स्टेक चुनें। हम आपको रेटिंग से मैच करते हैं और दोनों स्टेक को एस्क्रो पॉट में लॉक कर देते हैं।",
+        s3_t:"जीतें और निकालें", s3_p:"प्रतिद्वंद्वी को मात दें और पॉट आपके वॉलेट में आ जाता है। अपने खाते में निकालें, आमतौर पर मिनटों में।",
+        lb_eyebrow:"इस हफ़्ते के लीडर", lb_h2:"रैंकिंग में सबसे ऊपर।", lb_player:"खिलाड़ी", lb_rating:"रेटिंग", lb_won:"जीते",
+        lb_starts:"रात 8:00 बजे शुरू", lb_tt:"फ्राइडे नाइट रॉयल",
+        lb_tp:"256-सीट ब्रैकेट, सिंगल एलिमिनेशन। गारंटीड इनाम राशि, जिसका बड़ा हिस्सा फ़ाइनल टेबल को।",
+        lb_pool:"$2,000 गारंटीड", lb_reg:"सीट रजिस्टर करें",
+        cp_eyebrow:"सुरक्षित खेलें, कानूनी खेलें", cp_h2:"जहाँ हम काम करते हैं वहाँ विनियमित, जहाँ नहीं वहाँ अवरुद्ध।",
+        cp_li1:"किसी भी जमा या निकासी से पहले पहचान और उम्र सत्यापित।",
+        cp_li2:"उन क्षेत्रों में जियो-ब्लॉक्ड जहाँ रियल-मनी खेल की अनुमति नहीं है।",
+        cp_li3:"जमा सीमाएं, कूल-ऑफ़ अवधि और वन-टैप सेल्फ़-एक्सक्लूज़न।",
+        cp_li4:"फंड लाइसेंस प्राप्त पेमेंट पार्टनर के पास, परिचालन से अलग रखे जाते हैं।",
+        bdg1:"सख़्ती से उम्र-सीमित", bdg2:"सत्यापित खाते", bdg3t:"प्रमाणित निष्पक्ष", bdg3:"ऑडिट-योग्य RNG", bdg4t:"अलग रखे फंड", bdg4:"खिलाड़ी का पैसा सुरक्षित",
+        cta_eyebrow:"आपका पहला मैच इंतज़ार कर रहा है", cta_h2:"असली के लिए खेलने को तैयार?",
+        cta_p:"साइन अप करें, एक बार सत्यापित करें, और आप बोर्ड पर हैं। नए खिलाड़ियों को पहला मैच रिस्क-फ्री मिलता है।",
+        cta_b1:"मुफ़्त खाता बनाएं", cta_b2:"एंड्रॉइड ऐप पाएं",
+        foot_about:"स्किल-आधारित रियल-मनी लूडो। रेटेड मैच, प्रमाणित पासे, तेज़ भुगतान।",
+        foot_play:"खेलें", foot_trust:"भरोसा", foot_support:"सहायता",
+        foot_fair:"निष्पक्ष खेल और RNG", foot_rg:"ज़िम्मेदार गेमिंग", foot_lic:"लाइसेंसिंग", foot_terms:"नियम और गोपनीयता",
+        foot_help:"हेल्प सेंटर", foot_dep:"जमा और भुगतान", foot_verify:"खाता सत्यापित करें", foot_contact:"संपर्क",
+        legal_18:"आपकी उम्र 18 वर्ष या अधिक होनी चाहिए। ज़िम्मेदारी से खेलें — अपनी सीमाएं जानें।",
+        legal_small:"Ludora एक डेमो कॉन्सेप्ट इंटरफ़ेस है। रियल-मनी खेल के लिए हर बाज़ार में वैध गेमिंग लाइसेंस आवश्यक है और यह केवल अनुमत क्षेत्रों तक सीमित है। जुआ लत बन सकता है; सीमाएं तय करें और ज़रूरत हो तो मदद लें।"
+      }
+    };
+    var root = document.documentElement;
+    function apply(lang) {
+      if (!T[lang]) lang = "en";
+      var d = T[lang];
+      root.setAttribute("lang", lang); root.setAttribute("data-lang", lang);
+      document.querySelectorAll("[data-t]").forEach(function (el) { var v = d[el.getAttribute("data-t")]; if (v != null) el.textContent = v; });
+      document.querySelectorAll("[data-th]").forEach(function (el) { var v = d[el.getAttribute("data-th")]; if (v != null) el.innerHTML = v; });
+      document.querySelectorAll(".lang-toggle button").forEach(function (b) { var on = b.getAttribute("data-set") === lang; b.classList.toggle("active", on); b.setAttribute("aria-pressed", on ? "true" : "false"); });
+      try { localStorage.setItem("ludora_lang", lang); } catch (e) {}
+    }
+    document.querySelectorAll(".lang-toggle button").forEach(function (b) { b.addEventListener("click", function () { apply(b.getAttribute("data-set")); }); });
+    var saved = "en"; try { saved = localStorage.getItem("ludora_lang") || "en"; } catch (e) {}
+    apply(saved);
+
+    var els = document.querySelectorAll(".reveal");
+    if (!("IntersectionObserver" in window)) { els.forEach(function (e) { e.classList.add("in"); }); return; }
+    var io = new IntersectionObserver(function (ent) { ent.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add("in"); io.unobserve(en.target); } }); }, { threshold: 0.1 });
+    els.forEach(function (e) { if (!e.classList.contains("in")) io.observe(e); });
+  })();
+</script>
