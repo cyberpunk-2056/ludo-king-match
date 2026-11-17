@@ -3,7 +3,7 @@
 FROM node:20-slim AS build
 WORKDIR /app
 COPY backend/package*.json ./
-RUN npm install
+RUN npm ci
 COPY backend/ ./
 RUN npm run build
 
@@ -11,7 +11,7 @@ FROM node:20-slim AS run
 WORKDIR /app
 ENV NODE_ENV=production
 COPY backend/package*.json ./
-RUN npm install --omit=dev
+RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/src/schema.sql ./dist/schema.sql
 EXPOSE 8080
