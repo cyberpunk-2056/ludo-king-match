@@ -20,8 +20,8 @@ android {
 
     buildTypes {
         debug {
-            // localhost as seen from the Android emulator
-            buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:4000/\"")
+            // point the native app at the live backend so it works on real devices
+            buildConfigField("String", "BASE_URL", "\"https://ludo-king-match.onrender.com/\"")
         }
         release {
             isMinifyEnabled = true

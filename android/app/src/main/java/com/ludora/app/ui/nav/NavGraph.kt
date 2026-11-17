@@ -77,9 +77,9 @@ fun LudoraNavHost(loggedIn: Boolean, onToggleLang: () -> Unit, onToggleTheme: ()
             composable(Routes.DEPOSIT) { DepositScreen(nav) }
             composable(Routes.WITHDRAW) { WithdrawScreen(nav) }
             composable(Routes.PROFILE) {
-                ProfileScreen(nav, onToggleLang, onToggleTheme) {
+                ProfileScreen(nav, onToggleLang, onToggleTheme, onLoggedOut = {
                     nav.navigate(Routes.AUTH) { popUpTo(0) }
-                }
+                })
             }
         }
     }
