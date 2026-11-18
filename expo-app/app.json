@@ -24,6 +24,17 @@
     ],
     "experiments": {
       "typedRoutes": false
-    }
+    },
+    "extra": {
+      "router": {
+        "asyncRoutes": {
+          "web": true
+        }
+      },
+      "eas": {
+        "projectId": "a8be0d23-0813-47b3-b92c-6f5c9434f198"
+      }
+    },
+    "owner": "leo_2047"
   }
 }
