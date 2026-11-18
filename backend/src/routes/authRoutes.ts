@@ -52,17 +52,20 @@ authRoutes.post("/signup", async (req, res) => {
   res.json({ token: signToken(user.id), user: userView(user) });
 });
 
-const loginSchema = z.object({ phone: z.string().min(10), password: z.string().min(1) });
+// `phone` carries the identifier: it may be a phone number OR an email address,
+// so admins (known by email) can sign in with either.
+const loginSchema = z.object({ phone: z.string().min(1), password: z.string().min(1) });
 
 authRoutes.post("/login", async (req, res) => {
   const parsed = loginSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ message: "Invalid login details" });
-  const { phone, password } = parsed.data;
+  const id = parsed.data.phone.trim();
+  const password = parsed.data.password;
 
-  const r = await query("select * from users where phone = $1", [phone]);
+  const r = await query("select * from users where phone = $1 or lower(email) = lower($1)", [id]);
   const user = r.rows[0];
   if (!user || !(await bcrypt.compare(password, user.password_hash))) {
-    return res.status(401).json({ message: "Wrong phone or password" });
+    return res.status(401).json({ message: "Wrong phone/email or password" });
   }
   res.json({ token: signToken(user.id), user: userView(user) });
 });

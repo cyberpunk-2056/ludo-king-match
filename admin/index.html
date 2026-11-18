@@ -88,8 +88,8 @@
     <div class="brand"><span class="mk"><svg width="20" height="20" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" fill="#fff"/><rect x="4.5" y="4.5" width="6.4" height="6.4" rx="2" fill="#FF5A6A"/><rect x="13.1" y="4.5" width="6.4" height="6.4" rx="2" fill="#32D583"/><rect x="4.5" y="13.1" width="6.4" height="6.4" rx="2" fill="#4B9BFF"/><rect x="13.1" y="13.1" width="6.4" height="6.4" rx="2" fill="#FFC94D"/></svg></span>Ludo King <b>Maker</b></div>
     <p class="dim" style="text-align:center;margin:0 0 6px">Admin console</p>
     <div class="card" style="margin-top:14px">
-      <label class="lbl">Phone number</label>
-      <input id="lPhone" type="tel" autocomplete="username" placeholder="Admin phone">
+      <label class="lbl">Phone or email</label>
+      <input id="lPhone" type="text" autocomplete="username" placeholder="Admin phone or email">
       <label class="lbl">Password</label>
       <input id="lPass" type="password" autocomplete="current-password" placeholder="Password">
       <div class="err" id="lErr"></div>
@@ -147,7 +147,7 @@
   $("lBtn").addEventListener("click", function(){
     $("lErr").textContent="";
     var phone=$("lPhone").value.trim(), password=$("lPass").value;
-    if(!phone||!password){ $("lErr").textContent="Enter phone and password."; return; }
+    if(!phone||!password){ $("lErr").textContent="Enter your phone or email and password."; return; }
     api("/api/auth/login",{method:"POST",body:{phone:phone,password:password}})
       .then(function(res){
         TOKEN=res.token; try{ localStorage.setItem("lkm_admin_token",TOKEN); }catch(e){}
