@@ -16,4 +16,9 @@ export const env = {
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean),
+  // comma-separated emails that are promoted to admin on startup
+  adminEmails: (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean),
 };

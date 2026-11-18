@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ScrollView, Text, View, TextInput, Pressable } from "react-native";
+import { Alert, ScrollView, Text, View, TextInput, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { api, money } from "../src/api";
@@ -22,9 +22,12 @@ export default function Deposit() {
 
   async function pay() {
     setErr(null);
-    if (amt < 5) return setErr("Minimum deposit is $5.");
+    if (amt < 5) return setErr("Minimum deposit is ₹5.");
     setBusy(true);
-    try { await api.deposit({ amount: amt, method, instrument }); router.back(); }
+    try {
+      await api.deposit({ amount: amt, method, instrument });
+      Alert.alert(t("dep_submitted_t"), t("dep_submitted_b"), [{ text: t("ok"), onPress: () => router.back() }]);
+    }
     catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   }
 

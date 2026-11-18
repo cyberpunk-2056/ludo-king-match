@@ -19,31 +19,27 @@ walletRoutes.get("/wallet", requireAuth, async (req: AuthedRequest, res) => {
 walletRoutes.get("/wallet/transactions", requireAuth, async (req: AuthedRequest, res) => {
   const limit = Math.min(Number(req.query.limit ?? 50), 200);
   const r = await query(
-    "select id, type, amount, note, extract(epoch from created_at)*1000 as created_at from transactions where user_id = $1 order by created_at desc limit $2",
+    "select id, type, amount, note, status, extract(epoch from created_at)*1000 as created_at from transactions where user_id = $1 order by created_at desc limit $2",
     [req.userId, limit]
   );
-  res.json(r.rows.map((t) => ({ id: t.id, type: t.type, amount: Number(t.amount), note: t.note ?? "", created_at: Number(t.created_at) })));
+  res.json(r.rows.map((t) => ({ id: t.id, type: t.type, amount: Number(t.amount), note: t.note ?? "", status: t.status ?? "completed", created_at: Number(t.created_at) })));
 });
 
 const depositSchema = z.object({ amount: z.number().positive(), method: z.string(), instrument: z.string().optional() });
 
-// In production this endpoint is called by the payment provider's webhook AFTER a
-// successful charge, not directly by the client. Credits the deposit balance atomically.
+// Submits a deposit request for admin approval. The balance is credited only when
+// an admin approves it (so a real payment can be confirmed first).
 walletRoutes.post("/wallet/deposit", requireAuth, async (req: AuthedRequest, res) => {
   const parsed = depositSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ message: "Invalid deposit" });
   const amount = Money.round2(parsed.data.amount);
   if (amount < Money.MIN_DEPOSIT) return res.status(400).json({ message: `Minimum deposit is ₹${Money.MIN_DEPOSIT}` });
 
-  const txId = await withTransaction(async (c) => {
-    await c.query("update wallets set deposit = deposit + $1 where user_id = $2", [amount, req.userId]);
-    const t = await c.query(
-      "insert into transactions (user_id, type, amount, note) values ($1,'deposit',$2,$3) returning id",
-      [req.userId, amount, parsed.data.method]
-    );
-    return t.rows[0].id;
-  });
-  res.json({ status: "ok", txId });
+  const t = await query(
+    "insert into transactions (user_id, type, amount, note, status) values ($1,'deposit',$2,$3,'pending') returning id",
+    [req.userId, amount, parsed.data.method]
+  );
+  res.json({ status: "pending", txId: t.rows[0].id });
 });
 
 const withdrawSchema = z.object({ amount: z.number().positive(), upiId: z.string().min(3) });
@@ -74,12 +70,12 @@ walletRoutes.post("/wallet/withdraw", requireAuth, async (req: AuthedRequest, re
       await c.query("update wallets set deposit = deposit - $1, winnings = winnings - $2 where user_id = $3",
         [fromDeposit, fromWinnings, req.userId]);
       const t = await c.query(
-        "insert into transactions (user_id, type, amount, note) values ($1,'withdraw',$2,$3) returning id",
+        "insert into transactions (user_id, type, amount, note, status) values ($1,'withdraw',$2,$3,'pending') returning id",
         [req.userId, -amount, parsed.data.upiId]
       );
       return t.rows[0].id;
     });
-    res.json({ status: "ok", txId });
+    res.json({ status: "pending", txId });
   } catch (e: any) {
     if (e.message === "INSUFFICIENT") return res.status(400).json({ message: "Amount exceeds your balance" });
     throw e;

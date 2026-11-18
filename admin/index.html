@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Ludo King Maker — Admin</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap">
+<style>
+  :root{
+    --bg:#060912;--bg2:#0a0f1c;--surface:#0e1322;--surface2:#141c30;--line:rgba(130,160,230,.14);
+    --fg:#eef2fc;--dim:#97a3c2;--muted:#5c688a;--blue:#4c84ff;--blued:#2457e6;--gold:#ffc53d;
+    --green:#2bd98a;--red:#ff5b6e;--font:"Plus Jakarta Sans",system-ui,sans-serif;--disp:"Sora",sans-serif;
+    color-scheme:dark;
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{background:radial-gradient(900px 500px at 85% -10%,rgba(76,132,255,.15),transparent 60%),var(--bg);color:var(--fg);font-family:var(--font);font-size:14px;-webkit-font-smoothing:antialiased;min-height:100vh}
+  h1,h2,h3{font-family:var(--disp);margin:0;font-weight:800;letter-spacing:-.01em}
+  a{color:var(--blue)} .num{font-variant-numeric:tabular-nums}
+  button{font-family:inherit;cursor:pointer;border:0}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:linear-gradient(135deg,#4c84ff,#2457e6);color:#fff;font-family:var(--disp);font-weight:700;font-size:13px;padding:10px 16px;border-radius:10px}
+  .btn:active{transform:translateY(1px)} .btn:disabled{opacity:.5;cursor:default}
+  .btn.green{background:linear-gradient(135deg,#2bd98a,#12a594)} .btn.red{background:linear-gradient(135deg,#ff5b6e,#d23047)}
+  .btn.ghost{background:var(--surface2);color:var(--fg);box-shadow:inset 0 0 0 1px var(--line)}
+  .btn.sm{padding:7px 12px;font-size:12px;border-radius:8px}
+  input,select{width:100%;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:11px 13px;color:var(--fg);font-family:var(--font);font-size:14px;outline:none}
+  input:focus,select:focus{border-color:var(--blue)}
+  .muted{color:var(--muted)} .dim{color:var(--dim)}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .pill{display:inline-block;font-size:11px;font-weight:800;padding:3px 9px;border-radius:999px;text-transform:uppercase;letter-spacing:.03em}
+  .pill.pending{color:var(--gold);background:rgba(255,197,61,.15)} .pill.approved{color:var(--green);background:rgba(43,217,138,.15)}
+  .pill.rejected{color:var(--red);background:rgba(255,91,110,.15)} .pill.dispute{color:var(--red);background:rgba(255,91,110,.15)}
+  .pill.live{color:var(--green);background:rgba(43,217,138,.15)} .pill.settled{color:var(--dim);background:var(--surface2)}
+  .pill.admin{color:var(--blue);background:rgba(76,132,255,.16)}
+
+  /* login */
+  #login{min-height:100vh;display:grid;place-items:center;padding:22px}
+  #login .box{width:100%;max-width:360px}
+  .brand{display:flex;align-items:center;justify-content:center;gap:10px;font-family:var(--disp);font-weight:800;font-size:22px;margin-bottom:6px}
+  .brand .mk{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#4c84ff,#2457e6);display:grid;place-items:center}
+  .brand b{color:var(--gold)}
+  .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:800;margin:12px 0 6px;display:block}
+  .err{color:var(--red);font-size:13px;font-weight:700;margin-top:10px;min-height:1px}
+
+  /* shell */
+  #app[hidden]{display:none} #login[hidden]{display:none}
+  .top{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 85%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .top-in{max-width:1100px;margin:auto;display:flex;align-items:center;gap:12px;padding:12px 16px}
+  .top .mk{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#4c84ff,#2457e6);display:grid;place-items:center}
+  .top h1{font-size:16px} .top h1 b{color:var(--gold)}
+  .tabs{display:flex;gap:6px;overflow-x:auto;max-width:1100px;margin:14px auto 0;padding:0 16px}
+  .tab{background:var(--surface);border:1px solid var(--line);color:var(--dim);font-family:var(--disp);font-weight:700;font-size:13px;padding:9px 15px;border-radius:999px;white-space:nowrap}
+  .tab.on{background:linear-gradient(135deg,#4c84ff,#2457e6);color:#fff;border-color:transparent}
+  .wrap{max-width:1100px;margin:16px auto;padding:0 16px 60px}
+
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .stat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;position:relative;overflow:hidden}
+  .stat::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:linear-gradient(135deg,#4c84ff,#2457e6)}
+  .stat .v{font-family:var(--disp);font-weight:800;font-size:24px} .stat .k{color:var(--dim);font-size:12px;margin-top:3px}
+  .stat.gold .v{color:var(--gold)} .stat.green .v{color:var(--green)} .stat.blue .v{color:var(--blue)}
+
+  .row{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:13px 14px;margin-bottom:9px}
+  .row .grow{flex:1;min-width:0}
+  .row .t{font-weight:700} .row .s{color:var(--muted);font-size:12px;margin-top:2px}
+  .amt{font-family:var(--disp);font-weight:800} .amt.pos{color:var(--green)} .amt.neg{color:var(--red)} .amt.gold{color:var(--gold)}
+  .actions{display:flex;gap:7px;flex:none}
+  .search{margin-bottom:12px}
+  .empty{color:var(--muted);text-align:center;padding:30px}
+
+  /* modal */
+  .ov{position:fixed;inset:0;z-index:20;background:rgba(4,6,13,.8);backdrop-filter:blur(4px);display:grid;place-items:center;padding:16px}
+  .ov[hidden]{display:none}
+  .modal{width:100%;max-width:460px;max-height:88vh;overflow-y:auto;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px}
+  .modal h2{font-size:18px} .x{float:right;background:var(--surface2);width:32px;height:32px;border-radius:9px;color:var(--fg);font-size:17px}
+  .kv{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+  .kv:last-child{border-bottom:0} .kv b{font-family:var(--disp)}
+  .proof{margin-top:8px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .proof img{width:100%;display:block}
+  .toast{position:fixed;left:50%;bottom:20px;transform:translateX(-50%);background:var(--surface2);color:#fff;font-weight:700;font-size:13px;padding:11px 18px;border-radius:11px;box-shadow:0 10px 30px rgba(0,0,0,.5);z-index:40;opacity:0;transition:opacity .25s;pointer-events:none}
+  .toast.show{opacity:1}
+  @media(max-width:640px){ .stats{grid-template-columns:1fr 1fr} .row{flex-wrap:wrap} .actions{width:100%} .actions .btn{flex:1} }
+</style>
+</head>
+<body>
+
+<section id="login">
+  <div class="box">
+    <div class="brand"><span class="mk"><svg width="20" height="20" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" fill="#fff"/><rect x="4.5" y="4.5" width="6.4" height="6.4" rx="2" fill="#FF5A6A"/><rect x="13.1" y="4.5" width="6.4" height="6.4" rx="2" fill="#32D583"/><rect x="4.5" y="13.1" width="6.4" height="6.4" rx="2" fill="#4B9BFF"/><rect x="13.1" y="13.1" width="6.4" height="6.4" rx="2" fill="#FFC94D"/></svg></span>Ludo King <b>Maker</b></div>
+    <p class="dim" style="text-align:center;margin:0 0 6px">Admin console</p>
+    <div class="card" style="margin-top:14px">
+      <label class="lbl">Phone number</label>
+      <input id="lPhone" type="tel" autocomplete="username" placeholder="Admin phone">
+      <label class="lbl">Password</label>
+      <input id="lPass" type="password" autocomplete="current-password" placeholder="Password">
+      <div class="err" id="lErr"></div>
+      <button class="btn" id="lBtn" style="width:100%;margin-top:14px">Log in</button>
+      <p class="muted" style="font-size:12px;margin-top:12px">Sign in with an account that has been granted admin access.</p>
+    </div>
+  </div>
+</section>
+
+<div id="app" hidden>
+  <header class="top">
+    <div class="top-in">
+      <span class="mk"><svg width="18" height="18" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5" fill="#fff"/><rect x="4.5" y="4.5" width="6.4" height="6.4" rx="2" fill="#FF5A6A"/><rect x="13.1" y="4.5" width="6.4" height="6.4" rx="2" fill="#32D583"/><rect x="4.5" y="13.1" width="6.4" height="6.4" rx="2" fill="#4B9BFF"/><rect x="13.1" y="13.1" width="6.4" height="6.4" rx="2" fill="#FFC94D"/></svg></span>
+      <h1>Ludo King <b>Maker</b> Admin</h1>
+      <div style="flex:1"></div>
+      <button class="btn ghost sm" id="refreshBtn">↻ Refresh</button>
+      <button class="btn ghost sm" id="logoutBtn">Log out</button>
+    </div>
+  </header>
+  <nav class="tabs" id="tabs">
+    <button class="tab on" data-tab="dash">Dashboard</button>
+    <button class="tab" data-tab="approvals">Approvals</button>
+    <button class="tab" data-tab="users">Users</button>
+    <button class="tab" data-tab="matches">Matches</button>
+  </nav>
+  <main class="wrap" id="view"></main>
+</div>
+
+<div class="ov" id="ov" hidden><div class="modal" id="modal"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  var API = "https://ludo-king-match.onrender.com";
+  var TOKEN = null;
+  try { TOKEN = localStorage.getItem("lkm_admin_token"); } catch(e){}
+  var $ = function(id){ return document.getElementById(id); };
+  var cur = function(n){ n = Number(n)||0; return "₹"+Math.abs(n).toLocaleString("en-IN",{minimumFractionDigits:2,maximumFractionDigits:2}); };
+  var esc = function(s){ return String(s==null?"":s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];}); };
+  var when = function(ms){ if(!ms) return ""; var d=new Date(ms); return d.toLocaleDateString()+" "+d.toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"}); };
+  var toastT;
+  function toast(m){ var e=$("toast"); e.textContent=m; e.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(function(){e.classList.remove("show");},2200); }
+
+  function api(path, opts){
+    opts = opts || {};
+    var h = { "Content-Type":"application/json" };
+    if(TOKEN) h["Authorization"] = "Bearer "+TOKEN;
+    return fetch(API+path, { method:opts.method||"GET", headers:h, body:opts.body?JSON.stringify(opts.body):undefined })
+      .then(function(r){ return r.json().catch(function(){return {};}).then(function(j){ if(!r.ok) throw new Error(j.message||("Error "+r.status)); return j; }); });
+  }
+
+  // ---------- login ----------
+  function showLogin(){ $("login").hidden=false; $("app").hidden=true; }
+  function showApp(){ $("login").hidden=true; $("app").hidden=false; setTab("dash"); }
+  $("lBtn").addEventListener("click", function(){
+    $("lErr").textContent="";
+    var phone=$("lPhone").value.trim(), password=$("lPass").value;
+    if(!phone||!password){ $("lErr").textContent="Enter phone and password."; return; }
+    api("/api/auth/login",{method:"POST",body:{phone:phone,password:password}})
+      .then(function(res){
+        TOKEN=res.token; try{ localStorage.setItem("lkm_admin_token",TOKEN); }catch(e){}
+        return api("/api/admin/stats"); // verify admin access
+      })
+      .then(function(){ showApp(); })
+      .catch(function(e){
+        if(String(e.message).indexOf("Admins")>=0){ $("lErr").textContent="This account is not an admin."; TOKEN=null; try{localStorage.removeItem("lkm_admin_token");}catch(_){ } }
+        else $("lErr").textContent=e.message;
+      });
+  });
+  $("logoutBtn").addEventListener("click", function(){ TOKEN=null; try{localStorage.removeItem("lkm_admin_token");}catch(e){} showLogin(); });
+
+  // ---------- tabs ----------
+  var curTab="dash";
+  function setTab(t){
+    curTab=t;
+    [].forEach.call(document.querySelectorAll(".tab"),function(b){ b.classList.toggle("on", b.getAttribute("data-tab")===t); });
+    render();
+  }
+  document.getElementById("tabs").addEventListener("click", function(e){ var b=e.target.closest(".tab"); if(b) setTab(b.getAttribute("data-tab")); });
+  $("refreshBtn").addEventListener("click", render);
+
+  function render(){
+    if(curTab==="dash") return renderDash();
+    if(curTab==="approvals") return renderApprovals();
+    if(curTab==="users") return renderUsers();
+    if(curTab==="matches") return renderMatches();
+  }
+  function loading(){ $("view").innerHTML='<p class="empty">Loading…</p>'; }
+  function fail(e){ $("view").innerHTML='<p class="empty">'+esc(e.message)+'</p>'; if(String(e.message).indexOf("auth")>=0||String(e.message).indexOf("token")>=0) showLogin(); }
+
+  // ---------- dashboard ----------
+  function renderDash(){
+    loading();
+    api("/api/admin/stats").then(function(s){
+      $("view").innerHTML =
+        '<div class="stats">'+
+          stat("blue", s.users, "Users")+
+          stat("gold", s.pendingDeposits+s.pendingWithdrawals, "Pending approvals")+
+          stat("green", cur(s.walletDeposit+s.walletWinnings), "Wallet liability")+
+          stat("", s.matchesLive, "Live matches")+
+          stat("green", cur(s.deposited), "Approved deposits")+
+          stat("gold", cur(s.paidOut), "Paid out")+
+          stat("", s.matchesSettled, "Settled matches")+
+          stat("", s.matchesWaiting, "Open matches")+
+        '</div>'+
+        '<div class="card" style="margin-top:14px"><b>'+s.pendingDeposits+'</b> deposit and <b>'+s.pendingWithdrawals+'</b> withdrawal requests are waiting. Open the <a href="#" id="goAppr">Approvals</a> tab to process them.</div>';
+      var g=$("goAppr"); if(g) g.addEventListener("click",function(ev){ev.preventDefault();setTab("approvals");});
+    }).catch(fail);
+  }
+  function stat(cls,v,k){ return '<div class="stat '+cls+'"><div class="v num">'+esc(v)+'</div><div class="k">'+esc(k)+'</div></div>'; }
+
+  // ---------- approvals ----------
+  function renderApprovals(){
+    loading();
+    api("/api/admin/transactions?status=pending").then(function(list){
+      if(!list.length){ $("view").innerHTML='<p class="empty">No pending deposits or withdrawals 🎉</p>'; return; }
+      $("view").innerHTML = list.map(function(t){
+        var isDep = t.type==="deposit";
+        return '<div class="row" data-id="'+t.id+'">'+
+          '<div class="grow"><div class="t">'+esc(t.userName)+' <span class="muted">· '+esc(t.userPhone)+'</span></div>'+
+          '<div class="s">'+(isDep?"Deposit via ":"Withdraw to ")+esc(t.note)+' · '+when(t.created_at)+'</div></div>'+
+          '<div class="amt '+(isDep?"gold":"neg")+'">'+cur(t.amount)+'</div>'+
+          '<div class="actions"><button class="btn green sm" data-act="approve">Approve</button><button class="btn red sm" data-act="reject">Reject</button></div>'+
+        '</div>';
+      }).join("");
+      [].forEach.call($("view").querySelectorAll(".row"),function(rowEl){
+        rowEl.querySelectorAll("button").forEach(function(b){
+          b.addEventListener("click",function(){
+            var id=rowEl.getAttribute("data-id"), act=b.getAttribute("data-act");
+            b.disabled=true;
+            api("/api/admin/transactions/"+id+"/"+act,{method:"POST"})
+              .then(function(){ toast(act==="approve"?"Approved":"Rejected"); renderApprovals(); })
+              .catch(function(e){ b.disabled=false; toast(e.message); });
+          });
+        });
+      });
+    }).catch(fail);
+  }
+
+  // ---------- users ----------
+  function renderUsers(){
+    $("view").innerHTML='<div class="search"><input id="uq" placeholder="Search name, phone or email…"></div><div id="ulist"><p class="empty">Loading…</p></div>';
+    var box=$("uq"); var timer;
+    box.addEventListener("input",function(){ clearTimeout(timer); timer=setTimeout(loadUsers,250); });
+    loadUsers();
+    function loadUsers(){
+      api("/api/admin/users?q="+encodeURIComponent(box?box.value.trim():"")).then(function(list){
+        if(!list.length){ $("ulist").innerHTML='<p class="empty">No users</p>'; return; }
+        $("ulist").innerHTML=list.map(function(u){
+          return '<div class="row" data-id="'+u.id+'">'+
+            '<div class="grow"><div class="t">'+esc(u.name)+(u.isAdmin?' <span class="pill admin">admin</span>':'')+'</div>'+
+            '<div class="s">'+esc(u.phone)+(u.email?' · '+esc(u.email):'')+'</div></div>'+
+            '<div style="text-align:right"><div class="amt gold">'+cur(u.deposit+u.winnings)+'</div><div class="s">bal</div></div>'+
+          '</div>';
+        }).join("");
+        [].forEach.call($("ulist").querySelectorAll(".row"),function(r){ r.addEventListener("click",function(){ openUser(r.getAttribute("data-id")); }); });
+      }).catch(fail);
+    }
+  }
+  function openUser(id){
+    api("/api/admin/users/"+id).then(function(u){
+      var tx=u.transactions.slice(0,12).map(function(t){
+        return '<div class="kv"><span>'+esc(t.type)+' <span class="pill '+esc(t.status)+'">'+esc(t.status)+'</span></span><b class="'+(t.amount>=0?"amt pos":"amt neg")+'">'+(t.amount>=0?"+":"-")+cur(t.amount)+'</b></div>';
+      }).join("") || '<p class="muted">No transactions</p>';
+      modal(
+        '<button class="x" data-close>×</button><h2>'+esc(u.name)+(u.isAdmin?' <span class="pill admin">admin</span>':'')+'</h2>'+
+        '<p class="muted" style="margin:4px 0 12px">'+esc(u.phone)+(u.email?' · '+esc(u.email):'')+' · rating '+esc(u.rating)+'</p>'+
+        '<div class="kv"><span>Deposit balance</span><b>'+cur(u.deposit)+'</b></div>'+
+        '<div class="kv"><span>Winnings</span><b class="amt pos">'+cur(u.winnings)+'</b></div>'+
+        '<div class="kv"><span>Matches played / won</span><b>'+u.played+' / '+u.wins+'</b></div>'+
+        '<label class="lbl">Adjust balance</label>'+
+        '<div style="display:flex;gap:8px"><input id="adjAmt" type="number" placeholder="e.g. 100 or -50" style="flex:2"><select id="adjBucket" style="flex:1"><option value="deposit">Deposit</option><option value="winnings">Winnings</option></select></div>'+
+        '<button class="btn sm" id="adjBtn" style="margin-top:8px;width:100%">Apply adjustment</button>'+
+        '<button class="btn ghost sm" id="roleBtn" style="margin-top:8px;width:100%">'+(u.isAdmin?"Remove admin":"Make admin")+'</button>'+
+        '<label class="lbl">Recent transactions</label>'+tx
+      );
+      $("adjBtn").addEventListener("click",function(){
+        var amt=parseFloat($("adjAmt").value); if(!amt){ toast("Enter an amount"); return; }
+        api("/api/admin/users/"+id+"/adjust",{method:"POST",body:{amount:amt,bucket:$("adjBucket").value,note:"admin adjustment"}})
+          .then(function(){ toast("Balance updated"); closeModal(); }).catch(function(e){toast(e.message);});
+      });
+      $("roleBtn").addEventListener("click",function(){
+        api("/api/admin/users/"+id+"/role",{method:"POST",body:{isAdmin:!u.isAdmin}})
+          .then(function(){ toast("Role updated"); closeModal(); if(curTab==="users") render(); }).catch(function(e){toast(e.message);});
+      });
+    }).catch(function(e){toast(e.message);});
+  }
+
+  // ---------- matches ----------
+  function renderMatches(){
+    loading();
+    api("/api/admin/matches").then(function(list){
+      if(!list.length){ $("view").innerHTML='<p class="empty">No matches yet</p>'; return; }
+      $("view").innerHTML=list.map(function(m){
+        var badge = m.disputed?'<span class="pill dispute">dispute</span>':'<span class="pill '+esc(m.status)+'">'+esc(m.status)+'</span>';
+        var vs = m.seats>2 ? (esc(m.playerA)+' +'+(m.players-1)+' players') : (esc(m.playerA)+' vs '+esc(m.playerB||'—'));
+        return '<div class="row" data-id="'+m.id+'">'+
+          '<div class="grow"><div class="t">'+vs+' '+badge+'</div><div class="s">'+cur(m.stake)+' entry · '+m.players+'/'+m.seats+' players · '+when(m.created_at)+(m.winner?' · won by '+esc(m.winner):'')+'</div></div>'+
+          '<div class="amt gold">'+cur(m.pot)+'</div>'+
+        '</div>';
+      }).join("");
+      [].forEach.call($("view").querySelectorAll(".row"),function(r){ r.addEventListener("click",function(){ openMatch(r.getAttribute("data-id")); }); });
+    }).catch(fail);
+  }
+  function openMatch(id){
+    api("/api/admin/matches/"+id).then(function(m){
+      var players=m.players.map(function(p){
+        var proof = p.proofUrl ? '<div class="proof"><a href="'+esc(p.proofUrl)+'" target="_blank" rel="noopener"><img src="'+esc(p.proofUrl)+'" alt="proof" onerror="this.parentNode.innerHTML=\'<span class=&quot;dim&quot; style=&quot;padding:8px;display:block&quot;>Open proof ↗</span>\'"></a></div>' : '';
+        var res = p.result?('<span class="pill '+(p.result==="win"?"approved":"settled")+'">'+esc(p.result)+'</span>'):'<span class="muted">no report</span>';
+        var resolveBtn = m.status!=="settled" ? '<button class="btn sm" data-win="'+p.userId+'" style="margin-top:8px">Declare '+esc(p.name)+' winner</button>' : '';
+        return '<div class="card" style="margin-top:10px"><div style="display:flex;justify-content:space-between"><b>'+esc(p.name)+'</b>'+res+'</div>'+proof+resolveBtn+'</div>';
+      }).join("");
+      modal(
+        '<button class="x" data-close>×</button><h2>Match</h2>'+
+        '<p class="muted" style="margin:4px 0 12px">'+cur(m.stake)+' entry · pot '+cur(m.pot)+' · winner gets '+cur(m.payout)+' · <span class="pill '+esc(m.status)+'">'+esc(m.status)+'</span></p>'+
+        '<div class="kv"><span>Room code</span><b>'+esc(m.roomCode||"—")+'</b></div>'+
+        '<label class="lbl">Players & result proof</label>'+players
+      );
+      [].forEach.call($("modal").querySelectorAll("[data-win]"),function(b){
+        b.addEventListener("click",function(){
+          b.disabled=true;
+          api("/api/admin/matches/"+id+"/resolve",{method:"POST",body:{winnerId:b.getAttribute("data-win")}})
+            .then(function(){ toast("Match resolved"); closeModal(); if(curTab==="matches") render(); })
+            .catch(function(e){ b.disabled=false; toast(e.message); });
+        });
+      });
+    }).catch(function(e){toast(e.message);});
+  }
+
+  // ---------- modal ----------
+  function modal(html){ $("modal").innerHTML=html; $("ov").hidden=false; var x=$("modal").querySelector("[data-close]"); if(x) x.addEventListener("click",closeModal); }
+  function closeModal(){ $("ov").hidden=true; }
+  $("ov").addEventListener("click",function(e){ if(e.target===$("ov")) closeModal(); });
+
+  // ---------- boot ----------
+  if(TOKEN){ api("/api/admin/stats").then(showApp).catch(showLogin); } else showLogin();
+})();
+</script>
+</body>
+</html>

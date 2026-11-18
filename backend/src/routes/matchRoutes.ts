@@ -186,7 +186,7 @@ matchRoutes.post("/matches/:id/result", requireAuth, async (req: AuthedRequest, 
   res.json({ status: result.status });
 });
 
-async function settleMatch(client: any, match: any, winnerId: string) {
+export async function settleMatch(client: any, match: any, winnerId: string) {
   const pot = Money.pot(Number(match.stake), match.seats);
   const payout = Money.winnerPayout(pot);
 

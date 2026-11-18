@@ -14,6 +14,7 @@ import { matchRoutes, expireMatches } from "./routes/matchRoutes.js";
 import { referralRoutes } from "./routes/referralRoutes.js";
 import { pushRoutes } from "./routes/pushRoutes.js";
 import { supportRoutes } from "./routes/supportRoutes.js";
+import { adminRoutes } from "./routes/adminRoutes.js";
 
 const app = express();
 
@@ -32,6 +33,7 @@ app.use("/api", matchRoutes);
 app.use("/api", referralRoutes);
 app.use("/api", pushRoutes);
 app.use("/api", supportRoutes);
+app.use("/api", adminRoutes);
 
 // fallback error handler. Routes may throw an error carrying `http` (a status < 500)
 // and its message is sent to the client; everything else is a generic 500.
@@ -63,6 +65,9 @@ setInterval(() => {
 async function ensureSchema() {
   try {
     await pool.query(SCHEMA);
+    if (env.adminEmails.length) {
+      await pool.query("update users set is_admin = true where lower(email) = any($1::text[])", [env.adminEmails]);
+    }
     console.log("Schema ensured.");
   } catch (e) {
     console.error("ensureSchema failed (continuing):", e);

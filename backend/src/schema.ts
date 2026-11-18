@@ -80,6 +80,11 @@ create table if not exists match_reports (
   unique (match_id, user_id)
 );
 
+-- admin flag + approval status for deposits/withdrawals
+alter table users add column if not exists is_admin boolean not null default false;
+alter table transactions add column if not exists status text not null default 'completed';
+create index if not exists idx_tx_status on transactions(status, created_at desc);
+
 -- Expo push tokens, one row per device token (a user may have several devices).
 create table if not exists push_tokens (
   token      text primary key,

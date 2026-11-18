@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ScrollView, Text, View, TextInput, Pressable } from "react-native";
+import { Alert, ScrollView, Text, View, TextInput, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { api, money, type UpiAccount, type Wallet as W } from "../src/api";
@@ -35,11 +35,14 @@ export default function Withdraw() {
   }
   async function send() {
     setErr(null);
-    if (amt < 10) return setErr("Minimum withdrawal is $10.");
+    if (amt < 10) return setErr("Minimum withdrawal is ₹10.");
     if (amt > total + 0.001) return setErr("Amount exceeds your balance.");
     if (!def) return setErr("Add a verified UPI account first.");
     setBusy(true);
-    try { await api.withdraw({ amount: amt, upiId: def.vpa }); router.back(); }
+    try {
+      await api.withdraw({ amount: amt, upiId: def.vpa });
+      Alert.alert(t("wd_submitted_t"), t("wd_submitted_b"), [{ text: t("ok"), onPress: () => router.back() }]);
+    }
     catch (e: any) { setErr(e.message); } finally { setBusy(false); }
   }
 
