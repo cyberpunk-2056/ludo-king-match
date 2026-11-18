@@ -1,8 +1,26 @@
 import { Router } from "express";
+import { z } from "zod";
+import bcrypt from "bcryptjs";
 import { query } from "../db.js";
 import { requireAuth, type AuthedRequest } from "../auth.js";
 
 export const meRoutes = Router();
+
+const pwSchema = z.object({ currentPassword: z.string().min(1), newPassword: z.string().min(4) });
+
+// Change the signed-in user's password: verify the current one, then store the new hash.
+meRoutes.post("/me/password", requireAuth, async (req: AuthedRequest, res) => {
+  const parsed = pwSchema.safeParse(req.body);
+  if (!parsed.success) return res.status(400).json({ message: "New password must be at least 4 characters" });
+  const r = await query("select password_hash from users where id = $1", [req.userId]);
+  const u = r.rows[0];
+  if (!u) return res.status(404).json({ message: "Not found" });
+  const ok = await bcrypt.compare(parsed.data.currentPassword, u.password_hash);
+  if (!ok) return res.status(400).json({ message: "Current password is incorrect" });
+  const hash = await bcrypt.hash(parsed.data.newPassword, 10);
+  await query("update users set password_hash = $1 where id = $2", [hash, req.userId]);
+  res.json({ ok: true });
+});
 
 meRoutes.get("/me", requireAuth, async (req: AuthedRequest, res) => {
   const r = await query(

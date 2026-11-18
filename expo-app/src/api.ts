@@ -52,6 +52,8 @@ export const api = {
   login: (b: { phone: string; password: string }) =>
     request<{ token: string; user: User }>("/api/auth/login", { method: "POST", body: JSON.stringify(b) }),
   me: () => request<User>("/api/me"),
+  changePassword: (b: { currentPassword: string; newPassword: string }) =>
+    request<{ ok: boolean }>("/api/me/password", { method: "POST", body: JSON.stringify(b) }),
 
   wallet: () => request<Wallet>("/api/wallet"),
   transactions: (limit = 50) => request<Tx[]>(`/api/wallet/transactions?limit=${limit}`),

@@ -888,6 +888,14 @@
         <button class="pf-link" data-go="txnhist"><span class="ic1">💸</span><span data-t="pf_txn">Deposits &amp; withdrawals</span><span class="chev">›</span></button>
         <button class="pf-link" data-go="refer"><span class="ic1">🎁</span><span data-t="pf_refer">Refer &amp; earn</span><span class="chev">›</span></button>
       </div>
+      <div class="card" style="margin-top:14px">
+        <h3 style="font-size:16px;margin-bottom:4px" data-t="cp_title">Change password</h3>
+        <div class="field"><span class="label" data-t="cp_cur">Current password</span><input class="input" id="cpCur" type="password" autocomplete="current-password"></div>
+        <div class="field"><span class="label" data-t="cp_new">New password</span><input class="input" id="cpNew" type="password" autocomplete="new-password"></div>
+        <div class="field"><span class="label" data-t="cp_confirm">Confirm new password</span><input class="input" id="cpConfirm" type="password" autocomplete="new-password"></div>
+        <div class="err" id="cpErr"></div>
+        <button class="btn btn-accent btn-block" id="cpBtn" style="margin-top:12px" data-t="cp_btn">Update password</button>
+      </div>
       <button class="btn btn-ghost btn-block" id="logoutBtn" style="margin-top:14px" data-t="pf_logout">Log out</button>
     </section>
 
@@ -1152,6 +1160,7 @@
       tx_dep:"Money added", tx_wd:"Withdrawal", tx_ref:"Referral commission (3%)", tx_win:"Match won", tx_stake:"Stake locked",
       via:"via", to:"to", from:"from", played:"played", fr_won:"won", today:"Today", yday:"Yesterday", dago:"d ago",
       err_min_d:"Minimum deposit is ₹5.", err_min_w:"Minimum withdrawal is ₹10.", err_over:"Amount exceeds your withdrawable balance.", err_dest:"Enter a UPI ID or bank account.", err_bal:"Not enough balance. Add funds first.", err_rc:"Enter your Ludo King room code (at least 4 characters).",
+      cp_title:"Change password", cp_cur:"Current password", cp_new:"New password", cp_confirm:"Confirm new password", cp_btn:"Update password", cp_cur_req:"Enter your current password.", cp_short:"New password must be at least 4 characters.", cp_mismatch:"New passwords don't match.", cp_done:"Password updated.",
       t_added:"Added", t_wd:"Withdrawal requested", t_copied:"Referral link copied!", t_ref:"Referral commission credited!",
       matching:"Finding an opponent…", won:"You won!", lost:"You lost", won_sub:"You win the pot. We keep a 5% fee.", lost_sub:"Your opponent won this one.",
       mr_waiting:"Finding an opponent…", mr_cancel:"Cancel & refund", mr_found:"Opponent found!", mr_vs:"vs", mr_pot:"pot",
@@ -1236,6 +1245,7 @@
       tx_dep:"पैसे जोड़े", tx_wd:"निकासी", tx_ref:"रेफ़रल कमीशन (3%)", tx_win:"मैच जीता", tx_stake:"स्टेक लॉक",
       via:"के ज़रिए", to:"को", from:"से", played:"ने खेला", fr_won:"जीते", today:"आज", yday:"कल", dago:" दिन पहले",
       err_min_d:"न्यूनतम जमा ₹5 है।", err_min_w:"न्यूनतम निकासी ₹10 है।", err_over:"राशि आपके निकासी योग्य बैलेंस से अधिक है।", err_dest:"UPI ID या बैंक खाता दर्ज करें।", err_bal:"बैलेंस पर्याप्त नहीं। पहले फंड जोड़ें।", err_rc:"अपना लूडो किंग रूम कोड दर्ज करें (कम से कम 4 अक्षर)।",
+      cp_title:"पासवर्ड बदलें", cp_cur:"मौजूदा पासवर्ड", cp_new:"नया पासवर्ड", cp_confirm:"नया पासवर्ड दोहराएं", cp_btn:"पासवर्ड अपडेट करें", cp_cur_req:"अपना मौजूदा पासवर्ड दर्ज करें।", cp_short:"नया पासवर्ड कम से कम 4 अक्षरों का हो।", cp_mismatch:"नए पासवर्ड मेल नहीं खाते।", cp_done:"पासवर्ड अपडेट हो गया।",
       t_added:"जोड़ा गया", t_wd:"निकासी का अनुरोध किया गया", t_copied:"रेफ़रल लिंक कॉपी हो गया!", t_ref:"रेफ़रल कमीशन जोड़ा गया!",
       matching:"प्रतिद्वंद्वी ढूँढ रहे हैं…", won:"आप जीते!", lost:"आप हारे", won_sub:"आप पॉट जीतते हैं। हम 5% फीस लेते हैं।", lost_sub:"इस बार प्रतिद्वंद्वी जीता।",
       mr_waiting:"प्रतिद्वंद्वी ढूँढ रहे हैं…", mr_cancel:"रद्द करें और रिफंड लें", mr_found:"प्रतिद्वंद्वी मिल गया!", mr_vs:"बनाम", mr_pot:"पॉट",
@@ -1920,6 +1930,15 @@
   $("authSubmit").addEventListener("click",doAuth);
   $("authSwitch").addEventListener("click",function(){ authMode=(authMode==="login")?"signup":"login"; renderAuth(); $("authErr").textContent=""; });
   $("logoutBtn").addEventListener("click",logout);
+  $("cpBtn").addEventListener("click",function(){
+    var cur=$("cpCur").value, nw=$("cpNew").value, cf=$("cpConfirm").value, e=$("cpErr");
+    e.textContent="";
+    if(!cur){ e.textContent=t("cp_cur_req"); return; }
+    if(nw.length<4){ e.textContent=t("cp_short"); return; }
+    if(nw!==cf){ e.textContent=t("cp_mismatch"); return; }
+    $("cpCur").value=""; $("cpNew").value=""; $("cpConfirm").value="";
+    toast(t("cp_done"));
+  });
   document.querySelectorAll(".lang button").forEach(function(b){ b.addEventListener("click",function(){ applyLang(b.getAttribute("data-set")); }); });
 
   // theme

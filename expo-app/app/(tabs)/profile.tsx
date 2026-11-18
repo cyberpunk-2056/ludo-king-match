@@ -83,6 +83,7 @@ export default function Profile() {
           );
         })}
 
+        <Btn title={`🔒 ${t("change_pw")}`} variant="ghost" onPress={() => router.push("/password")} style={{ marginTop: 10 }} />
         <Btn title={`💬 ${t("support")}`} variant="ghost" onPress={() => router.push("/support")} style={{ marginTop: 10 }} />
         <Btn title={t("logout")} variant="ghost" onPress={async () => { await logout(); router.replace("/auth"); }} style={{ marginTop: 10 }} />
       </ScrollView>
