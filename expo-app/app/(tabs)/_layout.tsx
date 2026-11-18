@@ -48,8 +48,8 @@ function Header() {
   );
 }
 
-function tabIcon(emoji: string, color: ColorValue) {
-  return <Text style={{ fontSize: 18, color }}>{emoji}</Text>;
+function tabIcon(emoji: string, color: ColorValue, focused: boolean) {
+  return <Text style={{ fontSize: 26, color, opacity: focused ? 1 : 0.55 }}>{emoji}</Text>;
 }
 
 export default function TabsLayout() {
@@ -60,14 +60,15 @@ export default function TabsLayout() {
         header: () => <Header />,
         tabBarActiveTintColor: colors.violet,
         tabBarInactiveTintColor: colors.muted,
-        tabBarStyle: { backgroundColor: colors.bg, borderTopColor: colors.line, height: 60, paddingBottom: 8, paddingTop: 6 },
-        tabBarLabelStyle: { fontSize: 11, fontWeight: "700" },
+        tabBarStyle: { backgroundColor: colors.bg, borderTopColor: colors.line, height: 66, paddingBottom: 10, paddingTop: 8 },
+        tabBarLabelStyle: { fontSize: 11, fontWeight: "800" },
+        tabBarIconStyle: { marginTop: 2 },
       }}
     >
-      <Tabs.Screen name="index" options={{ title: t("nav_home"), tabBarIcon: ({ color }) => tabIcon("🏠", color) }} />
-      <Tabs.Screen name="play" options={{ title: t("nav_play"), tabBarIcon: ({ color }) => tabIcon("🎲", color) }} />
-      <Tabs.Screen name="wallet" options={{ title: t("nav_wallet"), tabBarIcon: ({ color }) => tabIcon("👛", color) }} />
-      <Tabs.Screen name="profile" options={{ title: t("nav_profile"), tabBarIcon: ({ color }) => tabIcon("👤", color) }} />
+      <Tabs.Screen name="index" options={{ title: t("nav_home"), tabBarIcon: ({ color, focused }) => tabIcon("🏠", color, focused) }} />
+      <Tabs.Screen name="play" options={{ title: t("nav_play"), tabBarIcon: ({ color, focused }) => tabIcon("🎲", color, focused) }} />
+      <Tabs.Screen name="wallet" options={{ title: t("nav_wallet"), tabBarIcon: ({ color, focused }) => tabIcon("👛", color, focused) }} />
+      <Tabs.Screen name="profile" options={{ title: t("nav_profile"), tabBarIcon: ({ color, focused }) => tabIcon("👤", color, focused) }} />
     </Tabs>
   );
 }

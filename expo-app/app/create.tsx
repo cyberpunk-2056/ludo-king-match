@@ -4,9 +4,10 @@ import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { api, money, seatsForMode } from "../src/api";
 import { useApp } from "../src/state";
-import { Btn, Card, Label } from "../src/ui";
+import { Btn, Card, Label, Tile } from "../src/ui";
 
 const CHIPS = [10, 20, 50, 100, 200];
+const r2 = (n: number) => Math.round(n * 100) / 100;
 
 export default function Create() {
   const { colors, t } = useApp();
@@ -20,6 +21,7 @@ export default function Create() {
   const [done, setDone] = useState<{ code: string; status: string; joined: number; seats: number } | null>(null);
 
   const s = parseFloat(stake) || 0;
+  const pot = r2(s * seatsForMode(mode));
 
   async function create() {
     setNote(null); setBusy(true);
@@ -78,6 +80,12 @@ export default function Create() {
           placeholderTextColor={colors.muted} autoCapitalize="characters" maxLength={20}
           style={{ backgroundColor: colors.bg2, borderColor: colors.line, borderWidth: 1, borderRadius: 12, padding: 13, color: colors.fg, fontSize: 17, fontWeight: "800", letterSpacing: 2, marginTop: 6 }} />
         <Text style={{ color: colors.muted, fontSize: 12, marginTop: 6 }}>{t("rc_hint")}</Text>
+
+        <View style={{ flexDirection: "row", gap: 10, marginTop: 18 }}>
+          <Tile k={t("prize_pot")} v={money(pot)} color={colors.gold} />
+          <Tile k={t("winner_95")} v={money(r2(pot * 0.95))} color={colors.green} />
+          <Tile k={t("fee_5")} v={money(r2(pot * 0.05))} />
+        </View>
 
         {note && <Text style={{ color: colors.red, marginTop: 12 }}>{note}</Text>}
         <Btn title={t("find_match")} onPress={create} disabled={busy || s < 1 || code.trim().length < 4} style={{ marginTop: 16 }} />

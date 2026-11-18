@@ -4,6 +4,7 @@ import { StatusBar } from "expo-status-bar";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as Notifications from "expo-notifications";
 import { AppProvider } from "../src/state";
+import { BuddyTour } from "../src/tour";
 
 function NotificationRouter() {
   const router = useRouter();
@@ -36,6 +37,7 @@ export default function RootLayout() {
           <Stack.Screen name="support" options={{ presentation: "card" }} />
           <Stack.Screen name="rules" options={{ presentation: "card" }} />
         </Stack>
+        <BuddyTour />
       </AppProvider>
     </SafeAreaProvider>
   );

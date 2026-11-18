@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { ScrollView, Text, View, Pressable } from "react-native";
+import { ScrollView, Text, View, Pressable, Share } from "react-native";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import { api, money, type Referral } from "../src/api";
 import { useApp } from "../src/state";
-import { Card, Tile } from "../src/ui";
+import { Btn, Card, Tile } from "../src/ui";
+
+const APP_URL = "https://ludo-king-match.vercel.app";
 
 export default function Refer() {
   const { colors, t } = useApp();
@@ -17,6 +19,13 @@ export default function Refer() {
   useEffect(() => {
     api.referral().then(setRef).catch((e) => setErr(e.message));
   }, []);
+
+  async function shareInvite() {
+    const code = ref?.code ?? "";
+    const link = `${APP_URL}/?ref=${encodeURIComponent(code)}`;
+    const message = `${t("share_msg")}\n\n${t("share_code")}: ${code}\n${link}`;
+    try { await Share.share({ message, url: link, title: "Ludora" }); } catch {}
+  }
 
   return (
     <ScrollView style={{ backgroundColor: colors.bg }} contentContainerStyle={{ padding: 16, paddingTop: insets.top + 8 }}>
@@ -30,6 +39,8 @@ export default function Refer() {
           <Text style={{ color: "#fff", fontSize: 20, fontWeight: "800", letterSpacing: 2 }}>{ref?.code ?? "……"}</Text>
         </View>
       </LinearGradient>
+
+      <Btn title={`🔗  ${t("share_app")}`} variant="gold" onPress={shareInvite} style={{ marginTop: 12 }} />
 
       <View style={{ flexDirection: "row", gap: 10, marginTop: 14 }}>
         <Tile k="Friends" v={String(ref?.friends.length ?? 0)} color={colors.violet} />

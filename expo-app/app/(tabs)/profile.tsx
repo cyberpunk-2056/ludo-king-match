@@ -5,7 +5,7 @@ import { useApp } from "../../src/state";
 import { Btn, Card, Tile } from "../../src/ui";
 
 export default function Profile() {
-  const { colors, t, user, logout } = useApp();
+  const { colors, t, user, logout, startTour } = useApp();
   const router = useRouter();
   if (!user) return null;
   const s = user.stats;
@@ -35,6 +35,7 @@ export default function Profile() {
 
       <Btn title={`🎁 ${t("refer")}`} variant="ghost" onPress={() => router.push("/refer")} style={{ marginTop: 14 }} />
       <Btn title={`📜 ${t("rules_policies")}`} variant="ghost" onPress={() => router.push("/rules")} style={{ marginTop: 10 }} />
+      <Btn title={`🧭 ${t("take_tour")}`} variant="ghost" onPress={startTour} style={{ marginTop: 10 }} />
       <Btn title={`💬 ${t("support")}`} variant="ghost" onPress={() => router.push("/support")} style={{ marginTop: 10 }} />
       <Btn title={t("logout")} variant="ghost" onPress={async () => { await logout(); router.replace("/auth"); }} style={{ marginTop: 10 }} />
     </ScrollView>

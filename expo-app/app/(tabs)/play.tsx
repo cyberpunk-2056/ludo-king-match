@@ -47,12 +47,10 @@ export default function Play() {
 
   return (
     <ScrollView style={{ backgroundColor: colors.bg }} contentContainerStyle={{ padding: 16, paddingBottom: 28 }}>
-      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16 }}>
-        <Text style={{ color: colors.fg, fontSize: 24, fontWeight: "900", textTransform: "uppercase", letterSpacing: 0.3, flex: 1 }}>{t("nav_play")}</Text>
-        <Btn title={`＋ ${t("create_match")}`} onPress={() => router.push("/create")} style={{ paddingHorizontal: 16, paddingVertical: 11 }} />
-      </View>
+      <Text style={{ color: colors.fg, fontSize: 24, fontWeight: "900", textTransform: "uppercase", letterSpacing: 0.3, marginBottom: 12 }}>{t("nav_play")}</Text>
+      <Btn title={`+   ${t("create_match")}`} onPress={() => router.push("/create")} style={{ alignSelf: "stretch", borderRadius: 18, marginBottom: 8 }} />
 
-      {note && <Text style={{ color: colors.red, marginBottom: 10 }}>{note}</Text>}
+      {note && <Text style={{ color: colors.red, marginTop: 8 }}>{note}</Text>}
 
       <Section title={t("live_matches")} empty={live.length === 0} emptyText={t("none")}>
         {live.map((m) => <Row key={m.id} title={`${m.playerA} vs ${m.playerB}`} sub={`${money(m.stake)} ${t("entry")} · ${seatsOf(m)} ${t("players")}`} right={money(potOf(m))} rightColor={colors.gold} />)}

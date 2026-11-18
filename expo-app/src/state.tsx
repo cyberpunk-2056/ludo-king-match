@@ -1,8 +1,11 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import * as SecureStore from "expo-secure-store";
 import { api, loadToken, clearToken, type User } from "./api";
 import { dict, type Lang } from "./i18n";
 import { darkColors, lightColors, type Colors } from "./theme";
 import { registerForPush } from "./push";
+
+const TOUR_KEY = "ludora_tour_done";
 
 interface AppState {
   user: User | null;
@@ -15,6 +18,9 @@ interface AppState {
   toggleTheme: () => void;
   setUser: (u: User | null) => void;
   logout: () => Promise<void>;
+  showTour: boolean;
+  startTour: () => void;
+  endTour: () => void;
 }
 
 const Ctx = createContext<AppState | null>(null);
@@ -24,6 +30,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [ready, setReady] = useState(false);
   const [lang, setLang] = useState<Lang>("en");
   const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [showTour, setShowTour] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -35,19 +42,25 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     })();
   }, []);
 
-  // once signed in, register this device for match push notifications
+  // once signed in, register push and, on first ever sign-in, open the guided tour
   useEffect(() => {
-    if (user) registerForPush();
+    if (!user) return;
+    registerForPush();
+    (async () => {
+      try { if ((await SecureStore.getItemAsync(TOUR_KEY)) !== "1") setShowTour(true); } catch {}
+    })();
   }, [user]);
 
   const colors = theme === "dark" ? darkColors : lightColors;
   const t = (key: string) => dict[lang][key] ?? dict.en[key] ?? key;
   const toggleTheme = () => setTheme((p) => (p === "dark" ? "light" : "dark"));
   const logout = async () => { await clearToken(); setUser(null); };
+  const startTour = () => setShowTour(true);
+  const endTour = () => { setShowTour(false); SecureStore.setItemAsync(TOUR_KEY, "1").catch(() => {}); };
 
   const value = useMemo<AppState>(
-    () => ({ user, ready, lang, theme, colors, t, setLang, toggleTheme, setUser, logout }),
-    [user, ready, lang, theme]
+    () => ({ user, ready, lang, theme, colors, t, setLang, toggleTheme, setUser, logout, showTour, startTour, endTour }),
+    [user, ready, lang, theme, showTour]
   );
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
 }
