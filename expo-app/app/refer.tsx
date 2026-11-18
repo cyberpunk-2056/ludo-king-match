@@ -23,9 +23,9 @@ export default function Refer() {
       <Pressable onPress={() => router.back()}><Text style={{ color: colors.fgDim, fontWeight: "700" }}>← {t("back")}</Text></Pressable>
       <Text style={{ color: colors.fg, fontSize: 24, fontWeight: "800", marginVertical: 14 }}>{t("refer")}</Text>
 
-      <LinearGradient colors={["#5B8DEF", "#8B6CFF"] as readonly [string, string]} style={{ borderRadius: 22, padding: 22, alignItems: "center" }}>
+      <LinearGradient colors={["#2457E6", "#0a1a4d"] as readonly [string, string]} style={{ borderRadius: 22, padding: 22, alignItems: "center" }}>
         <Text style={{ color: "rgba(255,255,255,0.85)", fontSize: 12, fontWeight: "700" }}>{t("refer_s")}</Text>
-        <Text style={{ color: "#fff", fontSize: 34, fontWeight: "800", marginTop: 6 }}>{money(ref?.earnings ?? 0)}</Text>
+        <Text style={{ color: "#FFC53D", fontSize: 34, fontWeight: "800", marginTop: 6 }}>{money(ref?.earnings ?? 0)}</Text>
         <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "rgba(255,255,255,0.18)", borderRadius: 13, paddingHorizontal: 16, paddingVertical: 12, marginTop: 14 }}>
           <Text style={{ color: "#fff", fontSize: 20, fontWeight: "800", letterSpacing: 2 }}>{ref?.code ?? "……"}</Text>
         </View>

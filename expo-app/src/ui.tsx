@@ -1,26 +1,27 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, Animated, Easing, Pressable, Text, TextInput, View, ViewStyle } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
-import { gradient, greenGradient } from "./theme";
+import { gradient, greenGradient, goldGradient } from "./theme";
 import { useApp } from "./state";
 
 /* ---------------- Buttons ---------------- */
 export function Btn({ title, onPress, variant = "accent", disabled, style }: {
-  title: string; onPress: () => void; variant?: "accent" | "green" | "ghost"; disabled?: boolean; style?: ViewStyle;
+  title: string; onPress: () => void; variant?: "accent" | "green" | "gold" | "ghost"; disabled?: boolean; style?: ViewStyle;
 }) {
   const { colors } = useApp();
-  const label = <Text style={{ color: variant === "ghost" ? colors.fg : "#fff", fontWeight: "800", fontSize: 15, letterSpacing: 0.2 }}>{title}</Text>;
+  const labelColor = variant === "ghost" ? colors.fg : variant === "gold" ? "#211603" : "#fff";
+  const label = <Text style={{ color: labelColor, fontWeight: "800", fontSize: 15, letterSpacing: 0.3, textTransform: "uppercase" }}>{title}</Text>;
   if (variant === "ghost") {
     return (
       <Pressable onPress={onPress} disabled={disabled}
-        style={[{ backgroundColor: colors.surface2, borderColor: colors.line, borderWidth: 1, borderRadius: 16, paddingVertical: 15, alignItems: "center", opacity: disabled ? 0.5 : 1 }, style]}>
+        style={[{ backgroundColor: colors.surface2, borderColor: colors.line, borderWidth: 1, borderRadius: 14, paddingVertical: 15, alignItems: "center", opacity: disabled ? 0.5 : 1 }, style]}>
         {label}
       </Pressable>
     );
   }
-  const cols = (variant === "green" ? greenGradient : gradient) as readonly [string, string];
+  const cols = (variant === "green" ? greenGradient : variant === "gold" ? goldGradient : gradient) as readonly [string, string];
   return (
-    <Pressable onPress={onPress} disabled={disabled} style={[{ borderRadius: 16, overflow: "hidden", opacity: disabled ? 0.5 : 1 }, style]}>
+    <Pressable onPress={onPress} disabled={disabled} style={[{ borderRadius: 14, overflow: "hidden", opacity: disabled ? 0.5 : 1 }, style]}>
       <LinearGradient colors={cols} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ paddingVertical: 15, alignItems: "center" }}>
         {label}
       </LinearGradient>
@@ -107,7 +108,7 @@ export function DiceRoll({ size = 72 }: { size?: number }) {
   }, []);
   const rotate = spin.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "360deg"] });
   return (
-    <Animated.View style={{ transform: [{ rotate }], shadowColor: "#8B6CFF", shadowOpacity: 0.6, shadowRadius: 16, shadowOffset: { width: 0, height: 6 } }}>
+    <Animated.View style={{ transform: [{ rotate }], shadowColor: "#4C84FF", shadowOpacity: 0.6, shadowRadius: 16, shadowOffset: { width: 0, height: 6 } }}>
       <DiceFace size={size} face={face} />
     </Animated.View>
   );

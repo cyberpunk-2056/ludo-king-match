@@ -1,24 +1,27 @@
 export interface Colors {
   bg: string; bg2: string; surface: string; surface2: string;
   line: string; fg: string; fgDim: string; muted: string;
-  violet: string; indigo: string; green: string; red: string; yellow: string; blue: string;
+  violet: string; indigo: string; green: string; red: string; yellow: string; blue: string; gold: string;
   isDark: boolean;
 }
 
+// Bold esports palette — royal blue primary, gold for prizes/winners/rank.
+// `violet` is kept as the field name used across screens but now holds the blue accent.
 export const darkColors: Colors = {
-  bg: "#080B13", bg2: "#0B0F1A", surface: "#101524", surface2: "#161D30",
-  line: "rgba(255,255,255,0.09)", fg: "#F1F4FB", fgDim: "#9AA5C2", muted: "#68728F",
-  violet: "#8B6CFF", indigo: "#5B8DEF", green: "#32D583", red: "#FF5A6A", yellow: "#FFC94D", blue: "#4B9BFF",
+  bg: "#060912", bg2: "#090D18", surface: "#0E1322", surface2: "#141C30",
+  line: "rgba(130,160,230,0.14)", fg: "#EEF2FC", fgDim: "#97A3C2", muted: "#5C688A",
+  violet: "#4C84FF", indigo: "#6FA0FF", green: "#2BD98A", red: "#FF5B6E", yellow: "#FFC53D", blue: "#6FA0FF", gold: "#FFC53D",
   isDark: true,
 };
 
 export const lightColors: Colors = {
-  bg: "#F3F6FD", bg2: "#EAEEF8", surface: "#FFFFFF", surface2: "#F2F5FC",
-  line: "rgba(22,32,64,0.10)", fg: "#131A2E", fgDim: "#525C78", muted: "#8891AC",
-  violet: "#7A5CF5", indigo: "#5B8DEF", green: "#22B06E", red: "#F0455A", yellow: "#F2A81E", blue: "#2E86E0",
+  bg: "#EEF2FB", bg2: "#E4EAF7", surface: "#FFFFFF", surface2: "#F3F6FD",
+  line: "rgba(18,28,56,0.12)", fg: "#0E1526", fgDim: "#46506C", muted: "#808BA6",
+  violet: "#2457E6", indigo: "#3B74FF", green: "#0FA866", red: "#E23B52", yellow: "#C98A00", blue: "#2457E6", gold: "#C98A00",
   isDark: false,
 };
 
-// fresh look: violet → pink
-export const gradient = ["#7A5CFF", "#FF5AA8"] as const;
-export const greenGradient = ["#2BD3A7", "#17B8C4"] as const;
+// primary (royal blue), gold (prizes/CTA highlight), green (cash).
+export const gradient = ["#4C84FF", "#1E4FE0"] as const;
+export const goldGradient = ["#FFD15C", "#F5A623"] as const;
+export const greenGradient = ["#2BD98A", "#12A594"] as const;
