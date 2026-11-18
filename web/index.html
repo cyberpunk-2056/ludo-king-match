@@ -466,11 +466,81 @@
     .hero { grid-template-columns: 1fr; } .hero .board-wrap { order: -1; max-width: 280px; margin-inline: auto; }
     .steps { grid-template-columns: 1fr 1fr; }
   }
-  @media (max-width: 560px) {
-    .stat-row { grid-template-columns: 1fr 1fr; } .modes { grid-template-columns: 1fr; } .play-modes { grid-template-columns: 1fr; } .steps { grid-template-columns: 1fr; }
-    .hero { padding: 22px; } .hero h1 { font-size: clamp(30px,8vw,40px); }
-    .wallet-actions { grid-template-columns: 1fr; }
-    .ticker-lead span { display: none; }
+  /* ---------- Phone (<=600px): scale everything down to fit one screen ---------- */
+  @media (max-width: 600px) {
+    body { font-size: 14px; }
+    .shell { gap: 18px; padding-top: 14px; }
+
+    /* top bar: slim it so all controls fit a 360px screen */
+    .topbar { height: 56px; }
+    .topbar-in { gap: 7px; padding-inline: max(12px, env(safe-area-inset-left,0px)) max(12px, env(safe-area-inset-right,0px)); }
+    .brand { font-size: 16px; gap: 8px; } .brand .mk { width: 28px; height: 28px; border-radius: 8px; } .brand .mk svg { width: 16px; height: 16px; }
+    .top-right { gap: 6px; }
+    .hdr-wallet { padding: 2px; } .hw-main { gap: 6px; padding: 2px 6px 2px 2px; } .hw-ic { width: 26px; height: 26px; } .hw-ic svg { width: 14px; height: 14px; } .hw-amt { font-size: 12.5px; } .hw-add { width: 26px; height: 26px; } .hw-add svg { width: 14px; height: 14px; }
+    .theme-btn { width: 34px; height: 34px; } .theme-btn svg { width: 17px; height: 17px; }
+    /* the bottom nav already has a "More" button, so the header hamburger is redundant here */
+    .menu-btn { display: none; }
+    .lang button { padding: 6px 8px; font-size: 11px; }
+
+    /* headings + cards */
+    .page-head { margin-bottom: 16px; } .page-head h1, .lobby-head h1 { font-size: 22px; } .page-head p { font-size: 13.5px; }
+    .section-title { font-size: 15.5px; margin: 22px 0 12px; } .section-title::before { height: 15px; }
+    .card { padding: 16px; border-radius: 15px; } .card + .card { margin-top: 12px; }
+    .btn { padding: 11px 16px; font-size: 13.5px; } .btn-lg { padding: 13px 18px; font-size: 14.5px; }
+
+    /* hero */
+    .hero { padding: 20px; gap: 16px; border-radius: 18px; }
+    .hero h1 { font-size: 29px; margin-top: 12px; line-height: 1.04; }
+    .hero p { font-size: 13.5px; margin-top: 12px; }
+    .hero-actions { flex-direction: column; gap: 10px; margin-top: 18px; } .hero-actions .btn { width: 100%; }
+    .hero-trust { gap: 8px 14px; margin-top: 16px; font-size: 11.5px; }
+    .ranked-chip { font-size: 10px; padding: 5px 11px; }
+    .hero .board-wrap { max-width: 200px; } .board-wrap svg.board { max-width: 200px; }
+
+    /* ticker */
+    .ticker-lead { padding: 10px 11px; font-size: 10px; } .ticker-lead span { display: none; }
+    .ticker-track { gap: 22px; padding-left: 22px; } .ticker-track .ti-item { font-size: 12px; }
+
+    /* stats + modes + steps + leaderboard */
+    .stat-row { grid-template-columns: 1fr 1fr; gap: 10px; } .stat { padding: 13px; } .stat .n { font-size: 19px; } .stat .c { font-size: 10px; }
+    .modes { grid-template-columns: 1fr; gap: 12px; } .mode { padding: 15px; } .mode .ic { width: 42px; height: 42px; } .mode h4 { font-size: 15px; }
+    .play-modes { grid-template-columns: 1fr; } .steps { grid-template-columns: 1fr; gap: 12px; } .step { padding: 16px; }
+    .lm-av { width: 34px; height: 34px; border-radius: 10px; } .lm-names { font-size: 13px; } .lm-sub { font-size: 11px; } .lm-pot { font-size: 13px; }
+
+    /* cta + download */
+    .cta { padding: 26px 20px; } .cta h2 { font-size: 22px; } .cta p { font-size: 13.5px; }
+    .dl-band { padding: 18px; gap: 14px; } .dl-band h3 { font-size: 19px; } .dl-band p { font-size: 13px; }
+    .dl-btns { width: 100%; } .dl-btn { min-width: 0; width: 100%; }
+
+    /* wallet + forms */
+    .wallet-hero { padding: 20px; } .wallet-hero .big { font-size: 32px; } .wallet-split { gap: 10px; } .wsplit { padding: 11px 13px; } .wsplit .v { font-size: 18px; }
+    .wallet-actions { grid-template-columns: 1fr; gap: 10px; }
+    .amt-box { padding: 5px 7px 5px 14px; } .amt-box span { font-size: 19px; } .amt-box input { font-size: 22px; }
+    .payout-tiles { gap: 8px; } .pt { padding: 11px 8px; } .pt-v { font-size: 16px; } .pt-k { font-size: 10px; }
+    .input { padding: 12px 14px; font-size: 14.5px; }
+
+    /* profile */
+    .profile-card { padding: 16px; gap: 12px; } .pf-av { width: 50px; height: 50px; font-size: 21px; border-radius: 14px; } .pf-name { font-size: 16px; } .pf-stats { gap: 8px; } .pf-stat { padding: 12px; } .pf-stat .v { font-size: 18px; }
+
+    /* referral + content */
+    .ref-hero { padding: 20px; } .ref-hero .big { font-size: 28px; } .code-box .code { font-size: 17px; }
+    .content-sec { padding: 16px; }
+
+    /* match overlay */
+    .match-box { padding: 22px; } .match-box h2 { font-size: 22px; } .code-card .cc-v { font-size: 24px; letter-spacing: .12em; } .res-emoji { font-size: 44px; }
+
+    /* bottom nav + auth */
+    .bn-i { font-size: 9px; } .bn-i svg { width: 21px; height: 21px; }
+    .auth-box { padding: 22px; } .auth-box h2 { font-size: 22px; }
+  }
+
+  /* ---------- Small phones (<=380px): a touch smaller again ---------- */
+  @media (max-width: 380px) {
+    .hero h1 { font-size: 26px; } .brand { font-size: 15px; }
+    .hw-amt { font-size: 12px; } .hw-ic, .hw-add { width: 24px; height: 24px; }
+    .theme-btn, .menu-btn { width: 32px; height: 32px; }
+    .stat .n { font-size: 17px; } .wallet-hero .big { font-size: 29px; }
+    .bn-i { font-size: 8.5px; } .lang button { padding: 6px 6px; }
   }
   @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } .btn:active { transform: none; } .live-badge i, .ticker-track { animation: none; } }
 
