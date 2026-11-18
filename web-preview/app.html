@@ -473,6 +473,30 @@
     .ticker-lead span { display: none; }
   }
   @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } .btn:active { transform: none; } .live-badge i, .ticker-track { animation: none; } }
+
+  /* ---------- Support chat widget ---------- */
+  .support-fab { position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom,0px)); z-index: 55; width: 58px; height: 58px; border-radius: 18px; border: 0; cursor: pointer; background: var(--grad); box-shadow: var(--glow); display: grid; place-items: center; color: #fff; transition: transform .15s ease, box-shadow .2s; }
+  .support-fab:hover { transform: translateY(-2px); box-shadow: 0 20px 44px -14px color-mix(in srgb, var(--blue) 75%, transparent); }
+  .support-fab svg { width: 26px; height: 26px; }
+  .support-fab .sdot { position: absolute; top: -2px; right: -2px; width: 15px; height: 15px; border-radius: 50%; background: var(--grad-gold); box-shadow: 0 0 0 3px var(--bg); }
+  .support-fab[hidden] { display: none !important; }
+  @media (max-width: 900px) { .support-fab { bottom: calc(var(--bn) + env(safe-area-inset-bottom,0px) + 14px); } }
+
+  .support-panel { position: fixed; right: 18px; bottom: 18px; z-index: 75; width: 372px; max-width: calc(100vw - 32px); height: 560px; max-height: calc(100vh - 40px); background: var(--surface); border-radius: 20px; box-shadow: var(--ring), var(--shadow); display: flex; flex-direction: column; overflow: hidden; }
+  .support-panel[hidden] { display: none !important; }
+  .sp-head { display: flex; align-items: center; gap: 11px; padding: 14px 16px; background: linear-gradient(135deg, var(--violet-d), #0a1a4d); color: #fff; }
+  .sp-head .sp-ic { width: 38px; height: 38px; border-radius: 11px; background: rgba(255,255,255,.14); display: grid; place-items: center; font-size: 19px; flex: none; }
+  .sp-head .sp-t { flex: 1; min-width: 0; } .sp-head .sp-t b { font-family: var(--font-display); font-weight: 800; font-size: 15px; text-transform: uppercase; letter-spacing: .02em; } .sp-head .sp-t span { display: block; font-size: 11px; color: #8fe9c1; font-weight: 700; margin-top: 1px; }
+  .sp-head .sp-x { background: rgba(255,255,255,.14); border: 0; color: #fff; width: 32px; height: 32px; border-radius: 9px; font-size: 17px; cursor: pointer; flex: none; }
+  .sp-body { flex: 1; overflow-y: auto; padding: 14px; display: flex; flex-direction: column; gap: 10px; background: var(--bg-2); }
+  .sp-msg { max-width: 85%; padding: 10px 13px; border-radius: 15px; font-size: 13.5px; line-height: 1.5; }
+  .sp-msg.them { align-self: flex-start; background: var(--surface); box-shadow: var(--ring); color: var(--fg); border-bottom-left-radius: 5px; }
+  .sp-msg.me { align-self: flex-end; background: var(--grad); color: #fff; border-bottom-right-radius: 5px; }
+  .sp-foot { display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--line); background: var(--surface); padding-bottom: calc(10px + env(safe-area-inset-bottom,0px)); }
+  .sp-foot input { flex: 1; min-width: 0; background: var(--bg-2); box-shadow: var(--ring); border: 0; border-radius: 13px; padding: 12px 14px; color: var(--fg); font-family: var(--font-body); font-weight: 500; font-size: 14px; outline: none; }
+  .sp-foot input:focus { box-shadow: 0 0 0 2px var(--blue); }
+  .sp-foot button { width: 46px; border: 0; border-radius: 13px; background: var(--grad); color: #fff; font-size: 18px; font-weight: 800; cursor: pointer; flex: none; }
+  @media (max-width: 560px) { .support-panel { right: 8px; left: 8px; bottom: 8px; width: auto; height: 78vh; } }
 </style>
 
 <header class="topbar">
@@ -814,7 +838,90 @@
   </div>
 </div>
 
+<button class="support-fab" id="supportFab" type="button" aria-label="Support chat">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 01-11.9 7.6L3 21l1.9-6A8.5 8.5 0 1121 11.5z"/></svg>
+  <span class="sdot"></span>
+</button>
+<div class="support-panel" id="supportPanel" hidden>
+  <div class="sp-head">
+    <div class="sp-ic">💬</div>
+    <div class="sp-t"><b id="spTitle">Support team</b><span id="spStatus">● Online</span></div>
+    <button class="sp-x" id="supportClose" type="button" aria-label="Close">×</button>
+  </div>
+  <div class="sp-body" id="supportBody"></div>
+  <div class="sp-foot"><input id="supportInput" type="text" autocomplete="off"><button id="supportSend" type="button" aria-label="Send">↑</button></div>
+</div>
+
 <div class="toast" id="toast"></div>
+
+<script>
+/* Self-contained support chat widget (demo): FAQ bot + localStorage history. */
+(function(){
+  function $(id){ return document.getElementById(id); }
+  function lang(){ return document.documentElement.getAttribute("data-lang")==="hi" ? "hi" : "en"; }
+  var S = {
+    en:{ title:"Support team", online:"● Online · replies in minutes", ph:"Type your message…",
+         greet:"Hi! I'm the Ludora support assistant. Ask me about deposits, withdrawals, room codes, refunds, KYC or referrals — or describe your issue and an agent will follow up." },
+    hi:{ title:"सपोर्ट टीम", online:"● ऑनलाइन · मिनटों में जवाब", ph:"अपना संदेश लिखें…",
+         greet:"नमस्ते! मैं लूडोरा सपोर्ट असिस्टेंट हूँ। जमा, निकासी, रूम कोड, रिफंड, KYC या रेफरल के बारे में पूछें — या अपनी समस्या बताएं, एजेंट फ़ॉलो-अप करेंगे।" }
+  };
+  function bot(text){
+    var t=(text||"").toLowerCase(), hi=lang()==="hi";
+    function has(){ for(var i=0;i<arguments.length;i++){ if(t.indexOf(arguments[i])>=0) return true; } return false; }
+    if(has("withdraw","payout","cash out","निकासी","withdrawl"))
+      return hi? "निकासी केवल आपके KYC-सत्यापित UPI पर होती है। न्यूनतम ₹10, और केवल जीती गई राशि निकाली जा सकती है। भुगतान आमतौर पर कुछ मिनटों में हो जाता है।"
+               : "Withdrawals go to your KYC-verified UPI only. Minimum ₹10, and only winnings are withdrawable. Payouts usually settle within a few minutes.";
+    if(has("deposit","add money","जमा","top up","payment"))
+      return hi? "पैसे जोड़ने के लिए वॉलेट → पैसे जोड़ें खोलें (न्यूनतम ₹5)। अगर भुगतान कट गया पर बैलेंस नहीं बढ़ा, तो राशि और समय बताएं, एजेंट मिलान करेंगे।"
+               : "To add money, open Wallet → Add money (minimum ₹5). If a payment was charged but your balance didn't update, send the amount and time and an agent will reconcile it.";
+    if(has("room code","ludo king","code"))
+      return hi? "मैच बनाने वाला अपना लूडो किंग रूम कोड पेस्ट करता है। जॉइन करते ही आपको वह कोड दिखता है — उसी कोड से लूडो किंग में जुड़ें।"
+               : "The match creator pastes their Ludo King room code. You see that exact code the moment you join and pay — open Ludo King and join that code to play.";
+    if(has("refund","cancel","no opponent","timer"))
+      return hi? "अगर 10 मिनट में कोई नहीं जुड़ता, तो मैच अपने-आप रद्द हो जाता है और सभी की एंट्री फीस वापस कर दी जाती है।"
+               : "If no one joins within 10 minutes, the match is cancelled automatically and every joined player's entry fee is refunded.";
+    if(has("referral","refer","commission","रेफर","invite"))
+      return hi? "रेफर & कमाएं से अपना कोड शेयर करें। जब आपका रेफर किया दोस्त जीतता है, आपको उसकी जीत का 3% मिलता है।"
+               : "Share your code from Refer & earn. When a friend you referred wins, you earn 3% of their winnings, straight to your withdrawable balance.";
+    if(has("win","winner","95","pot","prize"))
+      return hi? "पॉट = एंट्री फीस × खिलाड़ी। विजेता को पॉट का 95% मिलता है, 5% प्लेटफ़ॉर्म रखता है। भुगतान से पहले नतीजा सत्यापित होता है।"
+               : "The pot is entry fee times players. The winner gets 95% of the pot and the platform keeps 5%, verified before payout.";
+    if(has("kyc","verify","verification"))
+      return hi? "KYC आपके UPI को आपके नाम से जोड़ता है। निकासी → भुगतान खाता में UPI जोड़ें और सत्यापित करें।"
+               : "KYC links your UPI to your name. Add and verify a UPI under Withdraw → Pay out to; payouts only go to a verified account.";
+    return hi? "धन्यवाद — मैंने इसे सपोर्ट टीम के लिए दर्ज कर लिया है, एजेंट जल्द यहीं जवाब देंगे। आप जमा, निकासी, रूम कोड, रिफंड, KYC या रेफरल के बारे में भी पूछ सकते हैं।"
+             : "Thanks — I've logged this for our support team and an agent will reply here shortly. You can also ask about deposits, withdrawals, room codes, refunds, KYC or referrals.";
+  }
+  var msgs=[];
+  function load(){ try{ msgs=JSON.parse(localStorage.getItem("ludora_support")||"[]"); }catch(e){ msgs=[]; } if(!Array.isArray(msgs)) msgs=[]; }
+  function save(){ try{ localStorage.setItem("ludora_support", JSON.stringify(msgs.slice(-100))); }catch(e){} }
+  function render(){
+    var b=$("supportBody"); if(!b) return; b.innerHTML="";
+    var greet=document.createElement("div"); greet.className="sp-msg them"; greet.textContent=S[lang()].greet; b.appendChild(greet);
+    msgs.forEach(function(m){ var el=document.createElement("div"); el.className="sp-msg "+(m.me?"me":"them"); el.textContent=m.body; b.appendChild(el); });
+    b.scrollTop=b.scrollHeight;
+  }
+  function labels(){ var L=S[lang()]; if($("spTitle"))$("spTitle").textContent=L.title; if($("spStatus"))$("spStatus").textContent=L.online; if($("supportInput"))$("supportInput").placeholder=L.ph; }
+  function open(){ $("supportPanel").hidden=false; $("supportFab").hidden=true; labels(); render(); setTimeout(function(){ $("supportInput").focus(); },50); }
+  function close(){ $("supportPanel").hidden=true; $("supportFab").hidden=false; }
+  function send(){
+    var inp=$("supportInput"); var v=(inp.value||"").trim(); if(!v) return;
+    msgs.push({me:true, body:v}); inp.value=""; save(); render();
+    setTimeout(function(){ msgs.push({me:false, body:bot(v)}); save(); render(); }, 500);
+  }
+  function init(){
+    load();
+    var fab=$("supportFab"); if(!fab) return;
+    fab.addEventListener("click", open);
+    $("supportClose").addEventListener("click", close);
+    $("supportSend").addEventListener("click", send);
+    $("supportInput").addEventListener("keydown", function(e){ if(e.key==="Enter"){ e.preventDefault(); send(); } });
+    // keep labels in sync when the language toggles
+    try{ new MutationObserver(function(){ if(!$("supportPanel").hidden){ labels(); render(); } }).observe(document.documentElement,{attributes:true,attributeFilter:["data-lang"]}); }catch(e){}
+  }
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded", init); else init();
+})();
+</script>
 
 <script>
 (function () {

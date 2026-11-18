@@ -79,4 +79,23 @@ create table if not exists match_reports (
   created_at timestamptz not null default now(),
   unique (match_id, user_id)
 );
+
+-- Expo push tokens, one row per device token (a user may have several devices).
+create table if not exists push_tokens (
+  token      text primary key,
+  user_id    uuid not null references users(id) on delete cascade,
+  platform   text,
+  updated_at timestamptz not null default now()
+);
+create index if not exists idx_push_user on push_tokens(user_id);
+
+-- Support chat: a flat thread per user, sender is 'user' or 'support'.
+create table if not exists support_messages (
+  id         uuid primary key default gen_random_uuid(),
+  user_id    uuid not null references users(id) on delete cascade,
+  sender     text not null,
+  body       text not null,
+  created_at timestamptz not null default now()
+);
+create index if not exists idx_support_user on support_messages(user_id, created_at);
 `;

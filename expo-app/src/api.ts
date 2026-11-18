@@ -44,6 +44,7 @@ export interface JoinResult { status: string; roomCode: string; opponent: string
 /** Players a mode seats: 1 = 1v1 (2 players), anything else = 4-player. Mirrors the server. */
 export const seatsForMode = (mode: number) => (mode === 1 ? 2 : 4);
 export interface Referral { code: string; earnings: number; winnings_base: number; friends: { name: string; winnings: number }[] }
+export interface SupportMsg { id: string; sender: string; body: string; created_at: number }
 
 export const api = {
   signup: (b: { name: string; phone: string; email: string; password: string }) =>
@@ -71,6 +72,13 @@ export const api = {
     request<{ status: string }>(`/api/matches/${id}/result`, { method: "POST", body: JSON.stringify(b) }),
 
   referral: () => request<Referral>("/api/referral"),
+
+  registerPush: (token: string, platform: string) =>
+    request<{ ok: boolean }>("/api/push/register", { method: "POST", body: JSON.stringify({ token, platform }) }),
+
+  supportMessages: () => request<SupportMsg[]>("/api/support/messages"),
+  sendSupport: (body: string) =>
+    request<SupportMsg[]>("/api/support/messages", { method: "POST", body: JSON.stringify({ body }) }),
 };
 
 export const money = (n: number, c = "₹") => {

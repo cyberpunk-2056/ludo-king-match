@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useMemo, useState } from "
 import { api, loadToken, clearToken, type User } from "./api";
 import { dict, type Lang } from "./i18n";
 import { darkColors, lightColors, type Colors } from "./theme";
+import { registerForPush } from "./push";
 
 interface AppState {
   user: User | null;
@@ -33,6 +34,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
       setReady(true);
     })();
   }, []);
+
+  // once signed in, register this device for match push notifications
+  useEffect(() => {
+    if (user) registerForPush();
+  }, [user]);
 
   const colors = theme === "dark" ? darkColors : lightColors;
   const t = (key: string) => dict[lang][key] ?? dict.en[key] ?? key;

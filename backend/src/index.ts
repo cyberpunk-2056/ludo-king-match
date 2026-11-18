@@ -12,6 +12,8 @@ import { walletRoutes } from "./routes/walletRoutes.js";
 import { payoutRoutes } from "./routes/payoutRoutes.js";
 import { matchRoutes, expireMatches } from "./routes/matchRoutes.js";
 import { referralRoutes } from "./routes/referralRoutes.js";
+import { pushRoutes } from "./routes/pushRoutes.js";
+import { supportRoutes } from "./routes/supportRoutes.js";
 
 const app = express();
 
@@ -28,6 +30,8 @@ app.use("/api", walletRoutes);
 app.use("/api", payoutRoutes);
 app.use("/api", matchRoutes);
 app.use("/api", referralRoutes);
+app.use("/api", pushRoutes);
+app.use("/api", supportRoutes);
 
 // fallback error handler. Routes may throw an error carrying `http` (a status < 500)
 // and its message is sent to the client; everything else is a generic 500.

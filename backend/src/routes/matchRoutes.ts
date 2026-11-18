@@ -3,8 +3,11 @@ import { z } from "zod";
 import { query, withTransaction } from "../db.js";
 import { requireAuth, type AuthedRequest } from "../auth.js";
 import { Money } from "../money.js";
+import { sendPushToUsers } from "../push.js";
 
 export const matchRoutes = Router();
+
+function cur(n: number) { return "₹" + n.toFixed(2); }
 
 async function debitStake(client: any, userId: string, stake: number, note: string) {
   const w = await client.query("select deposit, winnings from wallets where user_id = $1 for update", [userId]);
@@ -92,12 +95,23 @@ matchRoutes.post("/matches/:id/join", requireAuth, async (req: AuthedRequest, re
     }
 
     const creator = await c.query("select name from users where id = $1", [match.player_a]);
+    const me = await c.query("select name from users where id = $1", [req.userId]);
+    // everyone already seated (so the creator who stepped away still gets told)
+    const others = await c.query(
+      "select user_id from match_players where match_id = $1 and user_id <> $2", [match.id, req.userId]);
     return {
       status: full ? "live" : "waiting",
       roomCode: match.room_code ?? "",   // the creator's pasted Ludo King code
       opponent: creator.rows[0]?.name ?? "",
       playersJoined: joined,
       seats: match.seats,
+      _notify: {
+        others: others.rows.map((r: any) => r.user_id as string),
+        joinerName: me.rows[0]?.name ?? "A player",
+        stake: Number(match.stake),
+        full, joined, seats: match.seats,
+        roomCode: match.room_code ?? "",
+      },
     };
   }).catch((e: any) => {
     if (e.message === "UNAVAILABLE") throw Object.assign(new Error("Match is no longer open"), { http: 400 });
@@ -106,6 +120,26 @@ matchRoutes.post("/matches/:id/join", requireAuth, async (req: AuthedRequest, re
     if (e.message === "INSUFFICIENT") throw Object.assign(new Error("Not enough balance"), { http: 400 });
     throw e;
   });
+
+  // Notify the other seated players that someone joined (fires even when they
+  // have left the app). When the room fills, tell everyone the match is live.
+  const n = (out as any)._notify;
+  if (n && n.others.length) {
+    if (n.full) {
+      sendPushToUsers(n.others, {
+        title: "Your match is live! 🎲",
+        body: `${n.joinerName} joined. Open Ludo King with room code ${n.roomCode} and play.`,
+        data: { type: "match_live", matchId: req.params.id },
+      });
+    } else {
+      sendPushToUsers(n.others, {
+        title: "An opponent joined 🙌",
+        body: `${n.joinerName} joined your ${cur(n.stake)} match (${n.joined}/${n.seats}).`,
+        data: { type: "match_joined", matchId: req.params.id },
+      });
+    }
+  }
+  delete (out as any)._notify;
   res.json(out);
 });
 
@@ -118,7 +152,7 @@ matchRoutes.post("/matches/:id/result", requireAuth, async (req: AuthedRequest, 
   const parsed = resultSchema.safeParse(req.body);
   if (!parsed.success) return res.status(400).json({ message: "Invalid result" });
 
-  const status = await withTransaction(async (c) => {
+  const result = await withTransaction(async (c) => {
     const m = await c.query("select * from matches where id = $1 for update", [req.params.id]);
     const match = m.rows[0];
     if (!match || match.status !== "live") throw new Error("NOT_LIVE");
@@ -132,16 +166,24 @@ matchRoutes.post("/matches/:id/result", requireAuth, async (req: AuthedRequest, 
     );
 
     const reports = await c.query("select user_id, result from match_reports where match_id = $1", [match.id]);
-    if ((reports.rowCount ?? 0) < match.seats) return "reported"; // wait for the other players
+    if ((reports.rowCount ?? 0) < match.seats) return { status: "reported" }; // wait for the other players
 
     const winners = reports.rows.filter((r: any) => r.result === "win").map((r: any) => r.user_id);
-    if (winners.length !== 1) return "disputed"; // nobody or several claim the win -> manual review
+    if (winners.length !== 1) return { status: "disputed" }; // nobody or several claim the win -> manual review
 
     await settleMatch(c, match, winners[0]);
-    return "settled";
+    const payout = Money.winnerPayout(Money.pot(Number(match.stake), match.seats));
+    return { status: "settled", winnerId: winners[0] as string, payout };
   });
 
-  res.json({ status });
+  if (result.status === "settled" && result.winnerId) {
+    sendPushToUsers([result.winnerId], {
+      title: "You won! 🏆",
+      body: `${cur(result.payout!)} has been added to your winnings.`,
+      data: { type: "match_won", matchId: req.params.id },
+    });
+  }
+  res.json({ status: result.status });
 });
 
 async function settleMatch(client: any, match: any, winnerId: string) {
@@ -250,6 +292,7 @@ matchRoutes.get("/matches/history", requireAuth, async (req: AuthedRequest, res)
 // Background sweep: refund every staked player for matches whose join window expired
 // before all seats were filled.
 export async function expireMatches() {
+  const refunded: { userId: string; stake: number }[] = [];
   await withTransaction(async (c) => {
     const expired = await c.query("select id from matches where status = 'waiting' and join_deadline <= now() for update");
     for (const m of expired.rows) {
@@ -258,8 +301,17 @@ export async function expireMatches() {
         await c.query("update wallets set deposit = deposit + $1 where user_id = $2", [Number(p.stake), p.user_id]);
         await c.query("insert into transactions (user_id, type, amount, note) values ($1,'refund',$2,'match cancelled - seats not filled')",
           [p.user_id, Number(p.stake)]);
+        refunded.push({ userId: p.user_id, stake: Number(p.stake) });
       }
       await c.query("update matches set status = 'cancelled' where id = $1", [m.id]);
     }
   });
+  // Tell each player their match was cancelled and the stake refunded.
+  for (const r of refunded) {
+    sendPushToUsers([r.userId], {
+      title: "Match cancelled — refunded",
+      body: `No opponent joined in time. ${cur(r.stake)} is back in your wallet.`,
+      data: { type: "match_cancelled" },
+    });
+  }
 }
