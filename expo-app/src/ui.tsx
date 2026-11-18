@@ -202,6 +202,23 @@ const TOKENS: { color: string; fx: number; fy: number; tx: number; ty: number }[
   { color: B_, fx: 160, fy: 280, tx: 160, ty: 192 },
 ];
 
+/** Small Ludo-board logo mark (matches the home board), for headers. */
+export function BoardMark({ size = 26 }: { size?: number }) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24">
+      <Rect x={1.5} y={1.5} width={21} height={21} rx={6} fill="#fff" />
+      <Rect x={4} y={4} width={6.6} height={6.6} rx={2} fill={R_} />
+      <Rect x={13.4} y={4} width={6.6} height={6.6} rx={2} fill={G_} />
+      <Rect x={4} y={13.4} width={6.6} height={6.6} rx={2} fill={B_} />
+      <Rect x={13.4} y={13.4} width={6.6} height={6.6} rx={2} fill={Y_} />
+      <Polygon points="9,9 15,9 12,12" fill={G_} />
+      <Polygon points="15,9 15,15 12,12" fill={Y_} />
+      <Polygon points="15,15 9,15 12,12" fill={B_} />
+      <Polygon points="9,15 9,9 12,12" fill={R_} />
+    </Svg>
+  );
+}
+
 export function Board({ size }: { size?: number }) {
   const { colors } = useApp();
   const dim = size ?? Math.min(280, Dimensions.get("window").width - 80);

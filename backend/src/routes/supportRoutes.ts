@@ -33,7 +33,7 @@ function botReply(text: string): string {
   if (has("kyc", "verify", "verification", "document"))
     return "KYC links your UPI to your name so payouts are safe. Add and verify a UPI ID under Withdraw → Pay out to. Payouts only go to a verified account.";
   if (has("hello", "hi ", "hey", "namaste", "नमस्ते") || t.trim() === "hi")
-    return "Hi! I'm the Ludora support assistant. Ask me about deposits, withdrawals, room codes, refunds or referrals, or describe your issue and an agent will follow up here.";
+    return "Hi! I'm the Ludo King Maker support assistant. Ask me about deposits, withdrawals, room codes, refunds or referrals, or describe your issue and an agent will follow up here.";
   return "Thanks for reaching out — I've logged this for our support team and an agent will reply here shortly. Meanwhile, you can ask me about deposits, withdrawals, room codes, refunds, KYC or referrals.";
 }
 

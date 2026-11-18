@@ -71,7 +71,7 @@ async function ensureSchema() {
 
 ensureSchema().finally(() => {
   server.listen(env.port, () => {
-    console.log(`Ludora API listening on :${env.port}`);
+    console.log(`Ludo King Maker API listening on :${env.port}`);
   });
 });
 

@@ -5,7 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { api, money } from "../../src/api";
 import { useApp } from "../../src/state";
-import { DiceFace } from "../../src/ui";
+import { BoardMark } from "../../src/ui";
 import { goldGradient } from "../../src/theme";
 
 function Header() {
@@ -26,8 +26,8 @@ function Header() {
   return (
     <View style={{ paddingTop: insets.top, backgroundColor: colors.bg, borderBottomColor: colors.line, borderBottomWidth: 1 }}>
       <View style={{ height: 56, flexDirection: "row", alignItems: "center", paddingHorizontal: 16, gap: 10 }}>
-        <DiceFace size={26} face={5} bg="#fff" pip="#10182b" />
-        <Text style={{ fontSize: 20, fontWeight: "900", color: colors.fg, letterSpacing: 0.3 }}>LUDO<Text style={{ color: colors.gold }}>RA</Text></Text>
+        <BoardMark size={26} />
+        <Text numberOfLines={1} style={{ fontSize: 15, fontWeight: "900", color: colors.fg, flexShrink: 1 }}>Ludo King <Text style={{ color: colors.gold }}>Maker</Text></Text>
         <View style={{ flex: 1 }} />
 
         {/* live wallet balance chip */}

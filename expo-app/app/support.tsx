@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { api, type SupportMsg } from "../src/api";
 import { useApp } from "../src/state";
-import { DiceFace } from "../src/ui";
+import { BoardMark } from "../src/ui";
 
 export default function Support() {
   const { colors, t } = useApp();
@@ -40,7 +40,7 @@ export default function Support() {
       <View style={{ flexDirection: "row", alignItems: "center", gap: 10, padding: 14, borderBottomColor: colors.line, borderBottomWidth: 1 }}>
         <Pressable onPress={() => router.back()} hitSlop={10}><Text style={{ color: colors.fgDim, fontWeight: "800", fontSize: 15 }}>←</Text></Pressable>
         <View style={{ width: 34, height: 34, borderRadius: 10, backgroundColor: colors.surface2, alignItems: "center", justifyContent: "center" }}>
-          <DiceFace size={20} face={5} bg="#fff" pip="#10182b" />
+          <BoardMark size={24} />
         </View>
         <View style={{ flex: 1 }}>
           <Text style={{ color: colors.fg, fontWeight: "800", fontSize: 15 }}>{t("support")}</Text>

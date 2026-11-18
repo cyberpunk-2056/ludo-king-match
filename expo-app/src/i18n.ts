@@ -1,7 +1,7 @@
 export type Lang = "en" | "hi";
 
 const en: Record<string, string> = {
-  appName: "Ludora",
+  appName: "Ludo King Maker",
   nav_home: "Home", nav_play: "Play", nav_wallet: "Wallet", nav_profile: "Profile",
   login_h: "Welcome back", login_s: "Log in to play and manage your wallet.",
   signup_h: "Create your account", signup_s: "Sign up to start playing for real.",
@@ -32,7 +32,7 @@ const en: Record<string, string> = {
   profile: "Profile", played: "Played", wins: "Wins", win_rate: "Win rate", total_won: "Total won",
   refer: "Refer & earn", refer_s: "Earn 3% of your friends' winnings — for life.",
   share_app: "Share app + invite code", share_code: "My code",
-  share_msg: "Play skill-based Ludo for real cash on Ludora! Sign up with my code and we both win.",
+  share_msg: "Play skill-based Ludo for real cash on Ludo King Maker! Sign up with my code and we both win.",
   logout: "Log out", loading: "Loading…", none: "Nothing yet", back: "Back",
   room_code: "Ludo King room code", i_won: "I won", i_lost: "I lost", report: "Report your result",
   players: "players", joined: "joined", ok: "OK",
@@ -45,7 +45,7 @@ const en: Record<string, string> = {
 };
 
 const hi: Record<string, string> = {
-  appName: "Ludora",
+  appName: "Ludo King Maker",
   nav_home: "होम", nav_play: "खेलें", nav_wallet: "वॉलेट", nav_profile: "प्रोफ़ाइल",
   login_h: "वापसी पर स्वागत है", login_s: "खेलने और वॉलेट संभालने के लिए लॉग इन करें।",
   signup_h: "अपना खाता बनाएं", signup_s: "असली के लिए खेलना शुरू करें।",

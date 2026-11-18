@@ -7,7 +7,7 @@ import { gradient } from "./theme";
 type Step = { title: string; body: string };
 const STEPS: Record<"en" | "hi", Step[]> = {
   en: [
-    { title: "Hi, I'm Ludo! 🎲", body: "Welcome to Ludora. Let me show you around in a few quick steps." },
+    { title: "Hi, I'm Ludo! 🎲", body: "Welcome to Ludo King Maker. Let me show you around in a few quick steps." },
     { title: "Your wallet", body: "Your balance sits in the top bar. Tap + to add money. Winnings are withdrawable to your verified UPI." },
     { title: "Create a match", body: "Open Play and tap Create match. Pick 1v1 or 4-player, set the entry fee, and paste your Ludo King room code." },
     { title: "Join a match", body: "Tap Join on any open match and you instantly get the room code. Open Ludo King and join that code." },

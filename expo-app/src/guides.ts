@@ -6,7 +6,7 @@ export const GUIDES: Record<"en" | "hi", Guide[]> = {
     { icon: "➕", title: "How to create a match", items: [
       "1. Make sure your wallet has enough for the entry fee (add money if needed).",
       "2. Open Ludo King and create a private room; copy its room code.",
-      "3. In Ludora, go to Play → Create match.",
+      "3. In Ludo King Maker, go to Play → Create match.",
       "4. Pick 1v1 or 4-player, set the entry fee, and paste the Ludo King room code.",
       "5. Tap Create. Your stake is held and the match opens for others to join.",
     ]},
@@ -19,7 +19,7 @@ export const GUIDES: Record<"en" | "hi", Guide[]> = {
     { icon: "🎮", title: "How to play & get paid", items: [
       "1. All players enter the same Ludo King room with the shared code.",
       "2. Play the game to the finish inside Ludo King.",
-      "3. Come back to Ludora and tap 'I won' or 'I lost'.",
+      "3. Come back to Ludo King Maker and tap 'I won' or 'I lost'.",
       "4. When everyone reports and results agree, the winner gets 95% of the pot automatically; the platform keeps 5%.",
       "5. If results clash, the pot is frozen for a quick review.",
     ]},

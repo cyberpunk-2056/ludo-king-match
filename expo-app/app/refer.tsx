@@ -24,7 +24,7 @@ export default function Refer() {
     const code = ref?.code ?? "";
     const link = `${APP_URL}/?ref=${encodeURIComponent(code)}`;
     const message = `${t("share_msg")}\n\n${t("share_code")}: ${code}\n${link}`;
-    try { await Share.share({ message, url: link, title: "Ludora" }); } catch {}
+    try { await Share.share({ message, url: link, title: "Ludo King Maker" }); } catch {}
   }
 
   return (
