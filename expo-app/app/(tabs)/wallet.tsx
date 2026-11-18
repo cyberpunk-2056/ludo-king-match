@@ -27,7 +27,7 @@ export default function Wallet() {
     <ScrollView style={{ backgroundColor: colors.bg }} contentContainerStyle={{ padding: 16 }}>
       <Text style={{ color: colors.fg, fontSize: 24, fontWeight: "800", marginBottom: 14 }}>{t("nav_wallet")}</Text>
 
-      <LinearGradient colors={["#1f2750", "#121634"]} style={{ borderRadius: 22, padding: 22 }}>
+      <LinearGradient colors={["#1f2750", "#121634"] as readonly [string, string]} style={{ borderRadius: 22, padding: 22 }}>
         <Text style={{ color: "rgba(255,255,255,0.7)", fontSize: 12, fontWeight: "700" }}>{t("w_total")}</Text>
         <Text style={{ color: "#fff", fontSize: 40, fontWeight: "800" }}>{money(total, cur)}</Text>
         <View style={{ flexDirection: "row", gap: 12, marginTop: 16 }}>

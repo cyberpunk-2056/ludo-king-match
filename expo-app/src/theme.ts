@@ -19,5 +19,6 @@ export const lightColors: Colors = {
   isDark: false,
 };
 
-export const gradient = ["#8B6CFF", "#5B8DEF"] as const;
-export const greenGradient = ["#32D583", "#15B8A6"] as const;
+// fresh look: violet → pink
+export const gradient = ["#7A5CFF", "#FF5AA8"] as const;
+export const greenGradient = ["#2BD3A7", "#17B8C4"] as const;
