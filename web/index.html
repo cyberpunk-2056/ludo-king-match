@@ -474,6 +474,25 @@
   }
   @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } .btn:active { transform: none; } .live-badge i, .ticker-track { animation: none; } }
 
+  /* ---------- App download band ---------- */
+  .dl-band { display: grid; grid-template-columns: 1fr auto; gap: 20px; align-items: center; background: linear-gradient(135deg, color-mix(in srgb, var(--blue) 12%, var(--surface)), var(--surface) 65%); border-radius: var(--radius-lg); box-shadow: var(--ring); padding: clamp(20px,3vw,30px); margin-top: 26px; position: relative; overflow: hidden; }
+  .dl-band::after { content:""; position:absolute; right:-30px; top:-30px; width:150px; height:150px; background: var(--grad-gold); filter: blur(60px); opacity:.18; border-radius:50%; pointer-events:none; }
+  .dl-band > * { position: relative; }
+  .dl-band h3 { font-size: clamp(19px,2.6vw,24px); text-transform: uppercase; }
+  .dl-band p { color: var(--fg-dim); font-size: 14px; margin-top: 6px; max-width: 46ch; }
+  .dl-note { font-size: 11.5px; color: var(--muted); margin-top: 8px; }
+  .dl-btns { display: flex; flex-direction: column; gap: 10px; }
+  .dl-btn { display: flex; align-items: center; gap: 12px; background: #0b1020; color: #fff; border-radius: 13px; padding: 10px 20px 10px 14px; box-shadow: var(--glow); min-width: 248px; transition: transform .12s ease, box-shadow .2s; border: 1px solid rgba(255,255,255,.08); }
+  .dl-btn:hover { transform: translateY(-2px); box-shadow: 0 20px 44px -16px color-mix(in srgb, var(--blue) 70%, transparent); }
+  .dl-btn.play { background: #fff; color: #10131a; box-shadow: var(--ring); border-color: var(--line); }
+  .dl-btn.play:hover { box-shadow: var(--shadow-sm), var(--ring); }
+  .dl-btn .dl-ic { width: 32px; height: 32px; display: grid; place-items: center; flex: none; }
+  .dl-btn .dl-ic svg { width: 30px; height: 30px; }
+  .dl-tx { display: flex; flex-direction: column; line-height: 1.14; text-align: left; }
+  .dl-tx small { font-size: 10px; text-transform: uppercase; letter-spacing: .09em; opacity: .72; font-weight: 800; }
+  .dl-tx b { font-family: var(--font-display); font-weight: 800; font-size: 15px; }
+  @media (max-width: 760px) { .dl-band { grid-template-columns: 1fr; } .dl-btn { min-width: 0; } }
+
   /* ---------- Support chat widget ---------- */
   .support-fab { position: fixed; right: 18px; bottom: calc(18px + env(safe-area-inset-bottom,0px)); z-index: 55; width: 58px; height: 58px; border-radius: 18px; border: 0; cursor: pointer; background: var(--grad); box-shadow: var(--glow); display: grid; place-items: center; color: #fff; transition: transform .15s ease, box-shadow .2s; }
   .support-fab:hover { transform: translateY(-2px); box-shadow: 0 20px 44px -14px color-mix(in srgb, var(--blue) 75%, transparent); }
@@ -608,10 +627,28 @@
         <div class="step"><div class="n">4</div><h4 data-t="s4t">Report &amp; get paid</h4><p data-t="s4p">The winner reports the result and gets 95% of the pot.</p></div>
       </div>
 
+      <div class="dl-band">
+        <div class="dl-copy">
+          <h3 data-t="dl_title">Play on your phone</h3>
+          <p data-t="dl_sub">Get the Ludora app for matches, wallet and payouts. You'll play the games themselves inside the official Ludo King app using the room code.</p>
+          <p class="dl-note" data-t="dl_note">Ludora is an Android app installed outside the Play Store — allow installs from your browser when prompted.</p>
+        </div>
+        <div class="dl-btns">
+          <a class="dl-btn" href="ludora.apk" download="Ludora.apk">
+            <span class="dl-ic"><svg viewBox="0 0 24 24" fill="#3DDC84"><path d="M17.6 9.48l1.84-3.18a.38.38 0 10-.66-.38l-1.87 3.23a11.3 11.3 0 00-9.82 0L5.22 5.92a.38.38 0 10-.66.38L6.4 9.48A10.8 10.8 0 001 18h22a10.8 10.8 0 00-5.4-8.52zM7.5 15.2a.95.95 0 110-1.9.95.95 0 010 1.9zm9 0a.95.95 0 110-1.9.95.95 0 010 1.9z"/></svg></span>
+            <span class="dl-tx"><small data-t="dl_get">Download</small><b data-t="dl_ludora">Ludora for Android</b></span>
+          </a>
+          <a class="dl-btn play" href="https://play.google.com/store/apps/details?id=com.ludo.king&hl=en_IN" target="_blank" rel="noopener noreferrer">
+            <span class="dl-ic"><svg viewBox="0 0 24 24"><path d="M3.6 2.1a1 1 0 00-.6.92v17.96a1 1 0 00.6.92l10.3-9.9L3.6 2.1z" fill="#00D0FF"/><path d="M16.6 8.9L13.9 12l2.7 3.1 3.9-2.25a1 1 0 000-1.7L16.6 8.9z" fill="#FFC107"/><path d="M3.6 2.1l10.3 9.9 2.7-3.1L5.6 1.5a1 1 0 00-2 .6z" fill="#00E676"/><path d="M3.6 21.9a1 1 0 002-.6l10.9-6.2-2.6-3.1L3.6 21.9z" fill="#FF3D57"/></svg></span>
+            <span class="dl-tx"><small data-t="dl_on">Get it on Google Play</small><b>Ludo King</b></span>
+          </a>
+        </div>
+      </div>
+
       <div class="cta">
         <h2 data-t="cta_h">Ready to play for real?</h2>
         <p data-t="cta_p">Your first match is waiting. New players get a risk-free first game.</p>
-        <button class="btn btn-ghost btn-lg" style="background:#fff;color:#2a1b6b" data-go="play" data-t="cta_btn">Start playing</button>
+        <button class="btn btn-ghost btn-lg" style="background:#fff;color:#10131a" data-go="play" data-t="cta_btn">Start playing</button>
       </div>
     </section>
 
@@ -981,6 +1018,7 @@
       home_modes:"Game modes", home_how:"How it works",
       ranked:"Ranked Season 1 · Live", trust1:"Instant payouts", trust2:"Provably-fair dice", trust3:"95% to the winner",
       recent_wins:"Recent wins", home_board:"Top players this week", lb_rating:"Rating", lb_wins:"wins",
+      dl_title:"Play on your phone", dl_sub:"Get the Ludora app for matches, wallet and payouts. You'll play the games inside the official Ludo King app using the room code.", dl_note:"Ludora is an Android app installed outside the Play Store — allow installs from your browser when prompted.", dl_get:"Download", dl_ludora:"Ludora for Android", dl_on:"Get it on Google Play",
       s1t:"Add money", s1p:"Sign up, verify your age, and add money to your wallet.",
       s2t:"Create or join", s2p:"Pick a stake. We hold both players' money safely.",
       s3t:"Play in Ludo King", s3p:"Use the shared room code to play in the Ludo King app.",
@@ -1064,6 +1102,7 @@
       home_modes:"गेम मोड", home_how:"यह कैसे काम करता है",
       ranked:"रैंक्ड सीज़न 1 · लाइव", trust1:"तुरंत भुगतान", trust2:"निष्पक्ष डाइस", trust3:"95% विजेता को",
       recent_wins:"हाल की जीत", home_board:"इस हफ़्ते के टॉप खिलाड़ी", lb_rating:"रेटिंग", lb_wins:"जीत",
+      dl_title:"अपने फ़ोन पर खेलें", dl_sub:"मैच, वॉलेट और भुगतान के लिए लूडोरा ऐप लें। गेम खुद आधिकारिक लूडो किंग ऐप में रूम कोड से खेलें।", dl_note:"लूडोरा एक Android ऐप है जो Play Store के बाहर इंस्टॉल होता है — पूछे जाने पर ब्राउज़र से इंस्टॉल की अनुमति दें।", dl_get:"डाउनलोड", dl_ludora:"लूडोरा Android के लिए", dl_on:"Google Play से लें",
       s1t:"पैसे जोड़ें", s1p:"साइन अप करें, उम्र सत्यापित करें, और वॉलेट में पैसे जोड़ें।",
       s2t:"बनाएं या जॉइन करें", s2p:"एक स्टेक चुनें। हम दोनों का पैसा सुरक्षित रखते हैं।",
       s3t:"लूडो किंग में खेलें", s3p:"शेयर किए रूम कोड से लूडो किंग ऐप में खेलें।",
