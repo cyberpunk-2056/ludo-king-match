@@ -34,7 +34,8 @@ fun CreateMatchScreen(nav: NavController, vm: PlayViewModel = viewModel()) {
     var working by remember { mutableStateOf(false) }
 
     val stake = stakeText.toDoubleOrNull() ?: 0.0
-    val pot = Money.pot(stake)
+    val seats = Money.seatsForMode(mode)
+    val pot = Money.pot(stake, seats)
 
     Column(Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState())) {
         TextButton(onClick = { nav.popBackStack() }) { Text("← ${t["nav_play"]}", color = c.fgDim) }

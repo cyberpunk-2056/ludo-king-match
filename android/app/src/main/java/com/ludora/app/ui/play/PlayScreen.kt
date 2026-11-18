@@ -64,7 +64,7 @@ private fun LiveRow(m: Match) {
         Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text("${m.playerA}  vs  ${m.playerB}", color = c.fg, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                Text("LIVE · ${Money.format(m.stake)} entry", color = c.red, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                Text("LIVE · ${Money.format(m.stake)} entry · ${m.effectiveSeats} players", color = c.red, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
             }
             Text(Money.format(m.pot), color = c.violet, fontWeight = FontWeight.Bold)
         }
@@ -81,7 +81,7 @@ private fun OpenRow(m: Match, onJoin: () -> Unit) {
         Row(Modifier.fillMaxWidth().padding(14.dp), verticalAlignment = Alignment.CenterVertically) {
             Column(Modifier.weight(1f)) {
                 Text(m.playerA, color = c.fg, fontWeight = FontWeight.Bold, fontSize = 14.sp)
-                Text("${Money.mmss(remaining)} ${t["left"]}", color = c.yellow, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                Text("${Money.mmss(remaining)} ${t["left"]} · ${m.playersJoined}/${m.effectiveSeats} joined · ${Money.format(m.pot)} pot", color = c.yellow, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
             }
             Text(Money.format(m.stake), color = c.violet, fontWeight = FontWeight.Bold)
             Spacer(Modifier.width(10.dp))
@@ -100,7 +100,7 @@ private fun ResultRow(r: MatchResult) {
                 Text("🏆 ${r.winner} beat ${r.loser}", color = c.fg, fontWeight = FontWeight.Bold, fontSize = 14.sp)
                 Text("${Money.format(r.stake)} entry", color = c.muted, fontSize = 12.sp)
             }
-            Text("+${Money.format(Money.winnerPayout(r.stake * 2))}", color = c.green, fontWeight = FontWeight.Bold)
+            Text("+${Money.format(r.payout)}", color = c.green, fontWeight = FontWeight.Bold)
         }
     }
     Spacer(Modifier.height(8.dp))

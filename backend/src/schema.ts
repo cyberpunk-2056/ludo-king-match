@@ -57,6 +57,19 @@ create table if not exists matches (
 );
 create index if not exists idx_match_status on matches(status, created_at desc);
 
+-- number of seats a match needs filled before it goes live (2 for 1v1, 4 for 4-player)
+alter table matches add column if not exists seats int not null default 2;
+
+-- every player who staked into a match (source of truth for the pot and payouts)
+create table if not exists match_players (
+  match_id   uuid not null references matches(id) on delete cascade,
+  user_id    uuid not null references users(id),
+  stake      numeric(14,2) not null,
+  joined_at  timestamptz not null default now(),
+  primary key (match_id, user_id)
+);
+create index if not exists idx_match_players_match on match_players(match_id);
+
 create table if not exists match_reports (
   id         uuid primary key default gen_random_uuid(),
   match_id   uuid not null references matches(id) on delete cascade,

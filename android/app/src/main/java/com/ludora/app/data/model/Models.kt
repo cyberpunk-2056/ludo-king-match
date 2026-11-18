@@ -79,20 +79,24 @@ data class VerifyUpiRequest(val vpa: String)
 data class Match(
     val id: String = "",
     val mode: Int = 1,                 // 1 = 1v1 duel, 2 = 4-player royale
+    val seats: Int = 0,                // players the match needs (2 or 4); 0 => derive from mode
     val stake: Double = 0.0,
+    val playersJoined: Int = 0,
     val playerA: String = "",
     val playerB: String = "",
     val status: String = "open",       // open | waiting | live | settled
     @SerialName("join_deadline") val joinDeadline: Long = 0,
     @SerialName("room_code") val roomCode: String = ""
 ) {
-    val pot: Double get() = stake * 2
+    val effectiveSeats: Int get() = if (seats > 0) seats else com.ludora.app.core.Money.seatsForMode(mode)
+    val pot: Double get() = com.ludora.app.core.Money.pot(stake, effectiveSeats)
 }
 
 @Serializable
 data class MatchResult(
     val id: String = "",
     val mode: Int = 1,
+    val seats: Int = 0,
     val stake: Double = 0.0,
     val winner: String = "",
     val loser: String = "",
@@ -106,7 +110,13 @@ data class MatchResult(
 data class CreateMatchRequest(val mode: Int, val stake: Double)
 
 @Serializable
-data class JoinResponse(val roomCode: String, val opponent: String)
+data class JoinResponse(
+    val status: String = "live",
+    val roomCode: String = "",
+    val opponent: String = "",
+    val playersJoined: Int = 0,
+    val seats: Int = 0
+)
 
 @Serializable
 data class ReportResultRequest(val result: String, val proofUrl: String? = null)

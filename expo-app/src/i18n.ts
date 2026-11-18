@@ -18,12 +18,15 @@ const en: Record<string, string> = {
   w_total: "Total balance", w_dep: "Deposit", w_win: "Winnings",
   add_money: "Add money", withdraw: "Withdraw", recent: "Recent activity",
   amount: "Amount", method: "Payment method", pay: "Pay", confirm_wd: "Confirm withdrawal",
-  dep_rule: "Minimum deposit $5. Used to join matches and also withdrawable.",
-  wd_rule: "Minimum withdrawal $10. Deposit + winnings, to a verified UPI only.",
+  dep_rule: "Minimum deposit ₹5. Used to join matches and also withdrawable.",
+  wd_rule: "Minimum withdrawal ₹10. Deposit + winnings, to a verified UPI only.",
   profile: "Profile", played: "Played", wins: "Wins", win_rate: "Win rate", total_won: "Total won",
   refer: "Refer & earn", refer_s: "Earn 3% of your friends' winnings — for life.",
   logout: "Log out", loading: "Loading…", none: "Nothing yet", back: "Back",
   room_code: "Ludo King room code", i_won: "I won", i_lost: "I lost", report: "Report your result",
+  players: "players", joined: "joined", ok: "OK",
+  waiting_players: "Waiting for players",
+  waiting_hint: "The room code appears once every seat is filled. Your spot is held.",
 };
 
 const hi: Record<string, string> = {
@@ -44,12 +47,15 @@ const hi: Record<string, string> = {
   w_total: "कुल बैलेंस", w_dep: "जमा", w_win: "जीत",
   add_money: "पैसे जोड़ें", withdraw: "निकासी", recent: "हाल की गतिविधि",
   amount: "राशि", method: "भुगतान का तरीका", pay: "भुगतान करें", confirm_wd: "निकासी की पुष्टि करें",
-  dep_rule: "न्यूनतम जमा $5। मैच जॉइन के लिए और निकासी योग्य भी।",
-  wd_rule: "न्यूनतम निकासी $10। जमा + जीत, केवल सत्यापित UPI में।",
+  dep_rule: "न्यूनतम जमा ₹5। मैच जॉइन के लिए और निकासी योग्य भी।",
+  wd_rule: "न्यूनतम निकासी ₹10। जमा + जीत, केवल सत्यापित UPI में।",
   profile: "प्रोफ़ाइल", played: "खेले", wins: "जीत", win_rate: "जीत दर", total_won: "कुल जीत",
   refer: "रेफ़र करें और कमाएं", refer_s: "अपने दोस्तों की जीत का 3% कमाएं — जीवनभर।",
   logout: "लॉग आउट", loading: "लोड हो रहा है…", none: "अभी कुछ नहीं", back: "वापस",
   room_code: "लूडो किंग रूम कोड", i_won: "मैं जीता", i_lost: "मैं हारा", report: "अपना नतीजा दर्ज करें",
+  players: "खिलाड़ी", joined: "जॉइन", ok: "ठीक है",
+  waiting_players: "खिलाड़ियों का इंतज़ार",
+  waiting_hint: "सभी सीटें भरते ही रूम कोड दिखेगा। आपकी सीट सुरक्षित है।",
 };
 
 export const dict: Record<Lang, Record<string, string>> = { en, hi };

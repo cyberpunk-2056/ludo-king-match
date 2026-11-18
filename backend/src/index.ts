@@ -29,10 +29,12 @@ app.use("/api", payoutRoutes);
 app.use("/api", matchRoutes);
 app.use("/api", referralRoutes);
 
-// fallback error handler
+// fallback error handler. Routes may throw an error carrying `http` (a status < 500)
+// and its message is sent to the client; everything else is a generic 500.
 app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+  const status = Number(err?.http || err?.status) || 500;
   console.error(err);
-  res.status(500).json({ message: "Server error" });
+  res.status(status).json({ message: status < 500 && err?.message ? err.message : "Server error" });
 });
 
 const server = createServer(app);

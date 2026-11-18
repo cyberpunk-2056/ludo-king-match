@@ -10,8 +10,13 @@ export const Money = {
   round2(v: number): number {
     return Math.round(v * 100) / 100;
   },
-  pot(stake: number): number {
-    return Money.round2(stake * 2);
+  // how many players a mode seats: mode 1 = 1v1 (2), anything else = 4-player
+  seatsForMode(mode: number): number {
+    return mode === 1 ? 2 : 4;
+  },
+  // total prize pool = every seat pays the same entry fee
+  pot(stake: number, seats = 2): number {
+    return Money.round2(stake * seats);
   },
   winnerPayout(pot: number): number {
     return Money.round2(pot * Money.WINNER_SHARE);

@@ -957,6 +957,8 @@
     {k:3, ic:"trophy", grad:"linear-gradient(135deg,#FFC94D,#FF9E3D)", live:true},
     {k:4, ic:"lock", grad:"linear-gradient(135deg,#FF5A6A,#8B6CFF)", live:false}
   ];
+  // players a mode seats: 1 = 1v1 (2 players), anything else = 4-player. Mirrors the server.
+  function seatsFor(k){ return k===1 ? 2 : 4; }
   var METHODS = [
     {id:"upi", ic:"upi", grad:"linear-gradient(135deg,#32D583,#15B8A6)"},
     {id:"card", ic:"card", grad:"linear-gradient(135deg,#4B9BFF,#8B6CFF)"},
@@ -980,7 +982,7 @@
     matches:[
       {res:"win", mode:1, stake:20, pot:40, payout:38, opp:"LunaR", ts:Date.now()-3600000},
       {res:"lose", mode:1, stake:10, pot:20, payout:0, opp:"KashFlow", ts:Date.now()-7200000},
-      {res:"win", mode:2, stake:5, pot:10, payout:9.5, opp:"RollRoyce", ts:Date.now()-90000000},
+      {res:"win", mode:2, stake:5, pot:20, payout:19, opp:"RollRoyce", ts:Date.now()-90000000},
       {res:"win", mode:1, stake:50, pot:100, payout:95, opp:"SixOnSix", ts:Date.now()-180000000},
       {res:"lose", mode:1, stake:20, pot:40, payout:0, opp:"Nova_Dice", ts:Date.now()-260000000},
       {res:"win", mode:2, stake:10, pot:20, payout:19, opp:"MiraPlays", ts:Date.now()-350000000}
@@ -1225,7 +1227,7 @@
     build(RULES,$("rulesBody"),"list"); build(FAIR,$("fairBody"),"body");
   }
   function updatePayout(){
-    var s=parseFloat($("playAmt").value)||0, pot=s*2, comm=Math.round(pot*5)/100, win=Math.round(pot*95)/100;
+    var s=parseFloat($("playAmt").value)||0, seats=seatsFor(state.playMode), pot=Math.round(s*seats*100)/100, comm=Math.round(pot*5)/100, win=Math.round(pot*95)/100;
     $("ppPot").textContent=money(pot); $("ppWin").textContent=money(win); $("ppComm").textContent=money(comm);
     syncChips("playAmt","playChips");
   }
@@ -1393,7 +1395,7 @@
     debit(stake);
     state.tx.unshift({ty:"out",k:"tx_stake",amt:-stake,meta:t("mode"+state.playMode+"_t"),ts:Date.now()});
     save(); renderBal(); renderTx();
-    MATCH={ stake:stake, pot:stake*2, mode:state.playMode, status:"waiting", code:genCode(), opp:null, won:false, proof:false, deadline:Date.now()+600000 };
+    MATCH={ stake:stake, pot:Math.round(stake*seatsFor(state.playMode)*100)/100, seats:seatsFor(state.playMode), mode:state.playMode, status:"waiting", code:genCode(), opp:null, won:false, proof:false, deadline:Date.now()+600000 };
     $("matchOv").hidden=false; renderRoom(); startWaitTimer();
     setTimeout(function(){ if(MATCH&&MATCH.status==="waiting"){ clearWait(); MATCH.opp=ROOMS[Math.floor(Math.random()*ROOMS.length)].name; MATCH.status="room"; renderRoom(); } }, 4000+Math.random()*4000);
   }

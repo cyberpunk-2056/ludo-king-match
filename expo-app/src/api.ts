@@ -37,8 +37,12 @@ export interface User { id: string; name: string; phone: string; email: string; 
 export interface Wallet { deposit: number; winnings: number; currency: string }
 export interface Tx { id: string; type: string; amount: number; note: string; created_at: number }
 export interface UpiAccount { id: string; vpa: string; name: string; verified: boolean; is_default: boolean }
-export interface Match { id: string; mode: number; stake: number; playerA: string; playerB: string; status: string; join_deadline: number; room_code: string }
-export interface MatchResult { id: string; mode: number; stake: number; winner: string; loser: string; payout: number; result: string; opponent: string; finished_at: number }
+export interface Match { id: string; mode: number; seats: number; stake: number; pot: number; playersJoined: number; playerA: string; playerB: string; status: string; join_deadline: number; room_code: string }
+export interface MatchResult { id: string; mode: number; seats: number; stake: number; winner: string; loser: string; payout: number; result: string; opponent: string; finished_at: number }
+export interface JoinResult { status: string; roomCode: string; opponent: string; playersJoined: number; seats: number }
+
+/** Players a mode seats: 1 = 1v1 (2 players), anything else = 4-player. Mirrors the server. */
+export const seatsForMode = (mode: number) => (mode === 1 ? 2 : 4);
 export interface Referral { code: string; earnings: number; winnings_base: number; friends: { name: string; winnings: number }[] }
 
 export const api = {
@@ -62,7 +66,7 @@ export const api = {
   openMatches: () => request<Match[]>("/api/matches/open"),
   recentResults: () => request<MatchResult[]>("/api/matches/recent"),
   createMatch: (b: { mode: number; stake: number }) => request<Match>("/api/matches", { method: "POST", body: JSON.stringify(b) }),
-  joinMatch: (id: string) => request<{ roomCode: string; opponent: string }>(`/api/matches/${id}/join`, { method: "POST" }),
+  joinMatch: (id: string) => request<JoinResult>(`/api/matches/${id}/join`, { method: "POST" }),
   reportResult: (id: string, b: { result: string; proofUrl?: string }) =>
     request<{ status: string }>(`/api/matches/${id}/result`, { method: "POST", body: JSON.stringify(b) }),
 

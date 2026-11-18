@@ -19,8 +19,11 @@ object Money {
     /** Platform fee from a pot (5%). */
     fun fee(pot: Double): Double = round2(pot * PLATFORM_FEE)
 
-    /** Pot for a two-player match at a given stake. */
-    fun pot(stake: Double): Double = round2(stake * 2)
+    /** Players a mode seats: 1 = 1v1 (2 players), anything else = 4-player. Mirrors the server. */
+    fun seatsForMode(mode: Int): Int = if (mode == 1) 2 else 4
+
+    /** Pot for a match: every one of [seats] players pays the same stake. */
+    fun pot(stake: Double, seats: Int = 2): Double = round2(stake * seats)
 
     /** Referral commission earned when a referred friend wins [winnings]. */
     fun referralCommission(winnings: Double): Double = round2(winnings * REFERRAL_RATE)
