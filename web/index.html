@@ -495,6 +495,9 @@
         <div class="label" data-t="play_stake">Entry fee (stake)</div>
         <div class="amt-box"><span>₹</span><input id="playAmt" type="number" inputmode="decimal" min="1" step="1" value="20"></div>
         <div class="chips" id="playChips"></div>
+        <div class="label" data-t="play_rc">Ludo King room code</div>
+        <div class="amt-box"><input id="playCode" type="text" maxlength="20" autocomplete="off" placeholder="Paste room code" style="letter-spacing:2px;font-family:var(--font-display)"></div>
+        <p class="muted" id="playRcHint" data-t="play_rc_hint" style="font-size:12.5px;margin-top:6px">Create a private room in Ludo King and paste its code. Opponents see it when they join.</p>
         <div class="payout-tiles">
           <div class="pt"><div class="pt-k" data-t="pp_pot">Prize pot</div><div class="pt-v num" id="ppPot">₹40.00</div></div>
           <div class="pt win"><div class="pt-k" data-t="pp_win">Winner gets 95%</div><div class="pt-v num" id="ppWin">₹38.00</div></div>
@@ -763,6 +766,7 @@
       play_title:"Play", play_sub:"Pick a mode and stake. We'll find you an opponent.", play_create:"＋ Create match", play_live:"Live matches", play_openm:"Open to join", back:"← Back", entry:"entry",
       create_title:"Create a match", create_sub:"Pick a mode and stake. We'll find you an opponent.",
       play_mode:"Mode", play_stake:"Entry fee (stake)", pp_pot:"Prize pot", pp_win:"Winner gets 95%", pp_comm:"Platform fee 5%",
+      play_rc:"Ludo King room code", play_rc_hint:"Create a private room in Ludo King and paste its code. Opponents see it when they join.",
       play_find:"Create match & find opponent", play_note:"You'll play the match in the Ludo King app using a room code we give you.", play_open:"Open rooms", join:"Join", host:"host",
       results_title:"Recent results", beat_pre:" beat ", beat_post:"",
       w_title:"Wallet", w_sub:"Demo money — shows exactly how the real wallet behaves.",
@@ -793,7 +797,7 @@
       m_upi:"UPI", m_upi_d:"Instant · GPay, PhonePe, Paytm", m_card:"Card", m_card_d:"Visa, Mastercard, RuPay", m_bank:"Bank transfer", m_bank_d:"Net banking · 1–2 min",
       tx_dep:"Money added", tx_wd:"Withdrawal", tx_ref:"Referral commission (3%)", tx_win:"Match won", tx_stake:"Stake locked",
       via:"via", to:"to", from:"from", played:"played", fr_won:"won", today:"Today", yday:"Yesterday", dago:"d ago",
-      err_min_d:"Minimum deposit is ₹5.", err_min_w:"Minimum withdrawal is ₹10.", err_over:"Amount exceeds your withdrawable balance.", err_dest:"Enter a UPI ID or bank account.", err_bal:"Not enough balance. Add funds first.",
+      err_min_d:"Minimum deposit is ₹5.", err_min_w:"Minimum withdrawal is ₹10.", err_over:"Amount exceeds your withdrawable balance.", err_dest:"Enter a UPI ID or bank account.", err_bal:"Not enough balance. Add funds first.", err_rc:"Enter your Ludo King room code (at least 4 characters).",
       t_added:"Added", t_wd:"Withdrawal requested", t_copied:"Referral link copied!", t_ref:"Referral commission credited!",
       matching:"Finding an opponent…", won:"You won!", lost:"You lost", won_sub:"You win the pot. We keep a 5% fee.", lost_sub:"Your opponent won this one.",
       mr_waiting:"Finding an opponent…", mr_cancel:"Cancel & refund", mr_found:"Opponent found!", mr_vs:"vs", mr_pot:"pot",
@@ -843,6 +847,7 @@
       play_title:"खेलें", play_sub:"एक मोड और स्टेक चुनें। हम आपको प्रतिद्वंद्वी ढूँढ देंगे।", play_create:"＋ मैच बनाएं", play_live:"लाइव मैच", play_openm:"जॉइन के लिए खुले", back:"← वापस", entry:"एंट्री",
       create_title:"मैच बनाएं", create_sub:"एक मोड और स्टेक चुनें। हम आपको प्रतिद्वंद्वी ढूँढ देंगे।",
       play_mode:"मोड", play_stake:"एंट्री फीस (स्टेक)", pp_pot:"इनाम राशि", pp_win:"विजेता को 95%", pp_comm:"प्लेटफ़ॉर्म फीस 5%",
+      play_rc:"लूडो किंग रूम कोड", play_rc_hint:"लूडो किंग में प्राइवेट रूम बनाएं और उसका कोड पेस्ट करें। जॉइन करने पर प्रतिद्वंद्वी इसे देखेंगे।",
       play_find:"मैच बनाएं और प्रतिद्वंद्वी ढूँढें", play_note:"आप यह मैच लूडो किंग ऐप में, हमारे दिए रूम कोड से खेलेंगे।", play_open:"खुले रूम", join:"जॉइन", host:"होस्ट",
       results_title:"हाल के नतीजे", beat_pre:" ने ", beat_post:" को हराया",
       w_title:"वॉलेट", w_sub:"डेमो पैसा — दिखाता है कि असली वॉलेट कैसे काम करेगा।",
@@ -873,7 +878,7 @@
       m_upi:"UPI", m_upi_d:"तुरंत · GPay, PhonePe, Paytm", m_card:"कार्ड", m_card_d:"Visa, Mastercard, RuPay", m_bank:"बैंक ट्रांसफ़र", m_bank_d:"नेट बैंकिंग · 1–2 मिनट",
       tx_dep:"पैसे जोड़े", tx_wd:"निकासी", tx_ref:"रेफ़रल कमीशन (3%)", tx_win:"मैच जीता", tx_stake:"स्टेक लॉक",
       via:"के ज़रिए", to:"को", from:"से", played:"ने खेला", fr_won:"जीते", today:"आज", yday:"कल", dago:" दिन पहले",
-      err_min_d:"न्यूनतम जमा ₹5 है।", err_min_w:"न्यूनतम निकासी ₹10 है।", err_over:"राशि आपके निकासी योग्य बैलेंस से अधिक है।", err_dest:"UPI ID या बैंक खाता दर्ज करें।", err_bal:"बैलेंस पर्याप्त नहीं। पहले फंड जोड़ें।",
+      err_min_d:"न्यूनतम जमा ₹5 है।", err_min_w:"न्यूनतम निकासी ₹10 है।", err_over:"राशि आपके निकासी योग्य बैलेंस से अधिक है।", err_dest:"UPI ID या बैंक खाता दर्ज करें।", err_bal:"बैलेंस पर्याप्त नहीं। पहले फंड जोड़ें।", err_rc:"अपना लूडो किंग रूम कोड दर्ज करें (कम से कम 4 अक्षर)।",
       t_added:"जोड़ा गया", t_wd:"निकासी का अनुरोध किया गया", t_copied:"रेफ़रल लिंक कॉपी हो गया!", t_ref:"रेफ़रल कमीशन जोड़ा गया!",
       matching:"प्रतिद्वंद्वी ढूँढ रहे हैं…", won:"आप जीते!", lost:"आप हारे", won_sub:"आप पॉट जीतते हैं। हम 5% फीस लेते हैं।", lost_sub:"इस बार प्रतिद्वंद्वी जीता।",
       mr_waiting:"प्रतिद्वंद्वी ढूँढ रहे हैं…", mr_cancel:"रद्द करें और रिफंड लें", mr_found:"प्रतिद्वंद्वी मिल गया!", mr_vs:"बनाम", mr_pot:"पॉट",
@@ -965,10 +970,10 @@
     {id:"bank", ic:"bank", grad:"linear-gradient(135deg,#FFC94D,#FF9E3D)"}
   ];
   var ROOMS = [
-    {name:"KashFlow", stake:10, c1:"#FFC94D", c2:"#FF5A6A"},
-    {name:"Nova_Dice", stake:20, c1:"#4B9BFF", c2:"#32D583"},
-    {name:"RollRoyce", stake:5, c1:"#32D583", c2:"#4B9BFF"},
-    {name:"SixOnSix", stake:50, c1:"#FF5A6A", c2:"#FFC94D"}
+    {name:"KashFlow", stake:10, code:"8421570", c1:"#FFC94D", c2:"#FF5A6A"},
+    {name:"Nova_Dice", stake:20, code:"5093184", c1:"#4B9BFF", c2:"#32D583"},
+    {name:"RollRoyce", stake:5, code:"2748316", c1:"#32D583", c2:"#4B9BFF"},
+    {name:"SixOnSix", stake:50, code:"6150927", c1:"#FF5A6A", c2:"#FFC94D"}
   ];
   var FRIEND_NAMES = ["Rohit","Priya","Aman","Neha","Vikram","Sana","Dev","Isha"];
 
@@ -1160,7 +1165,7 @@
         var row=document.createElement("div"); row.className="room";
         row.innerHTML='<div class="av" style="background:linear-gradient(145deg,'+r.c1+','+r.c2+')">'+r.name.charAt(0)+'</div><div class="ri"><div class="n">'+r.name+'</div><div class="s"><span class="room-timer" data-ri="'+i+'">'+fmtMMSS(r.exp-Date.now())+'</span> '+t("left")+'</div></div><div class="stk num">'+money(r.stake)+'</div>';
         var btn=document.createElement("button"); btn.className="btn btn-ghost"; btn.style.marginLeft="8px"; btn.textContent=t("join");
-        btn.addEventListener("click",function(){ tryMatch(r.stake); });
+        btn.addEventListener("click",function(){ tryMatch(r.stake, r.code); });
         row.appendChild(btn); rc.appendChild(row);
       });
     }
@@ -1387,7 +1392,7 @@
   function copyText(txt,msg){ if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(txt).then(function(){toast(msg);}).catch(function(){fallbackCopy(txt);}); } else fallbackCopy(txt); }
   function stepper(active){ var h=""; for(var i=0;i<3;i++){ h+='<span class="sdot '+(i<=active?"on":"")+'">'+(i+1)+'</span>'; if(i<2) h+='<span class="sline"></span>'; } return '<div class="steps-row">'+h+'</div>'; }
 
-  function tryMatch(stake){
+  function tryMatch(stake, code){
     $("playErr").textContent="";
     stake=Math.round(stake*100)/100;
     if(!stake||stake<1){ navigate("play"); $("playErr").textContent=t("err_min_w"); return; }
@@ -1395,7 +1400,7 @@
     debit(stake);
     state.tx.unshift({ty:"out",k:"tx_stake",amt:-stake,meta:t("mode"+state.playMode+"_t"),ts:Date.now()});
     save(); renderBal(); renderTx();
-    MATCH={ stake:stake, pot:Math.round(stake*seatsFor(state.playMode)*100)/100, seats:seatsFor(state.playMode), mode:state.playMode, status:"waiting", code:genCode(), opp:null, won:false, proof:false, deadline:Date.now()+600000 };
+    MATCH={ stake:stake, pot:Math.round(stake*seatsFor(state.playMode)*100)/100, seats:seatsFor(state.playMode), mode:state.playMode, status:"waiting", code:(code||genCode()), opp:null, won:false, proof:false, deadline:Date.now()+600000 };
     $("matchOv").hidden=false; renderRoom(); startWaitTimer();
     setTimeout(function(){ if(MATCH&&MATCH.status==="waiting"){ clearWait(); MATCH.opp=ROOMS[Math.floor(Math.random()*ROOMS.length)].name; MATCH.status="room"; renderRoom(); } }, 4000+Math.random()*4000);
   }
@@ -1536,7 +1541,12 @@
   $("wdBtn").addEventListener("click",doWithdraw);
   $("wdMax").addEventListener("click",function(){ $("wdAmt").value=Math.round(total()*100)/100; $("wdErr").textContent=""; });
   $("playAmt").addEventListener("input",updatePayout);
-  $("findBtn").addEventListener("click",function(){ tryMatch(parseFloat($("playAmt").value)); });
+  $("findBtn").addEventListener("click",function(){
+    var code=(($("playCode")||{}).value||"").replace(/[^A-Za-z0-9]/g,"").trim();
+    if(code.length<4){ $("playErr").textContent=t("err_rc"); return; }
+    tryMatch(parseFloat($("playAmt").value), code);
+    var pc=$("playCode"); if(pc) pc.value="";
+  });
   $("simBtn").addEventListener("click",doSimRef);
   $("rCopy").addEventListener("click",doCopy);
   $("balPill").addEventListener("click",function(){ navigate("wallet"); });

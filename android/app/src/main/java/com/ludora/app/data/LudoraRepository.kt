@@ -53,7 +53,7 @@ class LudoraRepository(
     suspend fun openMatches(): List<Match> = api.openMatches()
     suspend fun recentResults(): List<MatchResult> = api.recentResults()
     suspend fun matchHistory(): List<MatchResult> = api.matchHistory()
-    suspend fun createMatch(mode: Int, stake: Double): Match = api.createMatch(CreateMatchRequest(mode, stake))
+    suspend fun createMatch(mode: Int, stake: Double, roomCode: String): Match = api.createMatch(CreateMatchRequest(mode, stake, roomCode))
     suspend fun joinMatch(id: String): JoinResponse = api.joinMatch(id)
     suspend fun reportResult(id: String, result: String, proofUrl: String? = null): OpResult =
         api.reportResult(id, ReportResultRequest(result, proofUrl))

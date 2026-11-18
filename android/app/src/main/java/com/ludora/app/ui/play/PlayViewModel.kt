@@ -36,9 +36,9 @@ class PlayViewModel : ViewModel() {
         }
     }
 
-    fun create(mode: Int, stake: Double, onCreated: (Match) -> Unit, onError: (String) -> Unit) {
+    fun create(mode: Int, stake: Double, roomCode: String, onCreated: (Match) -> Unit, onError: (String) -> Unit) {
         viewModelScope.launch {
-            runCatching { repo.createMatch(mode, stake) }
+            runCatching { repo.createMatch(mode, stake, roomCode) }
                 .onSuccess(onCreated)
                 .onFailure { onError(it.message ?: "Could not create match.") }
         }

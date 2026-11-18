@@ -26,7 +26,11 @@ const en: Record<string, string> = {
   room_code: "Ludo King room code", i_won: "I won", i_lost: "I lost", report: "Report your result",
   players: "players", joined: "joined", ok: "OK",
   waiting_players: "Waiting for players",
-  waiting_hint: "The room code appears once every seat is filled. Your spot is held.",
+  waiting_hint: "Your spot is held. The match starts once everyone joins the room.",
+  rc_label: "Ludo King room code",
+  rc_ph: "Paste room code",
+  rc_hint: "Open Ludo King, create a private room, and paste its code. Opponents see it after they join and pay.",
+  rc_open: "Open Ludo King and join this room code to play.",
 };
 
 const hi: Record<string, string> = {
@@ -55,7 +59,11 @@ const hi: Record<string, string> = {
   room_code: "लूडो किंग रूम कोड", i_won: "मैं जीता", i_lost: "मैं हारा", report: "अपना नतीजा दर्ज करें",
   players: "खिलाड़ी", joined: "जॉइन", ok: "ठीक है",
   waiting_players: "खिलाड़ियों का इंतज़ार",
-  waiting_hint: "सभी सीटें भरते ही रूम कोड दिखेगा। आपकी सीट सुरक्षित है।",
+  waiting_hint: "आपकी सीट सुरक्षित है। सभी के रूम में जुड़ते ही मैच शुरू होगा।",
+  rc_label: "लूडो किंग रूम कोड",
+  rc_ph: "रूम कोड पेस्ट करें",
+  rc_hint: "लूडो किंग खोलें, प्राइवेट रूम बनाएं और उसका कोड पेस्ट करें। जॉइन और भुगतान के बाद प्रतिद्वंद्वी इसे देखेंगे।",
+  rc_open: "खेलने के लिए लूडो किंग खोलें और इस रूम कोड से जॉइन करें।",
 };
 
 export const dict: Record<Lang, Record<string, string>> = { en, hi };

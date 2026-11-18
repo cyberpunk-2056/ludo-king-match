@@ -65,7 +65,7 @@ export const api = {
   liveMatches: () => request<Match[]>("/api/matches/live"),
   openMatches: () => request<Match[]>("/api/matches/open"),
   recentResults: () => request<MatchResult[]>("/api/matches/recent"),
-  createMatch: (b: { mode: number; stake: number }) => request<Match>("/api/matches", { method: "POST", body: JSON.stringify(b) }),
+  createMatch: (b: { mode: number; stake: number; roomCode: string }) => request<Match>("/api/matches", { method: "POST", body: JSON.stringify(b) }),
   joinMatch: (id: string) => request<JoinResult>(`/api/matches/${id}/join`, { method: "POST" }),
   reportResult: (id: string, b: { result: string; proofUrl?: string }) =>
     request<{ status: string }>(`/api/matches/${id}/result`, { method: "POST", body: JSON.stringify(b) }),

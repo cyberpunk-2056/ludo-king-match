@@ -18,6 +18,7 @@ export default function Play() {
   const [recent, setRecent] = useState<MatchResult[]>([]);
   const [mode, setMode] = useState(1);
   const [stake, setStake] = useState("20");
+  const [code, setCode] = useState("");
   const [busy, setBusy] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
   const [note, setNote] = useState<string | null>(null);
@@ -37,8 +38,9 @@ export default function Play() {
   async function create() {
     setNote(null); setBusy(true);
     try {
-      const m = await api.createMatch({ mode, stake: s });
-      setRoom({ id: m.id, code: m.room_code || "", opp: "", status: m.status ?? "waiting", joined: m.playersJoined ?? 1, seats: m.seats || seats });
+      const m = await api.createMatch({ mode, stake: s, roomCode: code.trim() });
+      setRoom({ id: m.id, code: m.room_code || code.trim(), opp: "", status: m.status ?? "waiting", joined: m.playersJoined ?? 1, seats: m.seats || seats });
+      setCode("");
       load();
     } catch (e: any) { setNote(e.message); } finally { setBusy(false); }
   }
@@ -76,6 +78,13 @@ export default function Play() {
         <Label>{t("amount")}</Label>
         <TextInput value={stake} onChangeText={(v) => setStake(v.replace(/[^0-9.]/g, ""))} keyboardType="numeric"
           style={{ backgroundColor: colors.bg2, borderColor: colors.line, borderWidth: 1, borderRadius: 12, padding: 12, color: colors.fg, fontSize: 16, fontWeight: "700", marginTop: 6 }} />
+        <View style={{ marginTop: 12 }}>
+          <Label>{t("rc_label")}</Label>
+          <TextInput value={code} onChangeText={(v) => setCode(v.replace(/[^A-Za-z0-9]/g, ""))} placeholder={t("rc_ph")}
+            placeholderTextColor={colors.muted} autoCapitalize="characters" maxLength={20}
+            style={{ backgroundColor: colors.bg2, borderColor: colors.line, borderWidth: 1, borderRadius: 12, padding: 12, color: colors.fg, fontSize: 16, fontWeight: "700", letterSpacing: 2, marginTop: 6 }} />
+          <Text style={{ color: colors.muted, fontSize: 12, marginTop: 6 }}>{t("rc_hint")}</Text>
+        </View>
         <Text style={{ color: colors.muted, fontSize: 12, marginTop: 8 }}>
           {seats} × {money(s)} {t("entry")} = {money(pot)} {t("prize_pot").toLowerCase()}
         </Text>
@@ -85,7 +94,7 @@ export default function Play() {
           <Tile k={t("fee_5")} v={money(Math.round(pot * 5) / 100)} />
         </View>
         {note && <Text style={{ color: colors.fgDim, marginTop: 10 }}>{note}</Text>}
-        <Btn title={t("find_match")} onPress={create} disabled={busy || s < 1} style={{ marginTop: 14 }} />
+        <Btn title={t("find_match")} onPress={create} disabled={busy || s < 1 || code.trim().length < 4} style={{ marginTop: 14 }} />
       </Card>
 
       <Section title={t("live_matches")} empty={live.length === 0} emptyText={t("none")}>
@@ -106,23 +115,23 @@ export default function Play() {
       <Modal visible={!!room} transparent animationType="slide" onRequestClose={() => setRoom(null)}>
         <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "center", padding: 24 }}>
           <Card>
+            <Text style={{ color: colors.fg, fontWeight: "800", fontSize: 20, textAlign: "center" }}>{t("room_code")}</Text>
+            <Text style={{ color: colors.violet, fontWeight: "800", fontSize: 32, textAlign: "center", letterSpacing: 4, marginVertical: 10 }}>{room?.code || "—"}</Text>
+            <Text style={{ color: colors.fgDim, textAlign: "center", fontSize: 13 }}>{t("rc_open")}</Text>
             {isLive ? (
-              <>
-                <Text style={{ color: colors.fg, fontWeight: "800", fontSize: 20, textAlign: "center" }}>{t("room_code")}</Text>
-                <Text style={{ color: colors.violet, fontWeight: "800", fontSize: 30, textAlign: "center", letterSpacing: 4, marginVertical: 10 }}>{room?.code}</Text>
-                <Text style={{ color: colors.fgDim, textAlign: "center", marginBottom: 14 }}>{t("report")}</Text>
+              <View style={{ marginTop: 16 }}>
+                <Text style={{ color: colors.fgDim, textAlign: "center", marginBottom: 12 }}>{t("report")}</Text>
                 <View style={{ flexDirection: "row", gap: 10 }}>
                   <Btn title={t("i_won")} variant="green" onPress={() => report("win")} style={{ flex: 1 }} />
                   <Btn title={t("i_lost")} variant="ghost" onPress={() => report("lose")} style={{ flex: 1 }} />
                 </View>
-              </>
+              </View>
             ) : (
-              <>
-                <Text style={{ color: colors.fg, fontWeight: "800", fontSize: 20, textAlign: "center" }}>{t("waiting_players")}</Text>
-                <Text style={{ color: colors.violet, fontWeight: "800", fontSize: 30, textAlign: "center", marginVertical: 10 }}>{room?.joined}/{room?.seats}</Text>
-                <Text style={{ color: colors.fgDim, textAlign: "center", marginBottom: 14 }}>{t("waiting_hint")}</Text>
+              <View style={{ marginTop: 16 }}>
+                <Text style={{ color: colors.fg, fontWeight: "700", textAlign: "center" }}>{t("waiting_players")} · {room?.joined}/{room?.seats}</Text>
+                <Text style={{ color: colors.fgDim, textAlign: "center", marginTop: 6, marginBottom: 14 }}>{t("waiting_hint")}</Text>
                 <Btn title={t("ok")} variant="ghost" onPress={() => setRoom(null)} />
-              </>
+              </View>
             )}
           </Card>
         </View>

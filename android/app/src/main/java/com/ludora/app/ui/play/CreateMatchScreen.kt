@@ -30,6 +30,7 @@ fun CreateMatchScreen(nav: NavController, vm: PlayViewModel = viewModel()) {
 
     var mode by remember { mutableStateOf(1) }
     var stakeText by remember { mutableStateOf("20") }
+    var roomCode by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
     var working by remember { mutableStateOf(false) }
 
@@ -62,6 +63,15 @@ fun CreateMatchScreen(nav: NavController, vm: PlayViewModel = viewModel()) {
                 prefix = { Text("₹", color = c.muted) },
                 colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = c.violet, unfocusedBorderColor = c.line, focusedTextColor = c.fg, unfocusedTextColor = c.fg)
             )
+            Spacer(Modifier.height(10.dp))
+            Text(t["rc_label"]!!, color = c.muted, fontWeight = FontWeight.Bold, fontSize = 11.sp)
+            OutlinedTextField(
+                value = roomCode, onValueChange = { roomCode = it.filter { ch -> ch.isLetterOrDigit() }.take(20) },
+                singleLine = true, modifier = Modifier.fillMaxWidth(),
+                placeholder = { Text(t["rc_ph"]!!, color = c.muted) },
+                colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = c.violet, unfocusedBorderColor = c.line, focusedTextColor = c.fg, unfocusedTextColor = c.fg)
+            )
+            Text(t["rc_hint"]!!, color = c.muted, fontSize = 12.sp)
             Spacer(Modifier.height(14.dp))
             Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
                 StatTile(t["prize_pot"]!!, Money.format(pot), c.fg, Modifier.weight(1f))
@@ -71,9 +81,9 @@ fun CreateMatchScreen(nav: NavController, vm: PlayViewModel = viewModel()) {
             error?.let { Spacer(Modifier.height(10.dp)); Text(it, color = c.red, fontSize = 13.sp) }
             Spacer(Modifier.height(14.dp))
             if (working) CircularProgressIndicator(color = c.violet)
-            else GradientButton(t["find_match"]!!, Modifier.fillMaxWidth(), enabled = stake >= 1.0) {
+            else GradientButton(t["find_match"]!!, Modifier.fillMaxWidth(), enabled = stake >= 1.0 && roomCode.trim().length >= 4) {
                 working = true; error = null
-                vm.create(mode, stake, onCreated = {
+                vm.create(mode, stake, roomCode.trim(), onCreated = {
                     working = false
                     nav.popBackStack()   // in a full build this opens the match-room / room-code screen
                 }, onError = { working = false; error = it })

@@ -107,7 +107,7 @@ data class MatchResult(
 )
 
 @Serializable
-data class CreateMatchRequest(val mode: Int, val stake: Double)
+data class CreateMatchRequest(val mode: Int, val stake: Double, val roomCode: String)
 
 @Serializable
 data class JoinResponse(

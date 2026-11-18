@@ -6,10 +6,6 @@ import { Money } from "../money.js";
 
 export const matchRoutes = Router();
 
-function roomCode(): string {
-  return Math.floor(10000000 + Math.random() * 90000000).toString();
-}
-
 async function debitStake(client: any, userId: string, stake: number, note: string) {
   const w = await client.query("select deposit, winnings from wallets where user_id = $1 for update", [userId]);
   const row = w.rows[0];
@@ -29,13 +25,20 @@ async function playerCount(client: any, matchId: string): Promise<number> {
   return r.rows[0]?.n ?? 0;
 }
 
-const createSchema = z.object({ mode: z.number().int(), stake: z.number().positive() });
+const createSchema = z.object({
+  mode: z.number().int(),
+  stake: z.number().positive(),
+  // the creator makes a private room in Ludo King and pastes its code here
+  roomCode: z.string().trim().min(4).max(20),
+});
 
-// Create a match: hold the creator's stake in escrow and open a 10-minute join window.
-// A match waits until every seat is filled (2 for 1v1, 4 for 4-player) before going live.
+// Create a match: hold the creator's stake in escrow, store the creator's Ludo King
+// room code, and open a 10-minute join window. The match waits until every seat is
+// filled (2 for 1v1, 4 for 4-player) before going live. The room code is revealed to
+// each opponent only when they join and pay the entry fee.
 matchRoutes.post("/matches", requireAuth, async (req: AuthedRequest, res) => {
   const parsed = createSchema.safeParse(req.body);
-  if (!parsed.success) return res.status(400).json({ message: "Invalid match" });
+  if (!parsed.success) return res.status(400).json({ message: "Enter a valid Ludo King room code" });
   const stake = Money.round2(parsed.data.stake);
   const seats = Money.seatsForMode(parsed.data.mode);
   const deadline = new Date(Date.now() + Money.JOIN_WINDOW_MS);
@@ -44,9 +47,9 @@ matchRoutes.post("/matches", requireAuth, async (req: AuthedRequest, res) => {
     const match = await withTransaction(async (c) => {
       await debitStake(c, req.userId!, stake, "match created");
       const m = await c.query(
-        `insert into matches (mode, seats, stake, player_a, status, join_deadline)
-         values ($1,$2,$3,$4,'waiting',$5) returning *`,
-        [parsed.data.mode, seats, stake, req.userId, deadline]
+        `insert into matches (mode, seats, stake, player_a, status, join_deadline, room_code)
+         values ($1,$2,$3,$4,'waiting',$5,$6) returning *`,
+        [parsed.data.mode, seats, stake, req.userId, deadline, parsed.data.roomCode]
       );
       await c.query("insert into match_players (match_id, user_id, stake) values ($1,$2,$3)",
         [m.rows[0].id, req.userId, stake]);
@@ -59,8 +62,9 @@ matchRoutes.post("/matches", requireAuth, async (req: AuthedRequest, res) => {
   }
 });
 
-// Join an open match: hold the joiner's stake and take a seat. When the last seat
-// fills, the match goes live and everyone gets the shared room code.
+// Join an open match: hold the joiner's stake and take a seat. The joiner gets the
+// creator's Ludo King room code straight away so they can enter the same room. When the
+// last seat fills, the match goes live.
 matchRoutes.post("/matches/:id/join", requireAuth, async (req: AuthedRequest, res) => {
   const out = await withTransaction(async (c) => {
     const m = await c.query("select * from matches where id = $1 for update", [req.params.id]);
@@ -78,21 +82,19 @@ matchRoutes.post("/matches/:id/join", requireAuth, async (req: AuthedRequest, re
 
     const joined = before + 1;
     const full = joined >= match.seats;
-    let code = match.room_code as string | null;
 
     if (full) {
-      code = roomCode();
       // keep player_b populated with the first opponent for legacy list/history views
       await c.query(
-        "update matches set status = 'live', room_code = $1, player_b = coalesce(player_b, $2) where id = $3",
-        [code, req.userId, match.id]
+        "update matches set status = 'live', player_b = coalesce(player_b, $1) where id = $2",
+        [req.userId, match.id]
       );
     }
 
     const creator = await c.query("select name from users where id = $1", [match.player_a]);
     return {
       status: full ? "live" : "waiting",
-      roomCode: full ? code : "",
+      roomCode: match.room_code ?? "",   // the creator's pasted Ludo King code
       opponent: creator.rows[0]?.name ?? "",
       playersJoined: joined,
       seats: match.seats,
