@@ -1,49 +1,34 @@
-import { useEffect, useState } from "react";
-import { ScrollView, Text, View, TextInput, Pressable, Modal } from "react-native";
+import { useCallback, useState } from "react";
+import { ScrollView, Text, View, Pressable, Modal } from "react-native";
+import { useRouter, useFocusEffect } from "expo-router";
 import { api, money, seatsForMode, type Match, type MatchResult } from "../../src/api";
 import { useApp } from "../../src/state";
-import { Btn, Card, Label, Tile } from "../../src/ui";
+import { Btn, Card } from "../../src/ui";
 
 type Room = { id: string; code: string; opp: string; status: string; joined: number; seats: number };
 
 // Tolerate an older backend that doesn't yet send seats/pot/playersJoined.
-const seatsOf = (m: { seats?: number; mode: number }) => m.seats && m.seats > 0 ? m.seats : seatsForMode(m.mode);
+const seatsOf = (m: { seats?: number; mode: number }) => (m.seats && m.seats > 0 ? m.seats : seatsForMode(m.mode));
 const potOf = (m: { pot?: number; stake: number; seats?: number; mode: number }) =>
   m.pot != null ? m.pot : Math.round(m.stake * seatsOf(m) * 100) / 100;
 
 export default function Play() {
   const { colors, t } = useApp();
+  const router = useRouter();
   const [live, setLive] = useState<Match[]>([]);
   const [open, setOpen] = useState<Match[]>([]);
   const [recent, setRecent] = useState<MatchResult[]>([]);
-  const [mode, setMode] = useState(1);
-  const [stake, setStake] = useState("20");
-  const [code, setCode] = useState("");
-  const [busy, setBusy] = useState(false);
   const [room, setRoom] = useState<Room | null>(null);
   const [note, setNote] = useState<string | null>(null);
 
-  async function load() {
-    try {
-      const [l, o, r] = await Promise.all([api.liveMatches(), api.openMatches(), api.recentResults()]);
-      setLive(l); setOpen(o); setRecent(r);
-    } catch {}
-  }
-  useEffect(() => { load(); }, []);
+  const load = useCallback(() => {
+    Promise.all([api.liveMatches(), api.openMatches(), api.recentResults()])
+      .then(([l, o, r]) => { setLive(l); setOpen(o); setRecent(r); })
+      .catch(() => {});
+  }, []);
+  // refresh whenever the tab regains focus (e.g. after creating a match)
+  useFocusEffect(useCallback(() => { load(); }, [load]));
 
-  const s = parseFloat(stake) || 0;
-  const seats = seatsForMode(mode);
-  const pot = Math.round(s * seats * 100) / 100;
-
-  async function create() {
-    setNote(null); setBusy(true);
-    try {
-      const m = await api.createMatch({ mode, stake: s, roomCode: code.trim() });
-      setRoom({ id: m.id, code: m.room_code || code.trim(), opp: "", status: m.status ?? "waiting", joined: m.playersJoined ?? 1, seats: m.seats || seats });
-      setCode("");
-      load();
-    } catch (e: any) { setNote(e.message); } finally { setBusy(false); }
-  }
   async function join(m: Match) {
     setNote(null);
     try {
@@ -61,50 +46,22 @@ export default function Play() {
   const isLive = room?.status === "live";
 
   return (
-    <ScrollView style={{ backgroundColor: colors.bg }} contentContainerStyle={{ padding: 16 }}>
-      <Text style={{ color: colors.fg, fontSize: 24, fontWeight: "800", marginBottom: 14 }}>{t("nav_play")}</Text>
+    <ScrollView style={{ backgroundColor: colors.bg }} contentContainerStyle={{ padding: 16, paddingBottom: 28 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16 }}>
+        <Text style={{ color: colors.fg, fontSize: 24, fontWeight: "900", textTransform: "uppercase", letterSpacing: 0.3, flex: 1 }}>{t("nav_play")}</Text>
+        <Btn title={`＋ ${t("create_match")}`} onPress={() => router.push("/create")} style={{ paddingHorizontal: 16, paddingVertical: 11 }} />
+      </View>
 
-      <Card>
-        <Label>{t("create_match")}</Label>
-        <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
-          {[1, 2].map((m) => (
-            <Pressable key={m} onPress={() => setMode(m)}
-              style={{ flex: 1, backgroundColor: colors.bg2, borderRadius: 12, padding: 12, borderWidth: 2, borderColor: mode === m ? colors.violet : "transparent" }}>
-              <Text style={{ color: colors.fg, fontWeight: "700" }}>{t(m === 1 ? "mode1" : "mode2")}</Text>
-              <Text style={{ color: colors.muted, fontSize: 11, marginTop: 2 }}>{seatsForMode(m)} {t("players")}</Text>
-            </Pressable>
-          ))}
-        </View>
-        <Label>{t("amount")}</Label>
-        <TextInput value={stake} onChangeText={(v) => setStake(v.replace(/[^0-9.]/g, ""))} keyboardType="numeric"
-          style={{ backgroundColor: colors.bg2, borderColor: colors.line, borderWidth: 1, borderRadius: 12, padding: 12, color: colors.fg, fontSize: 16, fontWeight: "700", marginTop: 6 }} />
-        <View style={{ marginTop: 12 }}>
-          <Label>{t("rc_label")}</Label>
-          <TextInput value={code} onChangeText={(v) => setCode(v.replace(/[^A-Za-z0-9]/g, ""))} placeholder={t("rc_ph")}
-            placeholderTextColor={colors.muted} autoCapitalize="characters" maxLength={20}
-            style={{ backgroundColor: colors.bg2, borderColor: colors.line, borderWidth: 1, borderRadius: 12, padding: 12, color: colors.fg, fontSize: 16, fontWeight: "700", letterSpacing: 2, marginTop: 6 }} />
-          <Text style={{ color: colors.muted, fontSize: 12, marginTop: 6 }}>{t("rc_hint")}</Text>
-        </View>
-        <Text style={{ color: colors.muted, fontSize: 12, marginTop: 8 }}>
-          {seats} × {money(s)} {t("entry")} = {money(pot)} {t("prize_pot").toLowerCase()}
-        </Text>
-        <View style={{ flexDirection: "row", gap: 10, marginTop: 10 }}>
-          <Tile k={t("prize_pot")} v={money(pot)} />
-          <Tile k={t("winner_95")} v={money(Math.round(pot * 95) / 100)} color={colors.green} />
-          <Tile k={t("fee_5")} v={money(Math.round(pot * 5) / 100)} />
-        </View>
-        {note && <Text style={{ color: colors.fgDim, marginTop: 10 }}>{note}</Text>}
-        <Btn title={t("find_match")} onPress={create} disabled={busy || s < 1 || code.trim().length < 4} style={{ marginTop: 14 }} />
-      </Card>
+      {note && <Text style={{ color: colors.red, marginBottom: 10 }}>{note}</Text>}
 
       <Section title={t("live_matches")} empty={live.length === 0} emptyText={t("none")}>
-        {live.map((m) => <Row key={m.id} title={`${m.playerA} vs ${m.playerB}`} sub={`${money(m.stake)} ${t("entry")} · ${seatsOf(m)} ${t("players")}`} right={money(potOf(m))} />)}
+        {live.map((m) => <Row key={m.id} title={`${m.playerA} vs ${m.playerB}`} sub={`${money(m.stake)} ${t("entry")} · ${seatsOf(m)} ${t("players")}`} right={money(potOf(m))} rightColor={colors.gold} />)}
       </Section>
 
       <Section title={t("open_to_join")} empty={open.length === 0} emptyText={t("none")}>
         {open.map((m) => (
-          <Row key={m.id} title={m.playerA} sub={`${money(m.stake)} ${t("entry")} · ${m.playersJoined ?? 1}/${seatsOf(m)} ${t("joined")} · ${money(potOf(m))} ${t("prize_pot").toLowerCase()}`}
-            action={<Btn title={t("join")} variant="ghost" onPress={() => join(m)} style={{ paddingHorizontal: 16 }} />} />
+          <Row key={m.id} title={m.playerA} sub={`${money(m.stake)} ${t("entry")} · ${m.playersJoined ?? 1}/${seatsOf(m)} ${t("joined")}`}
+            action={<Btn title={t("join")} variant="ghost" onPress={() => join(m)} style={{ paddingHorizontal: 16, paddingVertical: 10 }} />} />
         ))}
       </Section>
 
@@ -116,7 +73,7 @@ export default function Play() {
         <View style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.6)", justifyContent: "center", padding: 24 }}>
           <Card>
             <Text style={{ color: colors.fg, fontWeight: "800", fontSize: 20, textAlign: "center" }}>{t("room_code")}</Text>
-            <Text style={{ color: colors.violet, fontWeight: "800", fontSize: 32, textAlign: "center", letterSpacing: 4, marginVertical: 10 }}>{room?.code || "—"}</Text>
+            <Text style={{ color: colors.gold, fontWeight: "800", fontSize: 32, textAlign: "center", letterSpacing: 4, marginVertical: 10 }}>{room?.code || "—"}</Text>
             <Text style={{ color: colors.fgDim, textAlign: "center", fontSize: 13 }}>{t("rc_open")}</Text>
             {isLive ? (
               <View style={{ marginTop: 16 }}>
@@ -144,8 +101,8 @@ function Section({ title, empty, emptyText, children }: { title: string; empty: 
   const { colors } = useApp();
   return (
     <View>
-      <Text style={{ color: colors.fg, fontSize: 17, fontWeight: "700", marginTop: 20, marginBottom: 10 }}>{title}</Text>
-      {empty ? <Text style={{ color: colors.fgDim }}>{emptyText}</Text> : children}
+      <Text style={{ color: colors.fg, fontSize: 16, fontWeight: "800", marginTop: 18, marginBottom: 10, textTransform: "uppercase", letterSpacing: 0.4 }}>{title}</Text>
+      {empty ? <Text style={{ color: colors.fgDim, marginBottom: 4 }}>{emptyText}</Text> : children}
     </View>
   );
 }
@@ -154,11 +111,11 @@ function Row({ title, sub, right, rightColor, action }: { title: string; sub: st
   const { colors } = useApp();
   return (
     <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: colors.surface, borderColor: colors.line, borderWidth: 1, borderRadius: 14, padding: 14, marginBottom: 10 }}>
-      <View style={{ flex: 1 }}>
-        <Text style={{ color: colors.fg, fontWeight: "800", fontSize: 14 }}>{title}</Text>
-        <Text style={{ color: colors.muted, fontSize: 12, marginTop: 2 }}>{sub}</Text>
+      <View style={{ flex: 1, minWidth: 0 }}>
+        <Text style={{ color: colors.fg, fontWeight: "800", fontSize: 14 }} numberOfLines={1}>{title}</Text>
+        <Text style={{ color: colors.muted, fontSize: 12, marginTop: 2 }} numberOfLines={1}>{sub}</Text>
       </View>
-      {right && <Text style={{ color: rightColor ?? colors.violet, fontWeight: "800" }}>{right}</Text>}
+      {right && <Text style={{ color: rightColor ?? colors.violet, fontWeight: "800", marginLeft: 10 }}>{right}</Text>}
       {action}
     </View>
   );

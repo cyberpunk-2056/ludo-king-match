@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Animated, Easing, Pressable, Text, TextInput, View, ViewStyle } from "react-native";
+import { ActivityIndicator, Animated, Easing, Pressable, Text, TextInput, View, ViewStyle, TextStyle } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { gradient, greenGradient, goldGradient } from "./theme";
 import { useApp } from "./state";
@@ -54,9 +54,9 @@ export function Field({ label, value, onChangeText, secure, keyboardType }: {
   );
 }
 
-export function Label({ children }: { children: React.ReactNode }) {
+export function Label({ children, style }: { children: React.ReactNode; style?: TextStyle }) {
   const { colors } = useApp();
-  return <Text style={{ color: colors.muted, fontSize: 11, fontWeight: "800", textTransform: "uppercase", letterSpacing: 0.6 }}>{children}</Text>;
+  return <Text style={[{ color: colors.muted, fontSize: 11, fontWeight: "800", textTransform: "uppercase", letterSpacing: 0.6 }, style]}>{children}</Text>;
 }
 
 export function Tile({ k, v, color }: { k: string; v: string; color?: string }) {
@@ -121,6 +121,54 @@ export function Loading({ text }: { text?: string }) {
     <View style={{ flex: 1, backgroundColor: colors.bg, alignItems: "center", justifyContent: "center", gap: 18 }}>
       <DiceRoll />
       <Text style={{ color: colors.fgDim, fontSize: 14, fontWeight: "700" }}>{text ?? t("loading")}</Text>
+    </View>
+  );
+}
+
+/* ---------------- Winners ticker (auto-scrolling marquee) ---------------- */
+const WINNERS = [
+  { name: "RollRoyce", amt: "₹950" }, { name: "Nova_Dice", amt: "₹380" },
+  { name: "KashFlow", amt: "₹190" }, { name: "SixOnSix", amt: "₹1,900" },
+  { name: "Arjun_92", amt: "₹760" }, { name: "MiraPlays", amt: "₹95" },
+];
+
+export function WinnersTicker() {
+  const { colors } = useApp();
+  const x = useRef(new Animated.Value(0)).current;
+  const [w, setW] = useState(0);
+
+  useEffect(() => {
+    if (w <= 0) return;
+    x.setValue(0);
+    const anim = Animated.loop(
+      Animated.timing(x, { toValue: -w, duration: Math.max(6000, w * 16), easing: Easing.linear, useNativeDriver: true })
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [w]);
+
+  const Strip = ({ measure }: { measure?: boolean }) => (
+    <View style={{ flexDirection: "row" }} onLayout={measure ? (e) => setW(e.nativeEvent.layout.width) : undefined}>
+      {WINNERS.map((it, i) => (
+        <View key={i} style={{ flexDirection: "row", alignItems: "center", marginRight: 22 }}>
+          <Text style={{ color: colors.fgDim, fontSize: 12.5, fontWeight: "600" }}>🏆 <Text style={{ color: colors.fg, fontWeight: "800" }}>{it.name}</Text> won </Text>
+          <Text style={{ color: colors.green, fontSize: 12.5, fontWeight: "800" }}>{it.amt}</Text>
+        </View>
+      ))}
+    </View>
+  );
+
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: colors.surface, borderColor: colors.line, borderWidth: 1, borderRadius: 13, overflow: "hidden" }}>
+      <View style={{ backgroundColor: colors.gold, paddingVertical: 10, paddingHorizontal: 12, flexDirection: "row", alignItems: "center" }}>
+        <Text style={{ color: "#211603", fontWeight: "900", fontSize: 11, textTransform: "uppercase", letterSpacing: 0.5 }}>🏆</Text>
+      </View>
+      <View style={{ flex: 1, overflow: "hidden", paddingVertical: 10 }}>
+        <Animated.View style={{ flexDirection: "row", transform: [{ translateX: x }], paddingLeft: 14 }}>
+          <Strip measure />
+          <Strip />
+        </Animated.View>
+      </View>
     </View>
   );
 }

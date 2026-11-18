@@ -29,10 +29,12 @@ export default function RootLayout() {
           <Stack.Screen name="index" />
           <Stack.Screen name="auth" />
           <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="create" options={{ presentation: "card" }} />
           <Stack.Screen name="deposit" options={{ presentation: "card" }} />
           <Stack.Screen name="withdraw" options={{ presentation: "card" }} />
           <Stack.Screen name="refer" options={{ presentation: "card" }} />
           <Stack.Screen name="support" options={{ presentation: "card" }} />
+          <Stack.Screen name="rules" options={{ presentation: "card" }} />
         </Stack>
       </AppProvider>
     </SafeAreaProvider>

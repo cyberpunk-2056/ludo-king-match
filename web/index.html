@@ -748,7 +748,7 @@
         <div class="label" data-t="play_rc">Ludo King room code</div>
         <div class="amt-box"><input id="playCode" type="text" maxlength="20" autocomplete="off" placeholder="Paste room code" style="letter-spacing:2px;font-family:var(--font-display)"></div>
         <p class="muted" id="playRcHint" data-t="play_rc_hint" style="font-size:12.5px;margin-top:6px">Create a private room in Ludo King and paste its code. Opponents see it when they join.</p>
-        <div class="payout-tiles">
+        <div class="payout-tiles" hidden>
           <div class="pt"><div class="pt-k" data-t="pp_pot">Prize pot</div><div class="pt-v num" id="ppPot">₹40.00</div></div>
           <div class="pt win"><div class="pt-k" data-t="pp_win">Winner gets 95%</div><div class="pt-v num" id="ppWin">₹38.00</div></div>
           <div class="pt"><div class="pt-k" data-t="pp_comm">Platform fee 5%</div><div class="pt-v num" id="ppComm">₹2.00</div></div>
@@ -1571,8 +1571,11 @@
     build(RULES,$("rulesBody"),"list"); build(FAIR,$("fairBody"),"body");
   }
   function updatePayout(){
+    // prize-pot breakdown is hidden; keep the tiles in sync if present
     var s=parseFloat($("playAmt").value)||0, seats=seatsFor(state.playMode), pot=Math.round(s*seats*100)/100, comm=Math.round(pot*5)/100, win=Math.round(pot*95)/100;
-    $("ppPot").textContent=money(pot); $("ppWin").textContent=money(win); $("ppComm").textContent=money(comm);
+    if($("ppPot")) $("ppPot").textContent=money(pot);
+    if($("ppWin")) $("ppWin").textContent=money(win);
+    if($("ppComm")) $("ppComm").textContent=money(comm);
     syncChips("playAmt","playChips");
   }
 

@@ -2,7 +2,7 @@ import { ScrollView, Text, View } from "react-native";
 import { useRouter } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import { useApp } from "../../src/state";
-import { Btn, Board, Card } from "../../src/ui";
+import { Btn, Board, Card, WinnersTicker } from "../../src/ui";
 
 const LEADERS = [
   { r: 1, name: "RollRoyce", rating: "1,920", won: "₹48,200" },
@@ -35,6 +35,9 @@ export default function Home() {
           <Trust icon="🏆" label={t("trust3")} c={colors.fgDim} />
         </View>
       </Card>
+
+      {/* recent winners ticker */}
+      <View style={{ marginTop: 14 }}><WinnersTicker /></View>
 
       {/* season stats */}
       <View style={{ flexDirection: "row", gap: 12, marginTop: 16 }}>
