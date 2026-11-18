@@ -94,6 +94,16 @@ export function DiceFace({ size = 64, face = 5, bg = "#fff", pip = "#10182b" }: 
   );
 }
 
+/** A Ludo token (goti): a ball on a rounded base. Decorative. */
+export function Goti({ size = 28, color = "#FF5B6E" }: { size?: number; color?: string }) {
+  return (
+    <View style={{ alignItems: "center" }}>
+      <View style={{ width: size * 0.62, height: size * 0.62, borderRadius: size * 0.31, backgroundColor: color }} />
+      <View style={{ width: size, height: size * 0.34, borderRadius: size * 0.17, backgroundColor: color, marginTop: -size * 0.12 }} />
+    </View>
+  );
+}
+
 /** Animated rolling die: spins and cycles faces. Used as the loading indicator. */
 export function DiceRoll({ size = 72 }: { size?: number }) {
   const spin = useRef(new Animated.Value(0)).current;
