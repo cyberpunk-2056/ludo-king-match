@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Animated, Easing, Pressable, Text, TextInput, View, ViewStyle, TextStyle } from "react-native";
+import { ActivityIndicator, Animated, Dimensions, Easing, Pressable, Text, TextInput, View, ViewStyle, TextStyle } from "react-native";
+import Svg, { Rect, Circle, Polygon } from "react-native-svg";
 import { LinearGradient } from "expo-linear-gradient";
 import { gradient, greenGradient, goldGradient } from "./theme";
 import { useApp } from "./state";
@@ -183,23 +184,80 @@ export function WinnersTicker() {
   );
 }
 
-/* ---------------- Ludo board (original, generic) ---------------- */
-export function Board() {
+/* ---------------- Ludo board (matches the website SVG, with live play) ---------------- */
+const ACircle = Animated.createAnimatedComponent(Circle);
+const R_ = "#FF5A6A", G_ = "#32D583", B_ = "#4B9BFF", Y_ = "#FFC94D";
+// the 16 home tokens, exactly as the website lays them out
+const HOME: [number, number, string][] = [
+  [60,60,R_],[92,60,R_],[60,92,R_],[92,92,R_],
+  [228,60,G_],[260,60,G_],[228,92,G_],[260,92,G_],
+  [60,228,B_],[92,228,B_],[60,260,B_],[92,260,B_],
+  [228,228,Y_],[260,228,Y_],[228,260,Y_],[260,260,Y_],
+];
+// a piece of each colour advances along its arm toward the centre, then the next starts
+const TOKENS: { color: string; fx: number; fy: number; tx: number; ty: number }[] = [
+  { color: R_, fx: 40, fy: 160, tx: 128, ty: 160 },
+  { color: G_, fx: 160, fy: 40, tx: 160, ty: 128 },
+  { color: Y_, fx: 280, fy: 160, tx: 192, ty: 160 },
+  { color: B_, fx: 160, fy: 280, tx: 160, ty: 192 },
+];
+
+export function Board({ size }: { size?: number }) {
   const { colors } = useApp();
-  const sq = (bg: string) => ({ flex: 1, margin: 3, borderRadius: 12, backgroundColor: bg });
+  const dim = size ?? Math.min(280, Dimensions.get("window").width - 80);
+  const boardBg = colors.isDark ? "#0B1020" : "#EEF2FB";
+  const line = colors.isDark ? "rgba(130,160,230,0.22)" : "rgba(18,28,56,0.16)";
+  const progress = useRef(TOKENS.map(() => new Animated.Value(0))).current;
+
+  useEffect(() => {
+    const loops = progress.map((v, i) =>
+      Animated.loop(Animated.sequence([
+        Animated.delay(i * 480),
+        Animated.timing(v, { toValue: 1, duration: 2400, easing: Easing.inOut(Easing.quad), useNativeDriver: false }),
+        Animated.timing(v, { toValue: 0, duration: 1, useNativeDriver: false }),
+        Animated.delay(900),
+      ]))
+    );
+    loops.forEach((l) => l.start());
+    return () => loops.forEach((l) => l.stop());
+  }, []);
+
   return (
-    <View style={{ aspectRatio: 1, width: "64%", alignSelf: "center", backgroundColor: colors.surface2, borderRadius: 20, padding: 8, marginVertical: 16, borderColor: colors.line, borderWidth: 1 }}>
-      <View style={{ flex: 1, flexDirection: "row" }}>
-        <View style={sq("#FF5A6A")} /><View style={sq(colors.surface)} /><View style={sq("#32D583")} />
-      </View>
-      <View style={{ flex: 1, flexDirection: "row" }}>
-        <View style={sq(colors.surface)} />
-        <View style={{ flex: 1, margin: 3, alignItems: "center", justifyContent: "center" }}><DiceFace size={30} face={5} /></View>
-        <View style={sq(colors.surface)} />
-      </View>
-      <View style={{ flex: 1, flexDirection: "row" }}>
-        <View style={sq("#4B9BFF")} /><View style={sq(colors.surface)} /><View style={sq("#FFC94D")} />
-      </View>
+    <View style={{ alignSelf: "center", marginVertical: 16 }}>
+      <Svg width={dim} height={dim} viewBox="0 0 320 320">
+        <Rect x={2} y={2} width={316} height={316} rx={26} fill={boardBg} stroke={line} strokeWidth={2} />
+        {/* colour homes */}
+        <Rect x={16} y={16} width={120} height={120} rx={18} fill={R_} />
+        <Rect x={184} y={16} width={120} height={120} rx={18} fill={G_} />
+        <Rect x={16} y={184} width={120} height={120} rx={18} fill={B_} />
+        <Rect x={184} y={184} width={120} height={120} rx={18} fill={Y_} />
+        <Rect x={38} y={38} width={76} height={76} rx={14} fill={boardBg} />
+        <Rect x={206} y={38} width={76} height={76} rx={14} fill={boardBg} />
+        <Rect x={38} y={206} width={76} height={76} rx={14} fill={boardBg} />
+        <Rect x={206} y={206} width={76} height={76} rx={14} fill={boardBg} />
+        {HOME.map((d, i) => <Circle key={i} cx={d[0]} cy={d[1]} r={9} fill={d[2]} />)}
+        {/* coloured arms */}
+        <Rect x={146} y={20} width={28} height={112} rx={8} fill={G_} opacity={0.85} />
+        <Rect x={20} y={146} width={112} height={28} rx={8} fill={R_} opacity={0.85} />
+        <Rect x={188} y={146} width={112} height={28} rx={8} fill={Y_} opacity={0.85} />
+        <Rect x={146} y={188} width={28} height={112} rx={8} fill={B_} opacity={0.85} />
+        {/* centre diamond */}
+        <Polygon points="136,136 184,136 160,160" fill={G_} />
+        <Polygon points="184,136 184,184 160,160" fill={Y_} />
+        <Polygon points="184,184 136,184 160,160" fill={B_} />
+        <Polygon points="136,184 136,136 160,160" fill={R_} />
+        {/* animated pieces advancing toward home */}
+        {TOKENS.map((tk, i) => {
+          const p = progress[i];
+          const cx = p.interpolate({ inputRange: [0, 1], outputRange: [tk.fx, tk.tx] });
+          const cy = p.interpolate({ inputRange: [0, 1], outputRange: [tk.fy, tk.ty] });
+          const opacity = p.interpolate({ inputRange: [0, 0.12, 0.82, 1], outputRange: [0, 1, 1, 0] });
+          return (
+            <ACircle key={i} cx={cx as any} cy={cy as any} r={12} fill={tk.color} opacity={opacity as any}
+              stroke="#ffffff" strokeWidth={2} strokeOpacity={0.6} />
+          );
+        })}
+      </Svg>
     </View>
   );
 }
