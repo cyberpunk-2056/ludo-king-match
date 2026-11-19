@@ -1,5 +1,6 @@
 import "express-async-errors"; // makes async route rejections reach the error handler (Express 4)
 import express from "express";
+import bcrypt from "bcryptjs";
 import cors from "cors";
 import { createServer } from "node:http";
 import { Server as SocketServer } from "socket.io";
@@ -66,7 +67,17 @@ async function ensureSchema() {
   try {
     await pool.query(SCHEMA);
     if (env.adminEmails.length) {
-      await pool.query("update users set is_admin = true where lower(email) = any($1::text[])", [env.adminEmails]);
+      const promoted = await pool.query("update users set is_admin = true where lower(email) = any($1::text[]) returning email", [env.adminEmails]);
+      console.log(`Admin promotion: matched ${promoted.rowCount} account(s) for ${env.adminEmails.join(", ")}`);
+      // optionally (re)set the admin password so you always have known credentials
+      if (env.adminPassword) {
+        const hash = await bcrypt.hash(env.adminPassword, 10);
+        const reset = await pool.query(
+          "update users set is_admin = true, password_hash = $1 where lower(email) = any($2::text[]) returning email, phone",
+          [hash, env.adminEmails]
+        );
+        console.log(`Admin password set for ${reset.rowCount} account(s): ${reset.rows.map((r: any) => r.email + " / " + r.phone).join(", ")}`);
+      }
     }
     console.log("Schema ensured.");
   } catch (e) {

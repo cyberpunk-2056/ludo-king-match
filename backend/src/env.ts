@@ -21,4 +21,7 @@ export const env = {
     .split(",")
     .map((s) => s.trim().toLowerCase())
     .filter(Boolean),
+  // optional: on startup, set the password of every ADMIN_EMAILS account to this
+  // value and mark it admin (lets you set/reset known admin credentials).
+  adminPassword: process.env.ADMIN_PASSWORD ?? "",
 };
