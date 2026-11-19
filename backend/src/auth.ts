@@ -32,8 +32,13 @@ export async function requireAdmin(req: AuthedRequest, res: Response, next: Next
   if (!token) return res.status(401).json({ message: "Not authenticated" });
   try {
     const payload = jwt.verify(token, env.jwtSecret) as { sub: string };
-    const r = await query("select is_admin from users where id = $1", [payload.sub]);
-    if (!r.rows[0]?.is_admin) return res.status(403).json({ message: "Admins only" });
+    const r = await query("select is_admin, email from users where id = $1", [payload.sub]);
+    const u = r.rows[0];
+    // An account is admin if its DB flag is set OR its email is in ADMIN_EMAILS.
+    // Checking the env directly means admin access works immediately on login,
+    // without waiting for the startup promotion to run.
+    const byEmail = u?.email && env.adminEmails.includes(String(u.email).trim().toLowerCase());
+    if (!u || !(u.is_admin || byEmail)) return res.status(403).json({ message: "Admins only" });
     req.userId = payload.sub;
     next();
   } catch {
